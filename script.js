@@ -9,8 +9,8 @@ const useInteractiveCard = () => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const rotateX = (y - rect.height / 2) / 8;
-      const rotateY = (rect.width / 2 - x) / 8;
+      const rotateX = (y - rect.height / 2) / 10;
+      const rotateY = (rect.width / 2 - x) / 10;
       card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
       card.style.setProperty('--mouse-x', `${x}px`);
       card.style.setProperty('--mouse-y', `${y}px`);
@@ -48,6 +48,7 @@ const useAnimatedCounter = (target, duration = 2000) => {
     const [count, setCount] = useState(0);
     const ref = useRef(null);
     useEffect(() => {
+        const element = ref.current;
         const observer = new IntersectionObserver(([entry]) => {
             if (entry.isIntersecting) {
                 let start = 0;
@@ -58,17 +59,27 @@ const useAnimatedCounter = (target, duration = 2000) => {
                     const progress = Math.min((currentTime - startTime) / duration, 1);
                     const currentNum = Math.floor(progress * end);
                     setCount(currentNum);
-                    if (progress < 1) requestAnimationFrame(animate);
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
                 };
                 animate();
-                if(ref.current) observer.unobserve(ref.current);
+                if(element) observer.unobserve(element);
             }
         }, { threshold: 0.5 });
-        if (ref.current) observer.observe(ref.current);
-        return () => { if (observer && ref.current) observer.unobserve(ref.current); }
+
+        if (element) {
+            observer.observe(element);
+        }
+        return () => {
+            if (element) {
+                observer.unobserve(element);
+            }
+        }
     }, [target, duration]);
     return [ref, count];
 };
+
 
 const useActiveNav = (headerHeight) => {
     const [activeSection, setActiveSection] = useState('home');
@@ -90,16 +101,17 @@ const useActiveNav = (headerHeight) => {
 
 // --- Components ---
 const Logo = ({ onScrollTo }) => (
-    <svg 
+    <svg
         onClick={() => onScrollTo('home')}
-        className="h-8 w-auto cursor-pointer" 
-        viewBox="0 0 100 100" 
-        fill="none" 
+        className="h-8 w-auto cursor-pointer"
+        viewBox="0 0 100 100"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
     >
         <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
     </svg>
 );
+
 
 const DiscordCounter = () => {
     const [onlineCount, setOnlineCount] = useState(null);
@@ -108,7 +120,7 @@ const DiscordCounter = () => {
     useEffect(() => {
         const fetchCount = () => {
             const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://discord.com/api/guilds/${serverId}/widget.json`)}`;
-            
+
             fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok.');
@@ -116,7 +128,7 @@ const DiscordCounter = () => {
                 })
                 .then(data => {
                     const discordData = JSON.parse(data.contents);
-                    
+
                     if (discordData.code && discordData.message) {
                         setOnlineCount('N/A');
                     } else if (discordData.presence_count !== undefined) {
@@ -132,7 +144,7 @@ const DiscordCounter = () => {
         };
 
         fetchCount();
-        const interval = setInterval(fetchCount, 30000); 
+        const interval = setInterval(fetchCount, 30000);
 
         return () => clearInterval(interval);
     }, []);
@@ -175,20 +187,24 @@ const AuroraBackground = () => {
                     key={i}
                     ref={spotRefs.current[i]}
                     className="aurora-spot"
-                    style={{ top: spot.top, left: spot.left, width: spot.size, height: spot.size, opacity: 'var(--aurora-opacity, 0.1)' }}
+                    style={{ top: spot.top, left: spot.left, width: spot.size, height: spot.size }}
                 />
             ))}
         </div>
     );
 };
 
-const Modal = ({ children, onClose, animationClasses }) => {
+const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
     useEffect(() => {
         setIsAnimating(true);
         const handleEsc = e => e.key === 'Escape' && handleClose();
+        document.body.style.overflow = 'hidden';
         document.addEventListener('keydown', handleEsc);
-        return () => document.removeEventListener('keydown', handleEsc);
+        return () => {
+            document.body.style.overflow = 'auto';
+            document.removeEventListener('keydown', handleEsc);
+        };
     }, []);
 
     const handleClose = () => {
@@ -199,7 +215,7 @@ const Modal = ({ children, onClose, animationClasses }) => {
     return (
         <div onClick={handleClose} className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
              <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
-             <div onClick={e => e.stopPropagation()} className={`relative transition-all duration-300 ${isAnimating ? animationClasses.enterActive : animationClasses.exitActive}`}>
+             <div onClick={e => e.stopPropagation()} className={`relative transition-all duration-300 ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
                  {children(handleClose)}
              </div>
         </div>
@@ -223,11 +239,11 @@ const VideoModal = ({ videoUrls, onClose }) => {
     const handleNext = () => setCurrentIndex(prev => (prev === videoUrls.length - 1 ? 0 : prev + 1));
 
     return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100', exitActive: 'opacity-0'}}>
+        <Modal onClose={onClose}>
             {(handleClose) => (
                 <div className="w-screen h-screen flex items-center justify-center relative group">
                     <button onClick={handleClose} className="absolute top-6 right-6 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl hover:bg-black/80 transition-colors">×</button>
-                    
+
                     <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
@@ -296,7 +312,7 @@ const VideoModal = ({ videoUrls, onClose }) => {
 
 const GameFeaturesModal = ({ game, onClose }) => {
      return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+        <Modal onClose={onClose}>
             {(handleClose) => (
                  <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme">
                      <div className="p-4 border-b border-theme flex justify-between items-center">
@@ -373,7 +389,7 @@ const AIHelperModal = ({ onClose }) => {
     };
     const quickQuestions = ["What are the features for FF2?", "How much is lifetime access?", "Is Klar Hub safe to use?"];
     return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+        <Modal onClose={onClose}>
             {(handleClose) => (
                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center flex-shrink-0">
@@ -544,15 +560,15 @@ const KlarClickerGameModal = ({ onClose }) => {
     };
 
     return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+        <Modal onClose={onClose}>
             {(handleClose) => (
-                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme p-4">
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme p-4 text-theme-primary">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold text-theme-primary">Klar Clicker</h3>
+                        <h3 className="text-xl font-bold">Klar Clicker</h3>
                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
                     </div>
 
-                    {loading ? <div className="text-center p-8 text-theme-primary">Loading Game...</div> :
+                    {loading ? <div className="text-center p-8">Loading Game...</div> :
                     (<>
                         <div className="text-center p-4 bg-theme-dark rounded-lg mb-4">
                             <h2 className="text-4xl font-bold text-klar">{klars.toLocaleString('en-US', {minimumFractionDigits: 1, maximumFractionDigits: 1})}</h2>
@@ -569,7 +585,7 @@ const KlarClickerGameModal = ({ onClose }) => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-theme-dark p-4 rounded-lg">
-                                <h4 className="font-bold text-theme-primary">Click Power</h4>
+                                <h4 className="font-bold">Click Power</h4>
                                 <p className="text-sm text-theme-secondary mb-2">+{klarsPerClick.toLocaleString()} Klars per click (Lvl {clickLevel})</p>
                                 <button 
                                     onClick={() => buyUpgrade('click')} 
@@ -581,7 +597,7 @@ const KlarClickerGameModal = ({ onClose }) => {
                             </div>
 
                             <div className="bg-theme-dark p-4 rounded-lg">
-                                <h4 className="font-bold text-theme-primary">Auto Klars</h4>
+                                <h4 className="font-bold">Auto Klars</h4>
                                 <p className="text-sm text-theme-secondary mb-2">+{klarsPerSecond.toFixed(1)} Klars per second (Lvl {autoLevel})</p>
                                 <button 
                                     onClick={() => buyUpgrade('auto')} 
@@ -601,7 +617,7 @@ const KlarClickerGameModal = ({ onClose }) => {
 
 const TosModal = ({ onClose }) => {
     return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+        <Modal onClose={onClose}>
             {(handleClose) => (
                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center">
@@ -620,7 +636,6 @@ const TosModal = ({ onClose }) => {
     );
 };
 
-// --- Page Layout Components (Moved before App) ---
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -634,7 +649,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
     ];
 
     return (
-         <header ref={headerRef} style={{backgroundColor: 'var(--header-bg)'}} className="sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
+         <header ref={headerRef} className="bg-theme-header sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
                  <Logo onScrollTo={onScrollTo}/>
                  <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-theme-secondary hover:text-theme-primary transition border border-theme hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
@@ -759,16 +774,17 @@ const App = () => {
     useEffect(() => {
         const root = document.documentElement;
         localStorage.setItem('klar-theme', theme);
-
+        
+        // This object now contains the high-contrast, corrected color schemes
         const themes = {
             dark: {
-                '--background-dark': '#111827',
-                '--background-light': '#1F2937',
-                '--text-primary': '#F9FAFB',
-                '--text-secondary': '#D1D5DB',
-                '--border-color': '#4B5563',
-                '--header-bg': 'rgba(17, 24, 39, 0.7)',
-                '--card-bg': 'rgba(31, 41, 55, 0.3)',
+                '--background-dark': '#121212',
+                '--background-light': '#1E1E1E',
+                '--text-primary': '#F9FAFB', 
+                '--text-secondary': '#D1D5DB', // Brighter secondary text
+                '--border-color': '#4B5563',   // More visible border
+                '--header-bg': 'rgba(18, 18, 18, 0.7)',
+                '--card-bg': 'rgba(30, 30, 30, 0.4)',
                 '--modal-card-bg': '#1F2937',
                 '--button-secondary-bg': '#374151',
                 '--button-secondary-hover-bg': '#4B5563',
@@ -779,8 +795,8 @@ const App = () => {
                 '--background-dark': '#F9FAFB',
                 '--background-light': '#FFFFFF',
                 '--text-primary': '#111827',
-                '--text-secondary': '#374151',
-                '--border-color': '#D1D5DB',
+                '--text-secondary': '#374151', // Darker for more contrast
+                '--border-color': '#9CA3AF', // Darker for more contrast
                 '--header-bg': 'rgba(249, 250, 251, 0.8)',
                 '--card-bg': '#FFFFFF',
                 '--modal-card-bg': '#FFFFFF',
@@ -806,12 +822,20 @@ const App = () => {
             if(preloader) preloader.classList.add('loaded')
         }, 1000);
     }, []);
+
     useFadeInSection();
     useInteractiveCard();
+
     const headerRef = useRef(null);
     const [headerHeight, setHeaderHeight] = useState(80);
     const activeSection = useActiveNav(headerHeight);
-    useEffect(() => { if(headerRef.current) setHeaderHeight(headerRef.current.offsetHeight); }, []);
+
+    useEffect(() => { 
+        if(headerRef.current) {
+            setHeaderHeight(headerRef.current.offsetHeight); 
+        }
+    }, []);
+
     const [usersRef, usersCount] = useAnimatedCounter(80);
     const [updatesRef, updatesCount] = useAnimatedCounter(20);
     const [uptimeRef, uptimeCount] = useAnimatedCounter(99);
@@ -827,7 +851,7 @@ const App = () => {
     };
 
     useEffect(() => {
-        if (headerHeight !== 80) { 
+        if (headerHeight > 0 && headerHeight !== 80) { 
             const hash = window.location.hash.replace('#', '');
             if (hash) {
                 const element = document.getElementById(hash);
@@ -889,7 +913,7 @@ const App = () => {
     ];
 
     return (
-        <div className="relative bg-theme-dark">
+        <div className="bg-theme-dark text-theme-primary">
             <AuroraBackground />
             <div className="relative z-10">
                 <Header
@@ -915,7 +939,7 @@ const App = () => {
                 <main>
                     <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center p-8 pt-20">
                         <div className="relative z-10">
-                            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-theme-primary">Welcome to <span className="text-klar">Klar</span> Hub</h2>
+                            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold">Welcome to <span className="text-klar">Klar</span> Hub</h2>
                             <p className="text-lg md:text-xl text-theme-secondary mt-4 max-w-2xl mx-auto">The pinnacle of script performance and reliability for FF2.</p>
                             <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-6 text-theme-secondary">
                                 <div className="flex items-center gap-2">
@@ -966,12 +990,12 @@ const App = () => {
                         </section>
 
                         <section id="features" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-theme-primary">Core Features</h3>
+                            <h3 className="text-4xl font-bold">Core Features</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
                                 {features.map(f => (
                                      <div key={f.title} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card">
                                          <svg className="w-8 h-8 text-klar mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d={f.icon} /></svg>
-                                         <h4 className="text-xl font-semibold text-theme-primary">{f.title}</h4>
+                                         <h4 className="text-xl font-semibold">{f.title}</h4>
                                          <p className="text-theme-secondary mt-2">{f.description}</p>
                                      </div>
                                 ))}
@@ -979,12 +1003,12 @@ const App = () => {
                         </section>
 
                         <section id="games" className="py-12 text-center fade-in-section">
-                             <h3 className="text-4xl font-bold text-theme-primary">Supported Games</h3>
+                             <h3 className="text-4xl font-bold">Supported Games</h3>
                              <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                   {supportedGames.map(game => (
                                        <div key={game.name} className="bg-theme-card p-8 rounded-lg border border-theme text-center interactive-card flex flex-col justify-between">
                                            <div>
-                                               <h4 className="text-2xl font-bold text-theme-primary">{game.name}</h4>
+                                               <h4 className="text-2xl font-bold">{game.name}</h4>
                                                <p className="text-klar font-semibold text-lg">{game.abbr}</p>
                                            </div>
                                            <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
@@ -996,7 +1020,7 @@ const App = () => {
                         </section>
 
                         <section id="pricing" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-theme-primary">Choose Your Access</h3>
+                            <h3 className="text-4xl font-bold">Choose Your Access</h3>
                             <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {pricingTiers.map(tier => (
                                     <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-theme'}`}>
@@ -1005,7 +1029,7 @@ const App = () => {
                                                 Best Value
                                             </div>
                                         )}
-                                        <h4 className="text-xl font-bold text-theme-primary mb-2">{tier.name}</h4>
+                                        <h4 className="text-xl font-bold mb-2">{tier.name}</h4>
                                         <p className="text-theme-secondary text-sm mb-4">Starting at</p>
                                         <p className="text-4xl font-extrabold text-klar mb-6">{tier.price}</p>
                                         <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-3 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Purchase</a>
@@ -1016,7 +1040,7 @@ const App = () => {
 
                         <section id="free" className="py-12 fade-in-section">
                             <div className="text-center">
-                                <h3 className="text-4xl font-bold text-theme-primary">Get Free Access</h3>
+                                <h3 className="text-4xl font-bold">Get Free Access</h3>
                                 <p className="text-lg text-theme-secondary mt-4 max-w-2xl mx-auto">Follow these three simple steps to get a free key and start using Klar Hub.</p>
                             </div>
                             <div className="mt-12 max-w-3xl mx-auto">
@@ -1028,7 +1052,7 @@ const App = () => {
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
                                         </div>
                                         <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-theme-primary">Get Your Key</h4>
+                                            <h4 className="text-2xl font-semibold">Get Your Key</h4>
                                             <p className="text-theme-secondary mt-2">Choose an option below and complete the required steps on our partner's site to receive your script key.</p>
                                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Linkvertise)</a>
@@ -1042,7 +1066,7 @@ const App = () => {
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
                                         </div>
                                         <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-theme-primary">Prepare Your Script</h4>
+                                            <h4 className="text-2xl font-semibold">Prepare Your Script</h4>
                                             <p className="text-theme-secondary mt-2">Paste the key you received from Step 1 into the box below. Then, click the copy button to get your final script.</p>
                                             <div className="mt-4 bg-theme-dark p-4 rounded-lg relative">
                                                 <pre className="text-gray-300 overflow-x-auto custom-scrollbar">
@@ -1071,7 +1095,7 @@ const App = () => {
                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">3</div>
                                         </div>
                                         <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-theme-primary">Execute</h4>
+                                            <h4 className="text-2xl font-semibold">Execute</h4>
                                             <p className="text-theme-secondary mt-2">You're all set! Now just paste the full script you copied into your executor and run it in-game.</p>
                                         </div>
                                     </div>
@@ -1080,7 +1104,7 @@ const App = () => {
                         </section>
 
                          <section id="reviews" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-theme-primary">Trusted by Players Worldwide</h3>
+                            <h3 className="text-4xl font-bold">Trusted by Players Worldwide</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
                                  {testimonials.map((t, i) => (
                                     <div key={i} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card flex flex-col h-full">
@@ -1100,12 +1124,12 @@ const App = () => {
                         </section>
 
                         <section id="faq" className="py-12 max-w-3xl mx-auto fade-in-section">
-                            <h3 className="text-4xl font-bold text-theme-primary text-center">Frequently Asked Questions</h3>
+                            <h3 className="text-4xl font-bold text-center">Frequently Asked Questions</h3>
                             <div className="mt-12 space-y-4">
                                 {faqs.map((faq, index) => (
                                     <div key={index} className="bg-theme-card border border-theme rounded-lg faq-item">
                                         <button onClick={() => setActiveFaq(activeFaq === index ? null : index)} className="w-full flex justify-between items-center p-6 text-left">
-                                            <span className="text-lg font-semibold text-theme-primary">{faq.q}</span>
+                                            <span className="text-lg font-semibold">{faq.q}</span>
                                             <svg className={`w-6 h-6 text-theme-secondary transition-transform duration-300 ${activeFaq === index ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                         <div className="grid transition-all duration-500 ease-in-out" style={{gridTemplateRows: activeFaq === index ? '1fr' : '0fr'}}>
@@ -1118,7 +1142,7 @@ const App = () => {
 
                         <section id="community" className="py-12 text-center fade-in-section">
                             <div className="bg-theme-card border border-theme rounded-2xl p-8">
-                                <h3 className="text-4xl font-bold text-theme-primary">Still Have Questions?</h3>
+                                <h3 className="text-4xl font-bold">Still Have Questions?</h3>
                                 <p className="text-lg text-theme-secondary mt-4">Get support and connect with other users on our Discord server.</p>
                                 <DiscordCounter />
                                 <div className="mt-8 max-w-xs mx-auto">
