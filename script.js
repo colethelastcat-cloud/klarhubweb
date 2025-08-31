@@ -102,8 +102,6 @@ const Logo = ({ onScrollTo }) => (
     </svg>
 );
 
-
-// Discord Counter Component
 const DiscordCounter = () => {
     const [onlineCount, setOnlineCount] = useState(null);
     const serverId = '1357439616877072545'; // Your provided server ID
@@ -149,7 +147,6 @@ const DiscordCounter = () => {
         </div>
     );
 };
-
 
 const AuroraBackground = () => {
     const [spots] = useState(() =>
@@ -210,52 +207,92 @@ const Modal = ({ children, onClose, animationClasses }) => {
                  {children(handleClose)}
              </div>
         </div>
-    )
+    )
 };
 
 const VideoModal = ({ videoUrls, onClose }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    const getYoutubeVideoId = (url) => {
+        let videoId = null;
+        try {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            videoId = (match && match[2].length === 11) ? match[2] : null;
+        } catch (error) { console.error("Invalid URL:", url, error); }
+        return videoId;
+    };
+
     const handlePrev = () => setCurrentIndex(prev => (prev === 0 ? videoUrls.length - 1 : prev - 1));
     const handleNext = () => setCurrentIndex(prev => (prev === videoUrls.length - 1 ? 0 : prev + 1));
 
     return (
-        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100', exitActive: 'opacity-0'}}>
             {(handleClose) => (
-                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-5xl border border-klar/50 text-white flex flex-col overflow-hidden">
-                    {/* Header */}
-                    <div className="p-4 border-b border-border-color flex justify-between items-center flex-shrink-0">
-                        <h3 className="text-xl font-bold text-white">Demo Video #{currentIndex + 1}</h3>
-                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
-                    </div>
+                <div className="w-screen h-screen flex items-center justify-center relative group">
+                    <button onClick={handleClose} className="absolute top-6 right-6 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl hover:bg-black/80 transition-colors">×</button>
+                    
+                    {/* Navigation Buttons */}
+                    <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                    </button>
+                    <button onClick={handleNext} className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                    </button>
 
-                    {/* Video Player Area */}
-                    <div className="w-full aspect-video relative group bg-black">
-                        <iframe
-                            key={currentIndex}
-                            className="w-full h-full"
-                            src={videoUrls[currentIndex]}
-                            title={`Klar Hub Demo Video ${currentIndex + 1}`}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
+                    {/* Video Slides Container */}
+                    <div className="w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
+                        <div className="relative w-full h-[60vh] flex items-center justify-center" style={{ transformStyle: 'preserve-3d' }}>
+                             {videoUrls.map((url, index) => {
+                                const videoId = getYoutubeVideoId(url);
+                                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/1280x720/121212/A0A0A0?text=Video';
 
-                        {/* Prev Button */}
-                        <button
-                            onClick={handlePrev}
-                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/60"
-                        >
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
-                        </button>
+                                let offset = index - currentIndex;
+                                const numItems = videoUrls.length;
+                                if (Math.abs(offset) > numItems / 2) {
+                                    offset = offset > 0 ? offset - numItems : offset + numItems;
+                                }
 
-                        {/* Next Button */}
-                        <button
-                            onClick={handleNext}
-                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/60"
-                        >
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                        </button>
+                                const isActive = offset === 0;
+                                const isVisible = Math.abs(offset) <= 1;
+
+                                const style = {
+                                    transform: `translateX(${offset * 80}%) scale(${isActive ? 1 : 0.7}) rotateY(${-offset * 40}deg)`,
+                                    opacity: isVisible ? (isActive ? 1 : 0.3) : 0,
+                                    zIndex: numItems - Math.abs(offset),
+                                    pointerEvents: isActive ? 'auto' : 'none',
+                                    filter: isActive ? 'blur(0px)' : 'blur(5px)',
+                                    transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                                };
+
+                                return (
+                                    <div key={index} className="absolute w-[70%] md:w-[60%] aspect-video" style={style}>
+                                        {isActive ? (
+                                            <iframe
+                                                className="w-full h-full rounded-lg shadow-2xl border-2 border-klar"
+                                                src={url}
+                                                title={`Klar Hub Demo Video ${index + 1}`}
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        ) : (
+                                            <div
+                                                className="w-full h-full cursor-pointer"
+                                                onClick={() => isVisible && setCurrentIndex(index)}
+                                                style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
+                                            >
+                                                <img
+                                                    src={thumbnailUrl}
+                                                    className="w-full h-full object-cover rounded-lg shadow-lg"
+                                                    alt={`Video thumbnail ${index + 1}`}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
             )}
@@ -396,7 +433,6 @@ const AIHelperModal = ({ onClose }) => {
     );
 };
 
-// --- KLAR CLICKER GAME ---
 const KlarClickerGameModal = ({ onClose }) => {
     const [klars, setKlars] = useState(0);
     const [clickLevel, setClickLevel] = useState(1);
@@ -596,6 +632,120 @@ const TosModal = ({ onClose }) => {
     );
 };
 
+const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
+    const discordLink = "https://discord.gg/bGmGSnW3gQ";
+    const navItems = [
+        { id: 'features', label: 'Features' },
+        { id: 'games', label: 'Supported Games' },
+        { id: 'pricing', label: 'Pricing' },
+        { id: 'free', label: 'Free Access' },
+        { id: 'reviews', label: 'Reviews' },
+        { id: 'faq', label: 'FAQ' },
+        { id: 'tos', label: 'Terms' }
+    ];
+
+    return (
+         <header ref={headerRef} style={{backgroundColor: 'var(--header-bg)'}} className="sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
+            <div className="flex-1 flex justify-start items-center gap-4">
+                 <Logo onScrollTo={onScrollTo}/>
+                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-gray-300 hover:text-white transition border border-border-color hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
+            </div>
+            <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
+                {navItems.map(item => (
+                    <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className={`text-gray-300 hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
+                        {item.label}
+                    </button>
+                ))}
+            </nav>
+            <div className="flex-1 hidden md:flex justify-end items-center gap-4">
+                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 rounded-full hover:bg-button-secondary-hover-bg transition" aria-label="Toggle theme">
+                    {theme === 'dark' ? (
+                        <svg className="w-6 h-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    ) : (
+                        <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    )}
+                </button>
+                <a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Join Discord</a>
+            </div>
+            <div className="md:hidden flex-1 flex justify-end">
+                <button onClick={onToggleMobileMenu} className="text-white z-50">
+                    {isMobileMenuOpen ?
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> :
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                    }
+                </button>
+            </div>
+        </header>
+    );
+};
+
+const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
+    if (!isOpen) return null;
+    const discordLink = "https://discord.gg/bGmGSnW3gQ";
+    const navItems = [
+        { id: 'features', label: 'Features' },
+        { id: 'games', label: 'Supported Games' },
+        { id: 'pricing', label: 'Pricing' },
+        { id: 'free', label: 'Free Access' },
+        { id: 'reviews', label: 'Reviews' },
+        { id: 'faq', label: 'FAQ' },
+        { id: 'tos', label: 'Terms' }
+    ];
+    return (
+        <div className="fixed top-0 left-0 w-full h-full z-30 bg-background-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
+            {navItems.map(item => (
+                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-gray-300 hover:text-klar transition">{item.label}</button>
+            ))}
+            <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
+        </div>
+    );
+};
+
+const BackToTopButton = () => {
+    const [isVisible, setIsVisible] = useState(false);
+    useEffect(() => {
+        const toggleVisibility = () => {
+            if (window.scrollY > 300) setIsVisible(true);
+            else setIsVisible(false);
+        };
+        window.addEventListener('scroll', toggleVisibility);
+        return () => window.removeEventListener('scroll', toggleVisibility);
+    }, []);
+
+    return (
+        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/></svg>
+        </button>
+    );
+};
+
+const AIHelperButton = ({ onClick }) => {
+    const [showTooltip, setShowTooltip] = useState(true);
+    useEffect(() => {
+        const timer = setTimeout(() => setShowTooltip(false), 7000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    return (
+        <div className="action-button-wrapper fixed bottom-8 right-8 z-40">
+             {showTooltip && (
+                 <div className="initial-tooltip absolute bottom-full mb-3 right-0 w-max bg-gray-800 text-white text-sm rounded-md px-3 py-1.5 pointer-events-none">
+                     Have questions? Ask our AI!
+                     <div className="absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+                 </div>
+            )}
+            <button id="ai-helper-button" onClick={onClick} className="bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto shadow-lg shadow-klar">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 16.5v-1.5m3.75-12H21M12 21v-1.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75v16.5M16.5 4.5l-9 15M16.5 19.5l-9-15" /></svg>
+            </button>
+        </div>
+    );
+};
+
+const Footer = () => (
+     <footer className="w-full p-8 text-center text-gray-500">
+        <p>© 2025 Klar Hub. All rights reserved.</p>
+    </footer>
+);
 
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -656,7 +806,9 @@ const App = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         const preloader = document.getElementById('preloader');
-        setTimeout(() => preloader.classList.add('loaded'), 1000);
+        setTimeout(() => {
+            if(preloader) preloader.classList.add('loaded')
+        }, 1000);
     }, []);
     useFadeInSection();
     useInteractiveCard();
@@ -983,125 +1135,6 @@ const App = () => {
     );
 };
 
-const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
-    const discordLink = "https://discord.gg/bGmGSnW3gQ";
-    const navItems = [
-        { id: 'features', label: 'Features' },
-        { id: 'games', label: 'Supported Games' },
-        { id: 'pricing', label: 'Pricing' },
-        { id: 'free', label: 'Free Access' },
-        { id: 'reviews', label: 'Reviews' },
-        { id: 'faq', label: 'FAQ' },
-        { id: 'tos', label: 'Terms' }
-    ];
-
-    return (
-         <header ref={headerRef} style={{backgroundColor: 'var(--header-bg)'}} className="sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
-            <div className="flex-1 flex justify-start items-center gap-4">
-                 <Logo onScrollTo={onScrollTo}/>
-                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-gray-300 hover:text-white transition border border-border-color hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
-            </div>
-            <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
-                {navItems.map(item => (
-                    <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className={`text-gray-300 hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
-                        {item.label}
-                    </button>
-                ))}
-            </nav>
-            <div className="flex-1 hidden md:flex justify-end items-center gap-4">
-                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 rounded-full hover:bg-button-secondary-hover-bg transition" aria-label="Toggle theme">
-                    {theme === 'dark' ? (
-                        <svg className="w-6 h-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    ) : (
-                        <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                    )}
-                </button>
-                <a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Join Discord</a>
-            </div>
-            <div className="md:hidden flex-1 flex justify-end">
-                <button onClick={onToggleMobileMenu} className="text-white z-50">
-                    {isMobileMenuOpen ?
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> :
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-                    }
-                </button>
-            </div>
-        </header>
-    );
-};
-
-const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
-    if (!isOpen) return null;
-    const discordLink = "https://discord.gg/bGmGSnW3gQ";
-    const navItems = [
-        { id: 'features', label: 'Features' },
-        { id: 'games', label: 'Supported Games' },
-        { id: 'pricing', label: 'Pricing' },
-        { id: 'free', label: 'Free Access' },
-        { id: 'reviews', label: 'Reviews' },
-        { id: 'faq', label: 'FAQ' },
-        { id: 'tos', label: 'Terms' }
-    ];
-    return (
-        <div className="fixed top-0 left-0 w-full h-full z-30 bg-background-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
-            {navItems.map(item => (
-                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-gray-300 hover:text-klar transition">{item.label}</button>
-            ))}
-            <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
-        </div>
-    );
-};
-
-const BackToTopButton = () => {
-    const [isVisible, setIsVisible] = useState(false);
-    useEffect(() => {
-        const toggleVisibility = () => {
-            if (window.scrollY > 300) setIsVisible(true);
-            else setIsVisible(false);
-        };
-        window.addEventListener('scroll', toggleVisibility);
-        return () => window.removeEventListener('scroll', toggleVisibility);
-    }, []);
-
-    return (
-        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/></svg>
-        </button>
-    );
-};
-
-const AIHelperButton = ({ onClick }) => {
-    const [showTooltip, setShowTooltip] = useState(true);
-    useEffect(() => {
-        const timer = setTimeout(() => setShowTooltip(false), 7000);
-        return () => clearTimeout(timer);
-    }, []);
-
-    return (
-        <div className="action-button-wrapper fixed bottom-8 right-8 z-40">
-             {showTooltip && (
-                 <div className="initial-tooltip absolute bottom-full mb-3 right-0 w-max bg-gray-800 text-white text-sm rounded-md px-3 py-1.5 pointer-events-none">
-                     Have questions? Ask our AI!
-                     <div className="absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
-                 </div>
-            )}
-            <button id="ai-helper-button" onClick={onClick} className="bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto shadow-lg shadow-klar">
-                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 16.5v-1.5m3.75-12H21M12 21v-1.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75v16.5M16.5 4.5l-9 15M16.5 19.5l-9-15" /></svg>
-            </button>
-        </div>
-    );
-};
-
-const Footer = () => (
-     <footer className="w-full p-8 text-center text-gray-500">
-        <p>© 2025 Klar Hub. All rights reserved.</p>
-    </footer>
-);
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
-
-
-
 
