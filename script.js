@@ -843,35 +843,35 @@ const App = () => {
                                 <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">Follow these three simple steps to get a free key and start using Klar Hub.</p>
                             </div>
                             <div className="mt-12 max-w-3xl mx-auto">
-                                <div className="relative pl-8">
+                                <div className="relative pl-12">
                                     {/* Vertical connector line */}
-                                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-border-color"></div>
+                                    <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-border-color"></div>
 
                                     {/* Step 1 */}
-                                    <div className="relative pl-8 mb-12">
-                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">1</div>
-                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative mb-12">
+                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
+                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
+                                        </div>
+                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Get Your Key</h4>
-                                            <p className="text-gray-400 mt-2">Choose an option below and complete the steps on our partner's site to receive your script key.</p>
+                                            <p className="text-gray-400 mt-2">Choose an option below and complete the required steps on our partner's site to receive your script key.</p>
                                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">
-                                                  Get Key (Linkvertise)
-                                                </a>
-                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-button-secondary-bg hover:bg-button-secondary-hover-bg text-button-secondary-text">
-                                                  Get Key (Lootlabs)
-                                                </a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Linkvertise)</a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-button-secondary-bg hover:bg-button-secondary-hover-bg text-button-secondary-text">Get Key (Lootlabs)</a>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Step 2 */}
-                                    <div className="relative pl-8 mb-12">
-                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">2</div>
-                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative mb-12">
+                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
+                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
+                                        </div>
+                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Prepare Your Script</h4>
                                             <p className="text-gray-400 mt-2">Paste the key you received from Step 1 into the box below. Then, click the copy button to get your final script.</p>
                                             <div className="mt-4 bg-background-dark p-4 rounded-lg relative">
-                                                <pre className="text-gray-300 overflow-x-auto">
+                                                <pre className="text-gray-300 overflow-x-auto custom-scrollbar">
                                                     <code>
                                                         {'script_key="'}<span className="text-klar">{freeKey || "insert key"}</span>{'";\nloadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/50da22b3657a22c353b0dde631cb1dcf.lua"))()'}
                                                     </code>
@@ -893,9 +893,11 @@ const App = () => {
                                     </div>
 
                                     {/* Step 3 */}
-                                    <div className="relative pl-8">
-                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">3</div>
-                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative">
+                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
+                                            <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">3</div>
+                                        </div>
+                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Execute</h4>
                                             <p className="text-gray-400 mt-2">You're all set! Now just paste the full script you copied into your executor and run it in-game.</p>
                                         </div>
@@ -1092,3 +1094,4 @@ const Footer = () => (
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
