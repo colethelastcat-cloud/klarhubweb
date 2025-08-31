@@ -820,15 +820,33 @@ const App = () => {
     const [updatesRef, updatesCount] = useAnimatedCounter(20);
     const [uptimeRef, uptimeCount] = useAnimatedCounter(99);
     
-    // SMOOTH SCROLLING
+    // SMOOTH SCROLLING & HASH ROUTING
     const handleScrollTo = (id) => {
-         const element = document.getElementById(id);
-         if (element) {
-             const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
-             window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-         }
-         setIsMobileMenuOpen(false);
+        const element = document.getElementById(id);
+        if (element) {
+            const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+            // Update the URL hash without reloading the page
+            history.pushState(null, null, `#${id}`);
+        }
+        setIsMobileMenuOpen(false);
     };
+
+    // Effect to scroll to section from URL hash on initial load
+    useEffect(() => {
+        // Run only after the header height has been properly measured
+        if (headerHeight !== 80) { 
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const element = document.getElementById(hash);
+                if (element) {
+                    const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
+            }
+        }
+    }, [headerHeight]);
+
 
     const handleCopyScript = () => {
         const keyToUse = freeKey || "insert key"; // Use placeholder if empty
@@ -1137,4 +1155,5 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
