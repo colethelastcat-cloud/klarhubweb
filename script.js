@@ -639,6 +639,11 @@ const TosModal = ({ onClose }) => {
 // --- NEW PREVIEW MODAL ---
 const PreviewModal = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState('Catching');
+    const [previewState, setPreviewState] = useState({});
+
+    const handleValueChange = (key, value) => {
+        setPreviewState(prev => ({ ...prev, [key]: value }));
+    };
 
     const tabs = [
         { name: 'Catching', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /><path d="M5 3a1 1 0 000 2h10a1 1 0 100-2H5z" /></svg> },
@@ -664,36 +669,133 @@ const PreviewModal = ({ onClose }) => {
         </div>
     );
     
-    const Checkbox = ({ label }) => (
-        <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-400">{label}</span>
-            <div className="w-9 h-5 bg-black/30 rounded-full p-1 flex items-center cursor-pointer">
-                <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-            </div>
-        </div>
-    );
-
-    const Slider = ({ label, value }) => (
-         <div className="space-y-1">
+    const Checkbox = ({ id, label }) => {
+        const checked = previewState[id] || false;
+        return (
             <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">{label}</span>
-                <span className="text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">{value}</span>
+                <div onClick={() => handleValueChange(id, !checked)} className={`w-9 h-5 rounded-full p-1 flex items-center cursor-pointer transition-colors ${checked ? 'bg-klar justify-end' : 'bg-black/30 justify-start'}`}>
+                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
             </div>
-            <div className="w-full bg-black/30 h-2 rounded-full flex items-center">
-                <div className="bg-klar h-2 rounded-full" style={{ width: '50%' }}></div>
-                <div className="w-4 h-4 bg-white rounded-full border-2 border-klar -ml-2"></div>
+        );
+    };
+
+    const Slider = ({ id, label, value, max = 100 }) => {
+        const sliderValue = previewState[id] || value;
+        return (
+             <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">{label}</span>
+                    <input 
+                        type="number"
+                        value={sliderValue}
+                        onChange={(e) => handleValueChange(id, e.target.value)}
+                        className="w-12 text-center text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded focus:outline-none focus:ring-1 focus:ring-klar"
+                    />
+                </div>
+                <div className="relative w-full h-2 flex items-center">
+                    <input 
+                        type="range"
+                        min="0"
+                        max={max}
+                        value={sliderValue}
+                        onChange={(e) => handleValueChange(id, e.target.value)}
+                        className="w-full h-2 rounded-full appearance-none bg-black/30 slider-thumb"
+                    />
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
     
-    const Dropdown = ({ label, options }) => (
-         <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-400">{label}</span>
-             <select className="bg-black/30 text-xs text-gray-300 border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-klar">
-                {options.map(o => <option key={o}>{o}</option>)}
-            </select>
-        </div>
-    );
+    const Dropdown = ({ id, label, options }) => {
+        const selectedValue = previewState[id] || options[0];
+        return (
+             <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400">{label}</span>
+                 <select value={selectedValue} onChange={(e) => handleValueChange(id, e.target.value)} className="bg-black/30 text-xs text-gray-300 border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-klar">
+                    {options.map(o => <option key={o}>{o}</option>)}
+                </select>
+            </div>
+        );
+    };
+    
+    const Button = ({ label }) => <button className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded hover:bg-white/5 transition-colors">{label}</button>
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'Catching':
+                return (
+                    <>
+                        <FeatureCard title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
+                           <Checkbox id="magnets" label="Magnets" />
+                           <Slider id="magnet_power" label="Magnet Power" value="25" />
+                           <Slider id="magnet_chance" label="Magnet Chance" value="100" />
+                           <Checkbox id="show_hitbox" label="Show Hitbox" />
+                           <Dropdown id="magnet_type" label="Magnet Type" options={["Regular", "Advanced"]} />
+                           <Checkbox id="freefall_shape" label="Freefall Shape" />
+                           <Dropdown id="hitbox_shape" label="Hitbox Shape" options={["Forcefield", "Box"]} />
+                        </FeatureCard>
+                         <FeatureCard title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                           <Checkbox id="pull_vector" label="Pull Vector" />
+                           <Dropdown id="vector_type" label="Vector Type" options={["Tween", "Linear"]} />
+                           <Slider id="vector_distance" label="Distance" value="0" />
+                           <Slider id="vector_power" label="Power" value="0" />
+                        </FeatureCard>
+                         <FeatureCard title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                           <Checkbox id="arm_resizement" label="Arm Resizement" />
+                           <Slider id="arm_size" label="Arm Size" value="3" max="10"/>
+                           <Checkbox id="football_resize" label="Football Resize" />
+                           <Slider id="football_size" label="Football Size" value="1" max="5"/>
+                        </FeatureCard>
+                         <FeatureCard title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
+                           <Checkbox id="freeze_tech" label="Freeze Tech" />
+                           <Slider id="freeze_duration" label="Duration" value="0" />
+                           <div className="flex items-center justify-between"><span className="text-xs text-gray-400">Manual Bind</span><button className="bg-black/30 text-xs text-gray-300 px-2 py-1 rounded">None</button></div>
+                        </FeatureCard>
+                    </>
+                );
+            case 'Throwing':
+                 return (
+                    <>
+                         <FeatureCard title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                            <Checkbox id="qb_aimbot" label="QB Aimbot" />
+                            <Checkbox id="auto_angle" label="Auto Angle" />
+                            <Checkbox id="smart_fit" label="Smart Fit" />
+                         </FeatureCard>
+                         <FeatureCard title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                            <Slider id="dime_lead" label="Dime Lead" value="11" />
+                            <Slider id="mag_lead" label="Mag Lead" value="12.5" />
+                            <Slider id="bullet_lead" label="Bullet Lead" value="4" />
+                            <Slider id="lead_distance" label="Lead Distance" value="0" />
+                            <Slider id="height_distance" label="Height Distance" value="0" />
+                         </FeatureCard>
+                    </>
+                 );
+            case 'Player':
+                 return (
+                    <>
+                        <FeatureCard title="Walkspeed" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="speed" label="Speed" /><Dropdown id="speed_type" label="Speed Type" options={['Walkspeed', 'Jump']} /><Slider id="walkspeed" label="Walkspeed" value="20" /><Slider id="cframe_speed" label="CFrame Speed" value="0" /></FeatureCard>
+                        <FeatureCard title="Jump Power" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="jump_power_check" label="Jump Power" /><Dropdown id="jump_type" label="Type" options={['Normal', 'High']} /><Slider id="jump_power" label="Power" value="50" /></FeatureCard>
+                        <FeatureCard title="Angle Enhancer" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="angle_enhancer" label="Angle Enhancer" /><Slider id="angle_power" label="Power" value="50" /></FeatureCard>
+                        <FeatureCard title="Hip Height" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="hip_height_check" label="Hip Height" /><Slider id="hip_height" label="Height" value="0" /></FeatureCard>
+                        <FeatureCard title="No Jump Cooldown" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="no_jump_cooldown" label="No Jump Cooldown" /></FeatureCard>
+                        <FeatureCard title="Gravity" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="gravity_check" label="Gravity" /><Slider id="gravity" label="Gravity" value="196.1" max="500"/></FeatureCard>
+                    </>
+                 );
+             case 'UI Settings':
+                return (
+                    <FeatureCard title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
+                        <input type="text" placeholder="Type Config Name..." className="w-full bg-black/30 text-xs p-2 rounded border border-gray-600 focus:outline-none focus:border-klar" />
+                        <Button label="Save Config" />
+                        <Button label="Load Config" />
+                        <Button label="Reset Config" />
+                    </FeatureCard>
+                );
+            default:
+                return <div className="col-span-2 text-center text-gray-500 pt-10">Content for {activeTab} coming soon...</div>;
+        }
+    };
 
 
     return (
@@ -718,54 +820,8 @@ const PreviewModal = ({ onClose }) => {
                         </div>
                     </div>
                     {/* Main Content */}
-                    <div className="flex-1 p-6 grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar">
-                       {activeTab === 'Catching' && (
-                           <>
-                            <FeatureCard title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
-                               <Checkbox label="Magnets" />
-                               <Slider label="Magnet Power" value="25" />
-                               <Slider label="Magnet Chance" value="100" />
-                               <Checkbox label="Show Hitbox" />
-                               <Dropdown label="Magnet Type" options={["Regular", "Advanced"]} />
-                               <Checkbox label="Freefall Shape" />
-                               <Dropdown label="Hitbox Shape" options={["Forcefield", "Box"]} />
-                            </FeatureCard>
-                             <FeatureCard title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                               <Checkbox label="Pull Vector" />
-                               <Dropdown label="Vector Type" options={["Tween", "Linear"]} />
-                               <Slider label="Distance" value="0" />
-                               <Slider label="Power" value="0" />
-                            </FeatureCard>
-                             <FeatureCard title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                               <Checkbox label="Arm Resizement" />
-                               <Slider label="Arm Size" value="3" />
-                               <Checkbox label="Football Resize" />
-                               <Slider label="Football Size" value="1" />
-                            </FeatureCard>
-                             <FeatureCard title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
-                               <Checkbox label="Freeze Tech" />
-                               <Slider label="Duration" value="0" />
-                               <div className="flex items-center justify-between"><span className="text-xs text-gray-400">Manual Bind</span><button className="bg-black/30 text-xs text-gray-300 px-2 py-1 rounded">None</button></div>
-                            </FeatureCard>
-                           </>
-                       )}
-                       {activeTab === 'Throwing' && (
-                           <>
-                             <FeatureCard title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                                <Checkbox label="QB Aimbot" />
-                                <Checkbox label="Auto Angle" />
-                                <Checkbox label="Smart Fit" />
-                             </FeatureCard>
-                             <FeatureCard title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                                <Slider label="Dime Lead" value="11" />
-                                <Slider label="Mag Lead" value="12.5" />
-                                <Slider label="Bullet Lead" value="4" />
-                                <Slider label="Lead Distance" value="0" />
-                                <Slider label="Height Distance" value="0" />
-                             </FeatureCard>
-                           </>
-                       )}
-                        {/* Add other tab content similarly */}
+                    <div className="flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto custom-scrollbar">
+                       {renderContent()}
                     </div>
                 </div>
             )}
