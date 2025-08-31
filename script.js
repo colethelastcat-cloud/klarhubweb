@@ -301,7 +301,7 @@ const GameFeaturesModal = ({ game, onClose }) => {
      return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-klar/50">
+                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme">
                      <div className="p-4 border-b border-theme flex justify-between items-center">
                          <h3 className="text-xl font-bold text-theme-primary">{game.name} Features</h3>
                          <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
@@ -378,7 +378,7 @@ const AIHelperModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-klar/50">
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center flex-shrink-0">
                         <h3 className="text-lg font-bold text-theme-primary">AI Script Helper</h3>
                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
@@ -386,7 +386,7 @@ const AIHelperModal = ({ onClose }) => {
                     <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
                         {chatHistory.map((msg, index) => (
                             <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-md p-3 rounded-lg ${msg.role === 'user' ? 'bg-klar text-white' : 'bg-theme-button-secondary text-theme-button-secondary'}`}>
+                                <div className={`max-w-md p-3 rounded-lg ${msg.role === 'user' ? 'bg-klar text-white' : 'bg-theme-button-secondary text-theme-button-secondary-text'}`}>
                                     <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\* (.*?)(?:\n|$)/g, '<li>$1</li>').replace(/<li>/g, '<li class="list-disc ml-4">') }}></p>
                                 </div>
                             </div>
@@ -407,7 +407,7 @@ const AIHelperModal = ({ onClose }) => {
                             <p className="text-sm text-theme-secondary mb-2 text-center">Or try one of these:</p>
                             <div className="flex flex-wrap justify-center gap-2">
                                 {quickQuestions.map(q => (
-                                    <button key={q} onClick={() => sendMessage(q)} className="bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary text-sm px-3 py-1 rounded-full transition">{q}</button>
+                                    <button key={q} onClick={() => sendMessage(q)} className="bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text text-sm px-3 py-1 rounded-full transition">{q}</button>
                                 ))}
                             </div>
                         </div>
@@ -418,7 +418,7 @@ const AIHelperModal = ({ onClose }) => {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Ask a question..."
-                            className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
+                            className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
                         />
                         <button type="submit" className="bg-klar hover:bg-klar-light text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center" disabled={isLoading}>
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.279 16.76a.75.75 0 00.95.826l14.25-3.562a.75.75 0 000-1.406L3.105 2.289z" /></svg>
@@ -549,7 +549,7 @@ const KlarClickerGameModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-klar/50 p-4">
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme p-4">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-xl font-bold text-theme-primary">Klar Clicker</h3>
                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
@@ -606,7 +606,7 @@ const TosModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl border border-klar/50">
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center">
                         <h3 className="text-xl font-bold text-theme-primary">Terms & Conditions</h3>
                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
@@ -758,29 +758,29 @@ const App = () => {
             dark: {
                 '--background-dark': '#121212',
                 '--background-light': '#1E1E1E',
-                '--text-primary': '#EAEAEA',
-                '--text-secondary': '#A0A0A0',
-                '--border-color': '#374151',
+                '--text-primary': '#F1F5F9', // Brighter white
+                '--text-secondary': '#94A3B8', // Lighter gray
+                '--border-color': '#475569', // More visible border
                 '--header-bg': 'rgba(18, 18, 18, 0.5)',
                 '--card-bg': 'rgba(30, 30, 30, 0.3)',
                 '--modal-card-bg': '#1E1E1E',
-                '--button-secondary-bg': '#374151',
-                '--button-secondary-hover-bg': '#4b5563',
-                '--button-secondary-text': '#d1d5db',
+                '--button-secondary-bg': '#334155',
+                '--button-secondary-hover-bg': '#475569',
+                '--button-secondary-text': '#F1F5F9',
                 '--aurora-opacity': '0.1'
             },
             light: {
-                '--background-dark': '#f0f2f5',
-                '--background-light': '#ffffff',
-                '--text-primary': '#1f2937',
-                '--text-secondary': '#6b7280',
-                '--border-color': '#d1d5db',
-                '--header-bg': 'rgba(240, 242, 245, 0.8)',
-                '--card-bg': '#ffffff',
-                '--modal-card-bg': '#ffffff',
-                '--button-secondary-bg': '#e5e7eb',
-                '--button-secondary-hover-bg': '#d1d5db',
-                '--button-secondary-text': '#374151',
+                '--background-dark': '#F8FAFC', // Off-white
+                '--background-light': '#FFFFFF',
+                '--text-primary': '#0F172A', // Darker text
+                '--text-secondary': '#64748B', // Softer gray
+                '--border-color': '#CBD5E1', // Softer border
+                '--header-bg': 'rgba(248, 250, 252, 0.8)',
+                '--card-bg': '#FFFFFF',
+                '--modal-card-bg': '#FFFFFF',
+                '--button-secondary-bg': '#E2E8F0',
+                '--button-secondary-hover-bg': '#CBD5E1',
+                '--button-secondary-text': '#0F172A',
                 '--aurora-opacity': '0.05'
             }
         };
