@@ -758,9 +758,9 @@ const App = () => {
             dark: {
                 '--background-dark': '#121212',
                 '--background-light': '#1E1E1E',
-                '--text-primary': '#F1F5F9', // Brighter white
-                '--text-secondary': '#94A3B8', // Lighter gray
-                '--border-color': '#475569', // More visible border
+                '--text-primary': '#F1F5F9', 
+                '--text-secondary': '#CBD5E1', // Made this much lighter for readability
+                '--border-color': '#475569',
                 '--header-bg': 'rgba(18, 18, 18, 0.5)',
                 '--card-bg': 'rgba(30, 30, 30, 0.3)',
                 '--modal-card-bg': '#1E1E1E',
@@ -770,11 +770,11 @@ const App = () => {
                 '--aurora-opacity': '0.1'
             },
             light: {
-                '--background-dark': '#F8FAFC', // Off-white
+                '--background-dark': '#F8FAFC',
                 '--background-light': '#FFFFFF',
-                '--text-primary': '#0F172A', // Darker text
-                '--text-secondary': '#64748B', // Softer gray
-                '--border-color': '#CBD5E1', // Softer border
+                '--text-primary': '#0F172A',
+                '--text-secondary': '#475569', // Made this darker for readability
+                '--border-color': '#CBD5E1', 
                 '--header-bg': 'rgba(248, 250, 252, 0.8)',
                 '--card-bg': '#FFFFFF',
                 '--modal-card-bg': '#FFFFFF',
