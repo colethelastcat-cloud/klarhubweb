@@ -639,25 +639,33 @@ const TosModal = ({ onClose }) => {
 // --- NEW PREVIEW MODAL ---
 const PreviewModal = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState('Catching');
+    const [isFading, setIsFading] = useState(false);
     const [previewState, setPreviewState] = useState({
         // Default values for a realistic preview
         magnet_power: 25, magnet_chance: 100, arm_size: 3, football_size: 1,
         dime_lead: 11, mag_lead: 12.5, bullet_lead: 4, lead_distance: 0, height_distance: 0,
-        walkspeed: 20, cframe_speed: 0, jump_power: 50, angle_power: 50, hip_height: 0, gravity: 196.1,
+        walkspeed_value: 20, cframe_speed: 0, jump_power_value: 50, angle_power: 50, hip_height_value: 0, gravity_value: 196.1,
         delay_auto_guard: 0.1, power_auto_boost: 0, swat_distance: 0, prediction_delay: 0,
         hump_speed: 5, underground_size: 0.001, fps_cap: 60,
     });
     const [listeningForBind, setListeningForBind] = useState(null); // Tracks which feature is waiting for a keybind
 
+    const handleTabClick = (tabName) => {
+        if (tabName === activeTab) return;
+        setIsFading(true);
+        setTimeout(() => {
+            setActiveTab(tabName);
+            setIsFading(false);
+        }, 150);
+    };
+
     const handleValueChange = (key, value) => {
         setPreviewState(prev => ({ ...prev, [key]: value }));
     };
     
-    // Effect to handle setting a keybind
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (listeningForBind) {
-                // Prevent binding keys like Tab, Alt, etc.
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z0-9]/i)) {
                     handleValueChange(`${listeningForBind}_bind`, e.key.toUpperCase());
                 } else if (e.key === " ") {
@@ -665,7 +673,7 @@ const PreviewModal = ({ onClose }) => {
                 } else {
                      handleValueChange(`${listeningForBind}_bind`, e.key);
                 }
-                setListeningForBind(null); // Stop listening after a key is pressed
+                setListeningForBind(null);
                 e.preventDefault();
             }
         };
@@ -679,18 +687,16 @@ const PreviewModal = ({ onClose }) => {
         };
     }, [listeningForBind]);
 
-    // Effect to handle toggling features with keybinds
      useEffect(() => {
         const handleKeyDown = (e) => {
-            const key = e.key.toUpperCase();
-            const spaceKey = e.key === " " ? "SPACE" : null;
+            const key = e.key.toUpperCase() === ' ' ? 'SPACE' : e.key.toUpperCase();
             
             Object.keys(previewState).forEach(stateKey => {
-                if (stateKey.endsWith('_bind')) {
-                    const featureKey = stateKey.replace('_bind', '');
-                    if (previewState[stateKey] === key || previewState[stateKey] === spaceKey || previewState[stateKey] === e.key) {
-                        handleValueChange(featureKey, !previewState[featureKey]);
-                    }
+                if (stateKey.endsWith('_bind') && previewState[stateKey] && previewState[stateKey].toUpperCase() === key) {
+                     const featureKey = stateKey.replace('_bind', '_enabled');
+                      if (previewState.hasOwnProperty(featureKey)) {
+                         handleValueChange(featureKey, !previewState[featureKey]);
+                      }
                 }
             });
         };
@@ -717,7 +723,7 @@ const PreviewModal = ({ onClose }) => {
         const bindKey = previewState[`${id}_bind`];
         const isListening = listeningForBind === id;
         return(
-            <div className="bg-[#18181C] p-3 rounded-md">
+            <div className="bg-[#18181C] p-3 rounded-md hub-feature-card">
                 <div className="flex items-center justify-between text-gray-300 mb-3">
                     <div className="flex items-center gap-2">
                         {icon}
@@ -738,7 +744,7 @@ const PreviewModal = ({ onClose }) => {
             <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">{label}</span>
                 <div onClick={() => handleValueChange(id, !checked)} className={`w-9 h-5 rounded-full p-1 flex items-center cursor-pointer transition-colors ${checked ? 'bg-klar justify-end' : 'bg-black/30 justify-start'}`}>
-                    <div className="w-3 h-3 bg-white rounded-full"></div>
+                    <div className="w-3 h-3 bg-white rounded-full transition-transform"></div>
                 </div>
             </div>
         );
@@ -754,6 +760,7 @@ const PreviewModal = ({ onClose }) => {
                         type="number"
                         value={sliderValue}
                         onChange={(e) => handleValueChange(id, parseFloat(e.target.value))}
+                        step={step}
                         className="w-14 text-center text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded focus:outline-none focus:ring-1 focus:ring-klar no-arrows"
                     />
                 </div>
@@ -850,7 +857,7 @@ const PreviewModal = ({ onClose }) => {
             case 'Automatic':
                 return (
                     <>
-                        <FeatureCard id="auto_qb" title="Auto QB" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_qb_enabled" label="Auto QB"/><Dropdown label="Auto QB Type" options={['Walk', 'Run']}/></FeatureCard>
+                        <FeatureCard id="auto_qb" title="Auto QB" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_qb_enabled" label="Auto QB"/><Dropdown id="auto_qb_type" label="Auto QB Type" options={['Walk', 'Run']}/></FeatureCard>
                         <FeatureCard id="auto_captain" title="Auto Captain" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_captain_enabled" label="Auto Captain"/></FeatureCard>
                         <FeatureCard id="auto_catch" title="Auto Catch" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_catch_enabled" label="Auto Catch (PC Only)"/></FeatureCard>
                         <FeatureCard id="auto_swat" title="Auto Swat" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_swat_enabled" label="Auto Swat (PC Only)"/><Slider id="swat_distance" label="Swat Distance" value={0}/></FeatureCard>
@@ -923,7 +930,7 @@ const PreviewModal = ({ onClose }) => {
                             {tabs.map(tab => (
                                 <button
                                     key={tab.name}
-                                    onClick={() => setActiveTab(tab.name)}
+                                    onClick={() => handleTabClick(tab.name)}
                                     className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors relative ${activeTab === tab.name ? 'text-white bg-klar/10' : 'text-gray-400 hover:bg-white/5'}`}
                                 >
                                     {tab.icon}
@@ -934,8 +941,10 @@ const PreviewModal = ({ onClose }) => {
                         </div>
                     </div>
                     {/* Main Content */}
-                    <div className="flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto custom-scrollbar">
-                       {renderContent()}
+                    <div className={`flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto custom-scrollbar transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                       <div className="hub-content-inner col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {renderContent()}
+                       </div>
                     </div>
                 </div>
             )}
