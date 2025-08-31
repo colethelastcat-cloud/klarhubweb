@@ -210,7 +210,7 @@ const Modal = ({ children, onClose, animationClasses }) => {
                  {children(handleClose)}
              </div>
         </div>
-    )
+    )
 };
 
 const VideoModal = ({ videoUrls, onClose }) => {
@@ -229,46 +229,46 @@ const VideoModal = ({ videoUrls, onClose }) => {
         return videoId;
     };
 
-    const handlePrev = () => setCurrentIndex(prev => (prev === 0 ? videoUrls.length - 1 : prev - 1));
-    const handleNext = () => setCurrentIndex(prev => (prev === videoUrls.length - 1 ? 0 : prev + 1));
-
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="w-[95vw] h-[80vh] relative group flex items-center justify-center">
-                    <button onClick={handleClose} className="absolute top-0 right-0 z-50 bg-white text-black rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg transform translate-x-1/2 -translate-y-1/2">×</button>
-                    {videoUrls.map((url, index) => {
-                        const isActive = index === currentIndex;
-                        const videoId = getYoutubeVideoId(url);
-                        const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
-                        let offset = index - currentIndex;
-                        const numItems = videoUrls.length;
-                        if (Math.abs(offset) > numItems / 2) offset = offset > 0 ? offset - numItems : offset + numItems;
-                        if (Math.abs(offset) > 1) return null;
+                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col md:flex-row border border-klar/50 text-white overflow-hidden relative">
+                    <button onClick={handleClose} className="absolute top-2 right-2 z-50 bg-background-dark/50 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-background-light transition-colors">×</button>
 
-                        const style = {
-                            transform: `translateX(${offset * 75}%) scale(${isActive ? 1 : 0.6})`,
-                            opacity: isActive ? 1 : 0.5,
-                            zIndex: numItems - Math.abs(offset),
-                            pointerEvents: 'all',
-                        };
+                    {/* Main Video Player */}
+                    <div className="flex-grow w-full md:w-3/4 bg-black flex items-center justify-center">
+                        <iframe
+                            key={currentIndex} // Key forces iframe to re-render, ensuring autoplay works on change
+                            className="w-full h-full"
+                            src={videoUrls[currentIndex]}
+                            title={`Klar Hub Demo Video ${currentIndex + 1}`}
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
+                    </div>
 
-                        return (
-                            <div key={index} className="absolute w-[65%] aspect-video transition-all duration-500 ease-in-out" style={style} onClick={() => !isActive && setCurrentIndex(index)}>
-                                {isActive ? (
-                                    <iframe className="w-full h-full rounded-lg shadow-2xl border-2 border-klar" src={url} title={`Klar Hub Demo Video ${index + 1}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
-                                ) : (
-                                    <div className="w-full h-full cursor-pointer"><img src={thumbnailUrl} className="w-full h-full object-cover rounded-lg" alt={`Video thumbnail ${index + 1}`} /></div>
-                                )}
-                            </div>
-                        );
-                    })}
-                    {videoUrls.length > 1 && (
-                        <>
-                            <button onClick={handlePrev} className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-40"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg></button>
-                            <button onClick={handleNext} className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-40"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg></button>
-                        </>
-                    )}
+                    {/* Playlist / Thumbnails */}
+                    <div className="w-full md:w-1/4 h-1/3 md:h-full bg-background-dark flex-shrink-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
+                        <h3 className="text-lg font-bold mb-2 text-text-primary px-2">Demo Videos</h3>
+                        {videoUrls.map((url, index) => {
+                            const videoId = getYoutubeVideoId(url);
+                            const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : 'https://placehold.co/128x72/1E1E1E/A0A0A0?text=Video';
+                            const isActive = index === currentIndex;
+                            return (
+                                <button
+                                    key={index}
+                                    onClick={() => setCurrentIndex(index)}
+                                    className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 text-left ${isActive ? 'bg-klar/20 ring-2 ring-klar' : 'bg-background-light hover:bg-button-secondary-bg'}`}
+                                >
+                                    <img src={thumbnailUrl} className="w-24 h-14 object-cover rounded flex-shrink-0" alt={`Thumbnail ${index + 1}`} />
+                                    <span className="text-sm font-semibold text-text-primary">
+                                        Demo Video #{index + 1}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </Modal>
@@ -1112,6 +1112,7 @@ const Footer = () => (
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
 
