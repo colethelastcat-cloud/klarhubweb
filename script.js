@@ -587,6 +587,27 @@ const KlarClickerGameModal = ({ onClose }) => {
     );
 };
 
+const TosModal = ({ onClose }) => {
+    return (
+        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+            {(handleClose) => (
+                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-2xl border border-klar/50 text-white">
+                    <div className="p-4 border-b border-border-color flex justify-between items-center">
+                        <h3 className="text-xl font-bold">Terms & Conditions</h3>
+                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <div className="p-6 space-y-4 text-gray-300 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <p><strong className="text-white">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
+                        <p><strong className="text-white">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
+                        <p><strong className="text-white">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
+                        <p><strong className="text-white">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
+                    </div>
+                </div>
+            )}
+        </Modal>
+    );
+};
+
 
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -597,6 +618,7 @@ const App = () => {
     const [scriptCopied, setScriptCopied] = useState(false);
     const [selectedGame, setSelectedGame] = useState(null);
     const [theme, setTheme] = useState('dark');
+    const [isTosModalOpen, setIsTosModalOpen] = useState(false);
     const [freeKey, setFreeKey] = useState('');
 
     // REBUILT THEME TOGGLE LOGIC
@@ -724,6 +746,7 @@ const App = () => {
                     headerRef={headerRef}
                     onScrollTo={handleScrollTo}
                     onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    onTosClick={() => setIsTosModalOpen(true)}
                     isMobileMenuOpen={isMobileMenuOpen}
                     activeSection={activeSection}
                     onGameClick={() => setIsGameOpen(true)}
@@ -733,6 +756,10 @@ const App = () => {
                  <MobileMenu
                     isOpen={isMobileMenuOpen}
                     onScrollTo={handleScrollTo}
+                    onTosClick={() => {
+                        setIsTosModalOpen(true);
+                        setIsMobileMenuOpen(false);
+                    }}
                     onClose={() => setIsMobileMenuOpen(false)}
                 />
                 <main>
@@ -943,16 +970,6 @@ const App = () => {
                             </div>
                         </section>
 
-                        <section id="tos" className="py-12 max-w-4xl mx-auto fade-in-section">
-                            <h3 className="text-4xl font-bold text-white text-center">Terms & Conditions</h3>
-                            <div className="mt-12 bg-card-bg border border-border-color rounded-lg p-8 space-y-6 text-gray-300">
-                                <p><strong className="text-white">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
-                                <p><strong className="text-white">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
-                                <p><strong className="text-white">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
-                                <p><strong className="text-white">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
-                            </div>
-                        </section>
-
                         <section id="community" className="py-12 text-center fade-in-section">
                             <div className="bg-card-bg border border-border-color rounded-2xl p-8">
                                 <h3 className="text-4xl font-bold text-white">Still Have Questions?</h3>
@@ -970,6 +987,7 @@ const App = () => {
                 <AIHelperButton onClick={() => setIsAiHelperOpen(true)} />
                 {isAiHelperOpen && <AIHelperModal onClose={() => setIsAiHelperOpen(false)} />}
                 {selectedGame && <GameFeaturesModal game={selectedGame} onClose={() => setSelectedGame(null)} />}
+                {isTosModalOpen && <TosModal onClose={() => setIsTosModalOpen(false)} />}
                 {isGameOpen && <KlarClickerGameModal onClose={() => setIsGameOpen(false)} />}
                 <BackToTopButton />
             </div>
@@ -977,7 +995,7 @@ const App = () => {
     );
 };
 
-const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
+const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
         { id: 'features', label: 'Features' },
@@ -997,7 +1015,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, activeSection, isMo
             </div>
             <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
                 {navItems.map(item => (
-                    <button key={item.id} onClick={() => onScrollTo(item.id)} className={`text-gray-300 hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
+                    <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className={`text-gray-300 hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
                         {item.label}
                     </button>
                 ))}
@@ -1024,7 +1042,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, activeSection, isMo
     );
 };
 
-const MobileMenu = ({ isOpen, onScrollTo, onClose }) => {
+const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
     if (!isOpen) return null;
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -1039,7 +1057,7 @@ const MobileMenu = ({ isOpen, onScrollTo, onClose }) => {
     return (
         <div className="fixed top-0 left-0 w-full h-full z-30 bg-background-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
             {navItems.map(item => (
-                <button key={item.id} onClick={() => onScrollTo(item.id)} className="text-gray-300 hover:text-klar transition">{item.label}</button>
+                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-gray-300 hover:text-klar transition">{item.label}</button>
             ))}
             <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
         </div>
@@ -1094,5 +1112,6 @@ const Footer = () => (
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
