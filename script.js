@@ -216,29 +216,23 @@ const Modal = ({ children, onClose, animationClasses }) => {
 const VideoModal = ({ videoUrls, onClose }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const getYoutubeVideoId = (url) => {
-        let videoId = null;
-        try {
-            const urlObj = new URL(url);
-            if (urlObj.hostname === 'youtu.be') videoId = urlObj.pathname.slice(1);
-            else if (urlObj.hostname.includes('youtube.com')) {
-                if (urlObj.pathname === '/watch') videoId = urlObj.searchParams.get('v');
-                else if (urlObj.pathname.startsWith('/embed/')) videoId = urlObj.pathname.split('/embed/')[1].split('?')[0];
-            }
-        } catch (error) { console.error("Invalid URL:", url, error); }
-        return videoId;
-    };
+    const handlePrev = () => setCurrentIndex(prev => (prev === 0 ? videoUrls.length - 1 : prev - 1));
+    const handleNext = () => setCurrentIndex(prev => (prev === videoUrls.length - 1 ? 0 : prev + 1));
 
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col md:flex-row border border-klar/50 text-white overflow-hidden relative">
-                    <button onClick={handleClose} className="absolute top-2 right-2 z-50 bg-background-dark/50 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg hover:bg-background-light transition-colors">×</button>
+                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-5xl border border-klar/50 text-white flex flex-col overflow-hidden">
+                    {/* Header */}
+                    <div className="p-4 border-b border-border-color flex justify-between items-center flex-shrink-0">
+                        <h3 className="text-xl font-bold text-white">Demo Video #{currentIndex + 1}</h3>
+                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
 
-                    {/* Main Video Player */}
-                    <div className="flex-grow w-full md:w-3/4 bg-black flex items-center justify-center">
+                    {/* Video Player Area */}
+                    <div className="w-full aspect-video relative group bg-black">
                         <iframe
-                            key={currentIndex} // Key forces iframe to re-render, ensuring autoplay works on change
+                            key={currentIndex}
                             className="w-full h-full"
                             src={videoUrls[currentIndex]}
                             title={`Klar Hub Demo Video ${currentIndex + 1}`}
@@ -246,28 +240,22 @@ const VideoModal = ({ videoUrls, onClose }) => {
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
                         ></iframe>
-                    </div>
 
-                    {/* Playlist / Thumbnails */}
-                    <div className="w-full md:w-1/4 h-1/3 md:h-full bg-background-dark flex-shrink-0 overflow-y-auto custom-scrollbar p-4 space-y-3">
-                        <h3 className="text-lg font-bold mb-2 text-text-primary px-2">Demo Videos</h3>
-                        {videoUrls.map((url, index) => {
-                            const videoId = getYoutubeVideoId(url);
-                            const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : 'https://placehold.co/128x72/1E1E1E/A0A0A0?text=Video';
-                            const isActive = index === currentIndex;
-                            return (
-                                <button
-                                    key={index}
-                                    onClick={() => setCurrentIndex(index)}
-                                    className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all duration-200 text-left ${isActive ? 'bg-klar/20 ring-2 ring-klar' : 'bg-background-light hover:bg-button-secondary-bg'}`}
-                                >
-                                    <img src={thumbnailUrl} className="w-24 h-14 object-cover rounded flex-shrink-0" alt={`Thumbnail ${index + 1}`} />
-                                    <span className="text-sm font-semibold text-text-primary">
-                                        Demo Video #{index + 1}
-                                    </span>
-                                </button>
-                            );
-                        })}
+                        {/* Prev Button */}
+                        <button
+                            onClick={handlePrev}
+                            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/60"
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
+                        </button>
+
+                        {/* Next Button */}
+                        <button
+                            onClick={handleNext}
+                            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 text-white rounded-full w-12 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-black/60"
+                        >
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
+                        </button>
                     </div>
                 </div>
             )}
@@ -1112,6 +1100,7 @@ const Footer = () => (
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
 
