@@ -434,7 +434,7 @@ const AIHelperModal = ({ onClose }) => {
                             className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
                         />
                         <button type="submit" className="bg-klar hover:bg-klar-light text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center" disabled={isLoading}>
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.279 16.76a.75.75 0 00.95.826l14.25-3.562a.75.75 0 000-1.406L3.105 2.289z" /></svg>
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.279 16.76a.75.75 0 00.95.826l1.425-3.562a.75.75 0 000-1.406L3.105 2.289z" /></svg>
                         </button>
                     </form>
                 </div>
@@ -636,6 +636,144 @@ const TosModal = ({ onClose }) => {
     );
 };
 
+// --- NEW PREVIEW MODAL ---
+const PreviewModal = ({ onClose }) => {
+    const [activeTab, setActiveTab] = useState('Catching');
+
+    const tabs = [
+        { name: 'Catching', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /><path d="M5 3a1 1 0 000 2h10a1 1 0 100-2H5z" /></svg> },
+        { name: 'Throwing', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg> },
+        { name: 'Player', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg> },
+        { name: 'Automatic', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg> },
+        { name: 'Physic', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" /></svg> },
+        { name: 'Visual', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg> },
+        { name: 'Trolling', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clipRule="evenodd" /></svg> },
+        { name: 'UI Settings', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg> },
+    ];
+
+    const FeatureCard = ({ title, icon, children }) => (
+        <div className="bg-[#18181C] p-3 rounded-md">
+            <div className="flex items-center justify-between text-gray-300 mb-3">
+                <div className="flex items-center gap-2">
+                    {icon}
+                    <h3 className="font-semibold text-sm">{title}</h3>
+                </div>
+                <div className="text-gray-500 cursor-move">...</div>
+            </div>
+            <div className="space-y-3">{children}</div>
+        </div>
+    );
+    
+    const Checkbox = ({ label }) => (
+        <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">{label}</span>
+            <div className="w-9 h-5 bg-black/30 rounded-full p-1 flex items-center cursor-pointer">
+                <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+            </div>
+        </div>
+    );
+
+    const Slider = ({ label, value }) => (
+         <div className="space-y-1">
+            <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-400">{label}</span>
+                <span className="text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded">{value}</span>
+            </div>
+            <div className="w-full bg-black/30 h-2 rounded-full flex items-center">
+                <div className="bg-klar h-2 rounded-full" style={{ width: '50%' }}></div>
+                <div className="w-4 h-4 bg-white rounded-full border-2 border-klar -ml-2"></div>
+            </div>
+        </div>
+    );
+    
+    const Dropdown = ({ label, options }) => (
+         <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">{label}</span>
+             <select className="bg-black/30 text-xs text-gray-300 border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-klar">
+                {options.map(o => <option key={o}>{o}</option>)}
+            </select>
+        </div>
+    );
+
+
+    return (
+        <Modal onClose={onClose}>
+            {(handleClose) => (
+                <div className="w-[800px] h-[500px] bg-[#0D0D0F] text-white rounded-lg flex overflow-hidden border border-gray-800 shadow-2xl shadow-black/50">
+                    {/* Sidebar */}
+                    <div className="w-48 bg-[#18181C] p-4 flex flex-col">
+                        <h1 className="text-lg font-bold">Klar Hub | <span className="text-klar">FF2</span></h1>
+                        <div className="mt-6 flex-grow space-y-1">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.name}
+                                    onClick={() => setActiveTab(tab.name)}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors relative ${activeTab === tab.name ? 'text-white bg-klar/10' : 'text-gray-400 hover:bg-white/5'}`}
+                                >
+                                    {tab.icon}
+                                    <span>{tab.name}</span>
+                                    {activeTab === tab.name && <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-klar rounded-r-full"></div>}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    {/* Main Content */}
+                    <div className="flex-1 p-6 grid grid-cols-2 gap-4 overflow-y-auto custom-scrollbar">
+                       {activeTab === 'Catching' && (
+                           <>
+                            <FeatureCard title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
+                               <Checkbox label="Magnets" />
+                               <Slider label="Magnet Power" value="25" />
+                               <Slider label="Magnet Chance" value="100" />
+                               <Checkbox label="Show Hitbox" />
+                               <Dropdown label="Magnet Type" options={["Regular", "Advanced"]} />
+                               <Checkbox label="Freefall Shape" />
+                               <Dropdown label="Hitbox Shape" options={["Forcefield", "Box"]} />
+                            </FeatureCard>
+                             <FeatureCard title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                               <Checkbox label="Pull Vector" />
+                               <Dropdown label="Vector Type" options={["Tween", "Linear"]} />
+                               <Slider label="Distance" value="0" />
+                               <Slider label="Power" value="0" />
+                            </FeatureCard>
+                             <FeatureCard title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                               <Checkbox label="Arm Resizement" />
+                               <Slider label="Arm Size" value="3" />
+                               <Checkbox label="Football Resize" />
+                               <Slider label="Football Size" value="1" />
+                            </FeatureCard>
+                             <FeatureCard title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
+                               <Checkbox label="Freeze Tech" />
+                               <Slider label="Duration" value="0" />
+                               <div className="flex items-center justify-between"><span className="text-xs text-gray-400">Manual Bind</span><button className="bg-black/30 text-xs text-gray-300 px-2 py-1 rounded">None</button></div>
+                            </FeatureCard>
+                           </>
+                       )}
+                       {activeTab === 'Throwing' && (
+                           <>
+                             <FeatureCard title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                                <Checkbox label="QB Aimbot" />
+                                <Checkbox label="Auto Angle" />
+                                <Checkbox label="Smart Fit" />
+                             </FeatureCard>
+                             <FeatureCard title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                                <Slider label="Dime Lead" value="11" />
+                                <Slider label="Mag Lead" value="12.5" />
+                                <Slider label="Bullet Lead" value="4" />
+                                <Slider label="Lead Distance" value="0" />
+                                <Slider label="Height Distance" value="0" />
+                             </FeatureCard>
+                           </>
+                       )}
+                        {/* Add other tab content similarly */}
+                    </div>
+                </div>
+            )}
+        </Modal>
+    );
+};
+
+
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -768,6 +906,7 @@ const App = () => {
     const [scriptCopied, setScriptCopied] = useState(false);
     const [selectedGame, setSelectedGame] = useState(null);
     const [isTosModalOpen, setIsTosModalOpen] = useState(false);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
@@ -775,14 +914,13 @@ const App = () => {
         const root = document.documentElement;
         localStorage.setItem('klar-theme', theme);
         
-        // This object now contains the high-contrast, corrected color schemes
         const themes = {
             dark: {
                 '--background-dark': '#121212',
                 '--background-light': '#1E1E1E',
                 '--text-primary': '#F9FAFB', 
-                '--text-secondary': '#D1D5DB', // Brighter secondary text
-                '--border-color': '#4B5563',   // More visible border
+                '--text-secondary': '#D1D5DB',
+                '--border-color': '#4B5563',   
                 '--header-bg': 'rgba(18, 18, 18, 0.7)',
                 '--card-bg': 'rgba(30, 30, 30, 0.4)',
                 '--modal-card-bg': '#1F2937',
@@ -795,8 +933,8 @@ const App = () => {
                 '--background-dark': '#F9FAFB',
                 '--background-light': '#FFFFFF',
                 '--text-primary': '#111827',
-                '--text-secondary': '#374151', // Darker for more contrast
-                '--border-color': '#9CA3AF', // Darker for more contrast
+                '--text-secondary': '#374151',
+                '--border-color': '#9CA3AF', 
                 '--header-bg': 'rgba(249, 250, 251, 0.8)',
                 '--card-bg': '#FFFFFF',
                 '--modal-card-bg': '#FFFFFF',
@@ -967,6 +1105,10 @@ const App = () => {
                                     </button>
                                 </div>
                                 <DiscordCounter />
+                                 <button onClick={() => setIsPreviewModalOpen(true)} className="mt-2 py-2 px-6 rounded-lg font-semibold text-center transition bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text flex items-center gap-2">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
+                                    Preview Hub
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -1159,6 +1301,7 @@ const App = () => {
                 {selectedGame && <GameFeaturesModal game={selectedGame} onClose={() => setSelectedGame(null)} />}
                 {isTosModalOpen && <TosModal onClose={() => setIsTosModalOpen(false)} />}
                 {isGameOpen && <KlarClickerGameModal onClose={() => setIsGameOpen(false)} />}
+                {isPreviewModalOpen && <PreviewModal onClose={() => setIsPreviewModalOpen(false)} />}
                 <BackToTopButton />
             </div>
         </div>
