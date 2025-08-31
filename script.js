@@ -9,7 +9,6 @@ const useInteractiveCard = () => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      // Increased the tilt effect
       const rotateX = (y - rect.height / 2) / 8;
       const rotateY = (rect.width / 2 - x) / 8;
       card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -62,7 +61,7 @@ const useAnimatedCounter = (target, duration = 2000) => {
                     if (progress < 1) requestAnimationFrame(animate);
                 };
                 animate();
-                observer.unobserve(ref.current);
+                if(ref.current) observer.unobserve(ref.current);
             }
         }, { threshold: 0.5 });
         if (ref.current) observer.observe(ref.current);
@@ -98,7 +97,7 @@ const Logo = ({ onScrollTo }) => (
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
     >
-        <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" fill="var(--text-primary)" stroke="var(--text-primary)" strokeWidth="4"/>
+        <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
     </svg>
 );
 
@@ -142,7 +141,7 @@ const DiscordCounter = () => {
     }, []);
 
     return (
-        <div className="mt-4 text-lg text-gray-400">
+        <div className="mt-4 text-lg text-theme-secondary">
             Join <span className="font-bold text-klar">{onlineCount === null ? '...' : onlineCount}</span> members online now!
         </div>
     );
@@ -232,7 +231,6 @@ const VideoModal = ({ videoUrls, onClose }) => {
                 <div className="w-screen h-screen flex items-center justify-center relative group">
                     <button onClick={handleClose} className="absolute top-6 right-6 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl hover:bg-black/80 transition-colors">×</button>
                     
-                    {/* Navigation Buttons */}
                     <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
@@ -240,9 +238,8 @@ const VideoModal = ({ videoUrls, onClose }) => {
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                     </button>
 
-                    {/* Video Slides Container */}
-                    <div className="w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
-                        <div className="relative w-full h-[60vh] flex items-center justify-center" style={{ transformStyle: 'preserve-3d' }}>
+                    <div className="w-full h-full flex items-center justify-center perspective-1000">
+                        <div className="relative w-full h-[60vh] flex items-center justify-center transform-style-3d">
                              {videoUrls.map((url, index) => {
                                 const videoId = getYoutubeVideoId(url);
                                 const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/1280x720/121212/A0A0A0?text=Video';
@@ -304,13 +301,13 @@ const GameFeaturesModal = ({ game, onClose }) => {
      return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                 <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-lg border border-klar/50">
-                     <div className="p-4 border-b border-border-color flex justify-between items-center">
-                         <h3 className="text-xl font-bold text-white">{game.name} Features</h3>
-                         <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">×</button>
+                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-klar/50">
+                     <div className="p-4 border-b border-theme flex justify-between items-center">
+                         <h3 className="text-xl font-bold text-theme-primary">{game.name} Features</h3>
+                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
                      </div>
                      <div className="p-6">
-                         <ul className="space-y-3 text-gray-300">
+                         <ul className="space-y-3 text-theme-secondary">
                              {game.features.map((feature, index) => (
                                  <li key={index} className="flex items-center gap-3">
                                      <svg className="w-5 h-5 text-klar flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
@@ -381,22 +378,22 @@ const AIHelperModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-klar/50">
-                    <div className="p-4 border-b border-border-color flex justify-between items-center flex-shrink-0">
-                        <h3 className="text-lg font-bold text-white">AI Script Helper</h3>
-                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">×</button>
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-klar/50">
+                    <div className="p-4 border-b border-theme flex justify-between items-center flex-shrink-0">
+                        <h3 className="text-lg font-bold text-theme-primary">AI Script Helper</h3>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
                     </div>
-                    <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+                    <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
                         {chatHistory.map((msg, index) => (
                             <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-md p-3 rounded-lg ${msg.role === 'user' ? 'bg-klar text-white' : 'bg-button-secondary-bg text-button-secondary-text'}`}>
+                                <div className={`max-w-md p-3 rounded-lg ${msg.role === 'user' ? 'bg-klar text-white' : 'bg-theme-button-secondary text-theme-button-secondary'}`}>
                                     <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\* (.*?)(?:\n|$)/g, '<li>$1</li>').replace(/<li>/g, '<li class="list-disc ml-4">') }}></p>
                                 </div>
                             </div>
                         ))}
                         {isLoading && (
                             <div className="flex justify-start">
-                                <div className="bg-button-secondary-bg text-button-secondary-text p-3 rounded-lg flex items-center gap-2">
+                                <div className="bg-theme-button-secondary text-theme-button-secondary p-3 rounded-lg flex items-center gap-2">
                                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
                                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-150"></div>
                                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-300"></div>
@@ -406,22 +403,22 @@ const AIHelperModal = ({ onClose }) => {
                         <div ref={chatEndRef} />
                     </div>
                      {chatHistory.length === 1 && (
-                        <div className="p-4 border-t border-border-color flex-shrink-0">
-                            <p className="text-sm text-gray-400 mb-2 text-center">Or try one of these:</p>
+                        <div className="p-4 border-t border-theme flex-shrink-0">
+                            <p className="text-sm text-theme-secondary mb-2 text-center">Or try one of these:</p>
                             <div className="flex flex-wrap justify-center gap-2">
                                 {quickQuestions.map(q => (
-                                    <button key={q} onClick={() => sendMessage(q)} className="bg-button-secondary-bg hover:bg-button-secondary-hover-bg text-button-secondary-text text-sm px-3 py-1 rounded-full transition">{q}</button>
+                                    <button key={q} onClick={() => sendMessage(q)} className="bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary text-sm px-3 py-1 rounded-full transition">{q}</button>
                                 ))}
                             </div>
                         </div>
                     )}
-                    <form onSubmit={handleFormSubmit} className="p-4 border-t border-border-color flex gap-2 flex-shrink-0">
+                    <form onSubmit={handleFormSubmit} className="p-4 border-t border-theme flex gap-2 flex-shrink-0">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Ask a question..."
-                            className="w-full bg-button-secondary-bg border border-border-color rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
+                            className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
                         />
                         <button type="submit" className="bg-klar hover:bg-klar-light text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center" disabled={isLoading}>
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.279 16.76a.75.75 0 00.95.826l14.25-3.562a.75.75 0 000-1.406L3.105 2.289z" /></svg>
@@ -446,7 +443,6 @@ const KlarClickerGameModal = ({ onClose }) => {
     const clickUpgradeCost = Math.floor(10 * Math.pow(1.15, clickLevel));
     const autoUpgradeCost = Math.floor(25 * Math.pow(1.2, autoLevel));
 
-    // Firebase Initialization and Data Loading
     useEffect(() => {
         const initFirebase = async () => {
             try {
@@ -501,7 +497,6 @@ const KlarClickerGameModal = ({ onClose }) => {
         initFirebase();
     }, []);
 
-    // NEW Smooth Auto-Klar generator
     useEffect(() => {
         if (loading || klarsPerSecond === 0) return;
 
@@ -523,8 +518,6 @@ const KlarClickerGameModal = ({ onClose }) => {
         return () => cancelAnimationFrame(animationFrameId);
     }, [loading, klarsPerSecond]);
 
-
-    // Auto-save progress
     useEffect(() => {
         if (loading || firebaseRef.current.disabled) return;
         const saveGameState = async () => {
@@ -534,7 +527,7 @@ const KlarClickerGameModal = ({ onClose }) => {
             }
         };
 
-        const interval = setInterval(saveGameState, 5000); // Save every 5 seconds
+        const interval = setInterval(saveGameState, 5000);
         return () => clearInterval(interval);
     }, [loading, klars, clickLevel, autoLevel]);
     
@@ -556,18 +549,18 @@ const KlarClickerGameModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-lg border border-klar/50 text-white p-4">
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-klar/50 p-4">
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-xl font-bold">Klar Clicker</h3>
-                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        <h3 className="text-xl font-bold text-theme-primary">Klar Clicker</h3>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
                     </div>
 
-                    {loading ? <div className="text-center p-8">Loading Game...</div> :
+                    {loading ? <div className="text-center p-8 text-theme-primary">Loading Game...</div> :
                     (<>
-                        <div className="text-center p-4 bg-background-dark rounded-lg mb-4">
+                        <div className="text-center p-4 bg-theme-dark rounded-lg mb-4">
                             <h2 className="text-4xl font-bold text-klar">{klars.toLocaleString('en-US', {minimumFractionDigits: 1, maximumFractionDigits: 1})}</h2>
-                            <p className="text-sm text-text-secondary">Klars</p>
-                            <p className="text-xs text-text-secondary mt-1">{klarsPerSecond.toFixed(1)} per second</p>
+                            <p className="text-sm text-theme-secondary">Klars</p>
+                            <p className="text-xs text-theme-secondary mt-1">{klarsPerSecond.toFixed(1)} per second</p>
                         </div>
 
                         <div 
@@ -578,10 +571,9 @@ const KlarClickerGameModal = ({ onClose }) => {
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Click Upgrade */}
-                            <div className="bg-background-dark p-4 rounded-lg">
-                                <h4 className="font-bold">Click Power</h4>
-                                <p className="text-sm text-text-secondary mb-2">+{klarsPerClick.toLocaleString()} Klars per click (Lvl {clickLevel})</p>
+                            <div className="bg-theme-dark p-4 rounded-lg">
+                                <h4 className="font-bold text-theme-primary">Click Power</h4>
+                                <p className="text-sm text-theme-secondary mb-2">+{klarsPerClick.toLocaleString()} Klars per click (Lvl {clickLevel})</p>
                                 <button 
                                     onClick={() => buyUpgrade('click')} 
                                     disabled={klars < clickUpgradeCost}
@@ -591,10 +583,9 @@ const KlarClickerGameModal = ({ onClose }) => {
                                 </button>
                             </div>
 
-                            {/* Auto Upgrade */}
-                            <div className="bg-background-dark p-4 rounded-lg">
-                                <h4 className="font-bold">Auto Klars</h4>
-                                <p className="text-sm text-text-secondary mb-2">+{klarsPerSecond.toFixed(1)} Klars per second (Lvl {autoLevel})</p>
+                            <div className="bg-theme-dark p-4 rounded-lg">
+                                <h4 className="font-bold text-theme-primary">Auto Klars</h4>
+                                <p className="text-sm text-theme-secondary mb-2">+{klarsPerSecond.toFixed(1)} Klars per second (Lvl {autoLevel})</p>
                                 <button 
                                     onClick={() => buyUpgrade('auto')} 
                                     disabled={klars < autoUpgradeCost}
@@ -615,16 +606,16 @@ const TosModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
             {(handleClose) => (
-                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-2xl border border-klar/50 text-white">
-                    <div className="p-4 border-b border-border-color flex justify-between items-center">
-                        <h3 className="text-xl font-bold">Terms & Conditions</h3>
-                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl border border-klar/50">
+                    <div className="p-4 border-b border-theme flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-theme-primary">Terms & Conditions</h3>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
                     </div>
-                    <div className="p-6 space-y-4 text-gray-300 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                        <p><strong className="text-white">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
-                        <p><strong className="text-white">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
-                        <p><strong className="text-white">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
-                        <p><strong className="text-white">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
+                    <div className="p-6 space-y-4 text-theme-secondary max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <p><strong className="text-theme-primary">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
+                        <p><strong className="text-theme-primary">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
+                        <p><strong className="text-theme-primary">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
+                        <p><strong className="text-theme-primary">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
                     </div>
                 </div>
             )}
@@ -648,27 +639,27 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
          <header ref={headerRef} style={{backgroundColor: 'var(--header-bg)'}} className="sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
                  <Logo onScrollTo={onScrollTo}/>
-                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-gray-300 hover:text-white transition border border-border-color hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
+                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-theme-secondary hover:text-theme-primary transition border border-theme hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
             </div>
             <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
                 {navItems.map(item => (
-                    <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className={`text-gray-300 hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
+                    <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className={`text-theme-secondary hover:text-klar transition ${activeSection === item.id ? 'nav-active' : ''}`}>
                         {item.label}
                     </button>
                 ))}
             </nav>
             <div className="flex-1 hidden md:flex justify-end items-center gap-4">
-                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 rounded-full hover:bg-button-secondary-hover-bg transition" aria-label="Toggle theme">
+                <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2 rounded-full bg-theme-button-secondary hover:bg-theme-button-secondary-hover transition" aria-label="Toggle theme">
                     {theme === 'dark' ? (
                         <svg className="w-6 h-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     ) : (
-                        <svg className="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                        <svg className="w-6 h-6 text-theme-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                     )}
                 </button>
                 <a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Join Discord</a>
             </div>
             <div className="md:hidden flex-1 flex justify-end">
-                <button onClick={onToggleMobileMenu} className="text-white z-50">
+                <button onClick={onToggleMobileMenu} className="text-theme-primary z-50">
                     {isMobileMenuOpen ?
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> :
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -692,9 +683,9 @@ const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
         { id: 'tos', label: 'Terms' }
     ];
     return (
-        <div className="fixed top-0 left-0 w-full h-full z-30 bg-background-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
+        <div className="fixed top-0 left-0 w-full h-full z-30 bg-theme-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
             {navItems.map(item => (
-                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-gray-300 hover:text-klar transition">{item.label}</button>
+                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-theme-secondary hover:text-klar transition">{item.label}</button>
             ))}
             <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
         </div>
@@ -713,7 +704,7 @@ const BackToTopButton = () => {
     }, []);
 
     return (
-        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/></svg>
         </button>
     );
@@ -755,15 +746,14 @@ const App = () => {
     const [activeFaq, setActiveFaq] = useState(null);
     const [scriptCopied, setScriptCopied] = useState(false);
     const [selectedGame, setSelectedGame] = useState(null);
-    const [theme, setTheme] = useState('dark');
     const [isTosModalOpen, setIsTosModalOpen] = useState(false);
     const [freeKey, setFreeKey] = useState('');
+    const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
-    // REBUILT THEME TOGGLE LOGIC
     useEffect(() => {
         const root = document.documentElement;
-        
-        // CSS Variables for themes
+        localStorage.setItem('klar-theme', theme);
+
         const themes = {
             dark: {
                 '--background-dark': '#121212',
@@ -771,8 +761,8 @@ const App = () => {
                 '--text-primary': '#EAEAEA',
                 '--text-secondary': '#A0A0A0',
                 '--border-color': '#374151',
-                '--header-bg': 'rgba(0,0,0,0.5)',
-                '--card-bg': 'rgba(0,0,0,0.3)',
+                '--header-bg': 'rgba(18, 18, 18, 0.5)',
+                '--card-bg': 'rgba(30, 30, 30, 0.3)',
                 '--modal-card-bg': '#1E1E1E',
                 '--button-secondary-bg': '#374151',
                 '--button-secondary-hover-bg': '#4b5563',
@@ -785,7 +775,7 @@ const App = () => {
                 '--text-primary': '#1f2937',
                 '--text-secondary': '#6b7280',
                 '--border-color': '#d1d5db',
-                '--header-bg': 'rgba(255,255,255,0.8)',
+                '--header-bg': 'rgba(240, 242, 245, 0.8)',
                 '--card-bg': '#ffffff',
                 '--modal-card-bg': '#ffffff',
                 '--button-secondary-bg': '#e5e7eb',
@@ -820,21 +810,17 @@ const App = () => {
     const [updatesRef, updatesCount] = useAnimatedCounter(20);
     const [uptimeRef, uptimeCount] = useAnimatedCounter(99);
     
-    // SMOOTH SCROLLING & HASH ROUTING
     const handleScrollTo = (id) => {
         const element = document.getElementById(id);
         if (element) {
             const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
             window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-            // Update the URL hash without reloading the page
             history.pushState(null, null, `#${id}`);
         }
         setIsMobileMenuOpen(false);
     };
 
-    // Effect to scroll to section from URL hash on initial load
     useEffect(() => {
-        // Run only after the header height has been properly measured
         if (headerHeight !== 80) { 
             const hash = window.location.hash.replace('#', '');
             if (hash) {
@@ -849,7 +835,7 @@ const App = () => {
 
 
     const handleCopyScript = () => {
-        const keyToUse = freeKey || "insert key"; // Use placeholder if empty
+        const keyToUse = freeKey || "insert key";
         const scriptText = `script_key="${keyToUse}";\nloadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/50da22b3657a22c353b0dde631cb1dcf.lua"))()`;
         navigator.clipboard.writeText(scriptText).then(() => {
             setScriptCopied(true);
@@ -870,7 +856,7 @@ const App = () => {
         { name: '1 Month Klar Access', price: '$2.50', url: 'https://klarhub.sellhub.cx/product/1-Month-Klar-Access/' },
         { name: '3 Month Klar Access', price: '$3.75', url: 'https://klarhub.sellhub.cx/product/3-Month-Access/' },
         { name: '6 Month Klar Access', price: '$5.50', url: 'https://klarhub.sellhub.cx/product/6-Month-Klar-Access/' },
-        { name: 'Lifetime Klar', price: '$15.00', url: 'https://klarhub.sellhub.cx/product/New-product/', isFeatured: true }, // Highlighted plan
+        { name: 'Lifetime Klar', price: '$15.00', url: 'https://klarhub.sellhub.cx/product/New-product/', isFeatured: true },
         { name: 'Extreme Alt Gen', price: '$1.00', url: 'https://klarhub.sellhub.cx/product/Extreme-Alt-Gen/' }
     ];
      const testimonials = [
@@ -897,7 +883,7 @@ const App = () => {
     ];
 
     return (
-        <div className="relative">
+        <div className="relative bg-theme-dark">
             <AuroraBackground />
             <div className="relative z-10">
                 <Header
@@ -923,9 +909,9 @@ const App = () => {
                 <main>
                     <section id="home" className="min-h-screen flex flex-col items-center justify-center text-center p-8 pt-20">
                         <div className="relative z-10">
-                            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white">Welcome to <span className="text-klar">Klar</span> Hub</h2>
-                            <p className="text-lg md:text-xl text-gray-400 mt-4 max-w-2xl mx-auto">The pinnacle of script performance and reliability for FF2.</p>
-                            <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-6 text-gray-400">
+                            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-theme-primary">Welcome to <span className="text-klar">Klar</span> Hub</h2>
+                            <p className="text-lg md:text-xl text-theme-secondary mt-4 max-w-2xl mx-auto">The pinnacle of script performance and reliability for FF2.</p>
+                            <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-6 text-theme-secondary">
                                 <div className="flex items-center gap-2">
                                     <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
                                     <span>100% Undetected</span>
@@ -940,12 +926,12 @@ const App = () => {
                                 </div>
                             </div>
                             <div className="mt-8 flex flex-col items-center justify-center gap-4">
-                               <div className="flex items-center justify-center gap-4">
+                               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                                     <button onClick={() => handleScrollTo('pricing')} className="py-3 px-8 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white shadow-lg shadow-klar flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25v-6h9M6.08 5.746l.473 2.365A1.125 1.125 0 015.454 9H2.25M9 11.25v3.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V11.25m-3.375 0h3.375M7.5 14.25h3.375z"/></svg>
                                         Purchase Now
                                     </button>
-                                    <button onClick={() => setIsVideoModalOpen(true)} className="py-3 px-8 rounded-lg font-semibold text-center transition bg-transparent border border-border-color text-gray-300 flex items-center gap-2">
+                                    <button onClick={() => setIsVideoModalOpen(true)} className="py-3 px-8 rounded-lg font-semibold text-center transition bg-transparent border border-theme text-theme-secondary hover:text-theme-primary hover:border-klar flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z" clipRule="evenodd" /></svg>
                                         Watch Demo
                                     </button>
@@ -960,39 +946,39 @@ const App = () => {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                                 <div ref={usersRef}>
                                     <p className="text-5xl font-extrabold text-klar">{usersCount.toLocaleString()}+</p>
-                                    <p className="text-lg text-gray-400 mt-2">Active Users</p>
+                                    <p className="text-lg text-theme-secondary mt-2">Active Users</p>
                                 </div>
                                 <div ref={updatesRef}>
                                     <p className="text-5xl font-extrabold text-klar">{updatesCount}+</p>
-                                    <p className="text-lg text-gray-400 mt-2">Monthly Updates</p>
+                                    <p className="text-lg text-theme-secondary mt-2">Monthly Updates</p>
                                 </div>
                                 <div ref={uptimeRef}>
                                     <p className="text-5xl font-extrabold text-klar">{uptimeCount}%</p>
-                                    <p className="text-lg text-gray-400 mt-2">Guaranteed Uptime</p>
+                                    <p className="text-lg text-theme-secondary mt-2">Guaranteed Uptime</p>
                                 </div>
                             </div>
                         </section>
 
                         <section id="features" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-white">Core Features</h3>
+                            <h3 className="text-4xl font-bold text-theme-primary">Core Features</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
                                 {features.map(f => (
-                                     <div key={f.title} className="bg-card-bg p-6 rounded-lg border border-border-color text-left interactive-card">
+                                     <div key={f.title} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card">
                                          <svg className="w-8 h-8 text-klar mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d={f.icon} /></svg>
-                                         <h4 className="text-xl font-semibold text-white">{f.title}</h4>
-                                         <p className="text-gray-400 mt-2">{f.description}</p>
+                                         <h4 className="text-xl font-semibold text-theme-primary">{f.title}</h4>
+                                         <p className="text-theme-secondary mt-2">{f.description}</p>
                                      </div>
                                 ))}
                             </div>
                         </section>
 
                         <section id="games" className="py-12 text-center fade-in-section">
-                             <h3 className="text-4xl font-bold text-white">Supported Games</h3>
+                             <h3 className="text-4xl font-bold text-theme-primary">Supported Games</h3>
                              <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                   {supportedGames.map(game => (
-                                       <div key={game.name} className="bg-card-bg p-8 rounded-lg border border-border-color text-center interactive-card flex flex-col justify-between">
+                                       <div key={game.name} className="bg-theme-card p-8 rounded-lg border border-theme text-center interactive-card flex flex-col justify-between">
                                            <div>
-                                               <h4 className="text-2xl font-bold text-white">{game.name}</h4>
+                                               <h4 className="text-2xl font-bold text-theme-primary">{game.name}</h4>
                                                <p className="text-klar font-semibold text-lg">{game.abbr}</p>
                                            </div>
                                            <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
@@ -1004,17 +990,17 @@ const App = () => {
                         </section>
 
                         <section id="pricing" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-white">Choose Your Access</h3>
+                            <h3 className="text-4xl font-bold text-theme-primary">Choose Your Access</h3>
                             <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {pricingTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-card-bg p-8 rounded-lg border text-center interactive-card transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-border-color'}`}>
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-theme'}`}>
                                         {tier.isFeatured && (
                                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-klar px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md">
                                                 Best Value
                                             </div>
                                         )}
-                                        <h4 className="text-xl font-bold text-white mb-2">{tier.name}</h4>
-                                        <p className="text-gray-400 text-sm mb-4">Starting at</p>
+                                        <h4 className="text-xl font-bold text-theme-primary mb-2">{tier.name}</h4>
+                                        <p className="text-theme-secondary text-sm mb-4">Starting at</p>
                                         <p className="text-4xl font-extrabold text-klar mb-6">{tier.price}</p>
                                         <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-3 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Purchase</a>
                                     </div>
@@ -1024,22 +1010,20 @@ const App = () => {
 
                         <section id="free" className="py-12 fade-in-section">
                             <div className="text-center">
-                                <h3 className="text-4xl font-bold text-white">Get Free Access</h3>
-                                <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">Follow these three simple steps to get a free key and start using Klar Hub.</p>
+                                <h3 className="text-4xl font-bold text-theme-primary">Get Free Access</h3>
+                                <p className="text-lg text-theme-secondary mt-4 max-w-2xl mx-auto">Follow these three simple steps to get a free key and start using Klar Hub.</p>
                             </div>
                             <div className="mt-12 max-w-3xl mx-auto">
                                 <div className="relative pl-12">
-                                    {/* Vertical connector line */}
-                                    <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-border-color"></div>
+                                    <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-theme"></div>
 
-                                    {/* Step 1 */}
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
                                         </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-white">Get Your Key</h4>
-                                            <p className="text-gray-400 mt-2">Choose an option below and complete the required steps on our partner's site to receive your script key.</p>
+                                        <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
+                                            <h4 className="text-2xl font-semibold text-theme-primary">Get Your Key</h4>
+                                            <p className="text-theme-secondary mt-2">Choose an option below and complete the required steps on our partner's site to receive your script key.</p>
                                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Linkvertise)</a>
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Lootlabs)</a>
@@ -1047,15 +1031,14 @@ const App = () => {
                                         </div>
                                     </div>
 
-                                    {/* Step 2 */}
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
                                         </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-white">Prepare Your Script</h4>
-                                            <p className="text-gray-400 mt-2">Paste the key you received from Step 1 into the box below. Then, click the copy button to get your final script.</p>
-                                            <div className="mt-4 bg-background-dark p-4 rounded-lg relative">
+                                        <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
+                                            <h4 className="text-2xl font-semibold text-theme-primary">Prepare Your Script</h4>
+                                            <p className="text-theme-secondary mt-2">Paste the key you received from Step 1 into the box below. Then, click the copy button to get your final script.</p>
+                                            <div className="mt-4 bg-theme-dark p-4 rounded-lg relative">
                                                 <pre className="text-gray-300 overflow-x-auto custom-scrollbar">
                                                     <code>
                                                         {'script_key="'}<span className="text-klar">{freeKey || "insert key"}</span>{'";\nloadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/50da22b3657a22c353b0dde631cb1dcf.lua"))()'}
@@ -1067,7 +1050,7 @@ const App = () => {
                                                         value={freeKey}
                                                         onChange={(e) => setFreeKey(e.target.value)}
                                                         placeholder="Paste your key here"
-                                                        className="w-full bg-button-secondary-bg border border-border-color rounded-lg text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-klar p-2"
+                                                        className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-2"
                                                     />
                                                     <button onClick={handleCopyScript} className="flex-shrink-0 bg-klar hover:bg-klar-light text-white px-4 py-2 text-sm font-semibold rounded-lg transition">
                                                         {scriptCopied ? 'Copied!' : 'Copy Script'}
@@ -1077,14 +1060,13 @@ const App = () => {
                                         </div>
                                     </div>
 
-                                    {/* Step 3 */}
                                     <div className="relative">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">3</div>
                                         </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
-                                            <h4 className="text-2xl font-semibold text-white">Execute</h4>
-                                            <p className="text-gray-400 mt-2">You're all set! Now just paste the full script you copied into your executor and run it in-game.</p>
+                                        <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
+                                            <h4 className="text-2xl font-semibold text-theme-primary">Execute</h4>
+                                            <p className="text-theme-secondary mt-2">You're all set! Now just paste the full script you copied into your executor and run it in-game.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1092,12 +1074,12 @@ const App = () => {
                         </section>
 
                          <section id="reviews" className="py-12 text-center fade-in-section">
-                            <h3 className="text-4xl font-bold text-white">Trusted by Players Worldwide</h3>
+                            <h3 className="text-4xl font-bold text-theme-primary">Trusted by Players Worldwide</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
                                  {testimonials.map((t, i) => (
-                                    <div key={i} className="bg-card-bg p-6 rounded-lg border border-border-color text-left interactive-card flex flex-col h-full">
-                                        <div className="flex-grow"><p className="text-gray-300 italic text-lg">"{t.text}"</p></div>
-                                        <div className="mt-4 pt-4 border-t border-border-color">
+                                    <div key={i} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card flex flex-col h-full">
+                                        <div className="flex-grow"><p className="text-theme-secondary italic text-lg">"{t.text}"</p></div>
+                                        <div className="mt-4 pt-4 border-t border-theme">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-klar font-semibold">{t.name}</span>
                                                 <div className="flex">
@@ -1112,16 +1094,16 @@ const App = () => {
                         </section>
 
                         <section id="faq" className="py-12 max-w-3xl mx-auto fade-in-section">
-                            <h3 className="text-4xl font-bold text-white text-center">Frequently Asked Questions</h3>
+                            <h3 className="text-4xl font-bold text-theme-primary text-center">Frequently Asked Questions</h3>
                             <div className="mt-12 space-y-4">
                                 {faqs.map((faq, index) => (
-                                    <div key={index} className="bg-card-bg border border-border-color rounded-lg faq-item">
+                                    <div key={index} className="bg-theme-card border border-theme rounded-lg faq-item">
                                         <button onClick={() => setActiveFaq(activeFaq === index ? null : index)} className="w-full flex justify-between items-center p-6 text-left">
-                                            <span className="text-lg font-semibold text-white">{faq.q}</span>
-                                            <svg className={`w-6 h-6 text-gray-400 transition-transform duration-300 ${activeFaq === index ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                            <span className="text-lg font-semibold text-theme-primary">{faq.q}</span>
+                                            <svg className={`w-6 h-6 text-theme-secondary transition-transform duration-300 ${activeFaq === index ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                         </button>
                                         <div className="grid transition-all duration-500 ease-in-out" style={{gridTemplateRows: activeFaq === index ? '1fr' : '0fr'}}>
-                                            <div className="overflow-hidden"><p className="p-6 pt-0 text-gray-400">{faq.a}</p></div>
+                                            <div className="overflow-hidden"><p className="p-6 pt-0 text-theme-secondary">{faq.a}</p></div>
                                         </div>
                                     </div>
                                 ))}
@@ -1129,9 +1111,9 @@ const App = () => {
                         </section>
 
                         <section id="community" className="py-12 text-center fade-in-section">
-                            <div className="bg-card-bg border border-border-color rounded-2xl p-8">
-                                <h3 className="text-4xl font-bold text-white">Still Have Questions?</h3>
-                                <p className="text-lg text-gray-400 mt-4">Get support and connect with other users on our Discord server.</p>
+                            <div className="bg-theme-card border border-theme rounded-2xl p-8">
+                                <h3 className="text-4xl font-bold text-theme-primary">Still Have Questions?</h3>
+                                <p className="text-lg text-theme-secondary mt-4">Get support and connect with other users on our Discord server.</p>
                                 <DiscordCounter />
                                 <div className="mt-8 max-w-xs mx-auto">
                                     <a href="https://discord.gg/bGmGSnW3gQ" target="_blank" rel="noopener noreferrer" className="block py-3 px-8 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join our Community</a>
@@ -1155,5 +1137,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
 
