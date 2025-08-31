@@ -30,6 +30,7 @@
 
     <!-- Custom Scrollbar Styles -->
     <style>
+        /* Styles for specific elements with the class */
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -46,6 +47,21 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background-color: var(--klar-light, #73a1e8);
         }
+
+        /* Styles for the main body scrollbar */
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: var(--background-dark, #121212);
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--klar-primary, #5586D6);
+            border-radius: 4px;
+        }
+        body::-webkit-scrollbar-thumb:hover {
+            background-color: var(--klar-light, #73a1e8);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -55,3 +71,4 @@
     <script type="text/babel" src="script.js"></script>
 </body>
 </html>
+
