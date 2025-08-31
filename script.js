@@ -857,7 +857,7 @@ const App = () => {
                                             <p className="text-gray-400 mt-2">Choose an option below and complete the required steps on our partner's site to receive your script key.</p>
                                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Linkvertise)</a>
-                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-button-secondary-bg hover:bg-button-secondary-hover-bg text-button-secondary-text">Get Key (Lootlabs)</a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Lootlabs)</a>
                                             </div>
                                         </div>
                                     </div>
@@ -1094,4 +1094,5 @@ const Footer = () => (
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
