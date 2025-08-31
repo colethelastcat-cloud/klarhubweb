@@ -906,12 +906,14 @@ const PreviewModal = ({ onClose }) => {
                 );
              case 'UI Settings':
                 return (
-                    <FeatureCard id="configs" title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
-                        <TextInput placeholder="Type Config Name..." />
-                        <Button label="Save Config" />
-                        <Button label="Load Config" />
-                        <Button label="Reset Config" />
-                    </FeatureCard>
+                    <div className="col-span-2">
+                        <FeatureCard id="configs" title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
+                            <TextInput placeholder="Type Config Name..." />
+                            <Button label="Save Config" />
+                            <Button label="Load Config" />
+                            <Button label="Reset Config" />
+                        </FeatureCard>
+                    </div>
                 );
             default:
                 return <div className="col-span-2 text-center text-gray-500 pt-10">Content for {activeTab} not found.</div>;
@@ -941,8 +943,8 @@ const PreviewModal = ({ onClose }) => {
                         </div>
                     </div>
                     {/* Main Content */}
-                    <div className={`flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto custom-scrollbar transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-                       <div className="hub-content-inner col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className={`flex-1 p-6 overflow-y-auto custom-scrollbar transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
+                       <div className="hub-content-inner grid grid-cols-1 md:grid-cols-2 gap-4">
                           {renderContent()}
                        </div>
                     </div>
@@ -1070,8 +1072,14 @@ const AIHelperButton = ({ onClick }) => {
 };
 
 const Footer = () => (
-     <footer className="w-full p-8 text-center text-gray-500">
+     <footer className="w-full p-8 text-center text-gray-500 text-sm">
         <p>© 2025 Klar Hub. All rights reserved.</p>
+        <p className="mt-2">made by auaqa</p>
+         <div className="flex justify-center gap-4 mt-2">
+            <a href="#" className="hover:text-klar transition-colors">Discord</a>
+            <a href="#" className="hover:text-klar transition-colors">Telegram</a>
+            <a href="#" className="hover:text-klar transition-colors">Youtube</a>
+        </div>
     </footer>
 );
 
