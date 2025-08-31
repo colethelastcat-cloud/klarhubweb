@@ -2,34 +2,34 @@ const { useState, useEffect, useRef } = React;
 
 // --- Helper Hooks ---
 const useInteractiveCard = () => {
-    useEffect(() => {
-        const cards = document.querySelectorAll('.interactive-card');
-        const handleMouseMove = (e) => {
-            const card = e.currentTarget;
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            // Increased the tilt effect
-            const rotateX = (y - rect.height / 2) / 8;
-            const rotateY = (rect.width / 2 - x) / 8;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
-        };
-        const handleMouseLeave = (e) => {
-            e.currentTarget.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        };
-        cards.forEach(card => {
-            card.addEventListener('mousemove', handleMouseMove);
-            card.addEventListener('mouseleave', handleMouseLeave);
-        });
-        return () => {
-            cards.forEach(card => {
-                card.removeEventListener('mousemove', handleMouseMove);
-                card.removeEventListener('mouseleave', handleMouseLeave);
-            });
-        };
-    }, []);
+  useEffect(() => {
+    const cards = document.querySelectorAll('.interactive-card');
+    const handleMouseMove = (e) => {
+      const card = e.currentTarget;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      // Increased the tilt effect
+      const rotateX = (y - rect.height / 2) / 8;
+      const rotateY = (rect.width / 2 - x) / 8;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    };
+    const handleMouseLeave = (e) => {
+      e.currentTarget.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+    };
+    cards.forEach(card => {
+      card.addEventListener('mousemove', handleMouseMove);
+      card.addEventListener('mouseleave', handleMouseLeave);
+    });
+    return () => {
+      cards.forEach(card => {
+        card.removeEventListener('mousemove', handleMouseMove);
+        card.removeEventListener('mouseleave', handleMouseLeave);
+      });
+    };
+  }, []);
 };
 
 const useFadeInSection = () => {
@@ -534,8 +534,8 @@ const KlarClickerGameModal = ({ onClose }) => {
             {(handleClose) => (
                 <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-lg border border-klar/50 text-white p-4">
                     <div className="flex justify-between items-center mb-4">
-                         <h3 className="text-xl font-bold">Klar Clicker</h3>
-                         <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        <h3 className="text-xl font-bold">Klar Clicker</h3>
+                        <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
                     </div>
 
                     {loading ? <div className="text-center p-8">Loading Game...</div> :
@@ -662,8 +662,8 @@ const App = () => {
     const handleScrollTo = (id) => {
          const element = document.getElementById(id);
          if (element) {
-            const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
-            window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+             const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+             window.scrollTo({ top: offsetPosition, behavior: "smooth" });
          }
          setIsMobileMenuOpen(false);
     };
@@ -805,15 +805,15 @@ const App = () => {
                              <h3 className="text-4xl font-bold text-white">Supported Games</h3>
                              <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                   {supportedGames.map(game => (
-                                     <div key={game.name} className="bg-card-bg p-8 rounded-lg border border-border-color text-center interactive-card flex flex-col justify-between">
-                                         <div>
-                                             <h4 className="text-2xl font-bold text-white">{game.name}</h4>
-                                             <p className="text-klar font-semibold text-lg">{game.abbr}</p>
-                                         </div>
-                                         <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
-                                             View Features
-                                         </button>
-                                     </div>
+                                       <div key={game.name} className="bg-card-bg p-8 rounded-lg border border-border-color text-center interactive-card flex flex-col justify-between">
+                                           <div>
+                                               <h4 className="text-2xl font-bold text-white">{game.name}</h4>
+                                               <p className="text-klar font-semibold text-lg">{game.abbr}</p>
+                                           </div>
+                                           <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
+                                               View Features
+                                           </button>
+                                       </div>
                                   ))}
                              </div>
                         </section>
@@ -843,28 +843,31 @@ const App = () => {
                                 <p className="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">Follow these three simple steps to get a free key and start using Klar Hub.</p>
                             </div>
                             <div className="mt-12 max-w-3xl mx-auto">
-                                <div className="relative pl-12">
+                                <div className="relative pl-8">
                                     {/* Vertical connector line */}
-                                    <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-border-color"></div>
+                                    <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-border-color"></div>
 
                                     {/* Step 1 */}
-                                    <div className="relative mb-12">
-                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
-                                            <div className="z-10 w-12 h-12 rounded-full bg-klar flex items-center justify-center font-bold text-white text-2xl">1</div>
-                                        </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative pl-8 mb-12">
+                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">1</div>
+                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Get Your Key</h4>
-                                            <p className="text-gray-400 mt-2">Click the button below and complete the required steps on our partner's site to receive your script key.</p>
-                                            <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="inline-block mt-4 py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key</a>
+                                            <p className="text-gray-400 mt-2">Choose an option below and complete the steps on our partner's site to receive your script key.</p>
+                                            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">
+                                                  Get Key (Linkvertise)
+                                                </a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-button-secondary-bg hover:bg-button-secondary-hover-bg text-button-secondary-text">
+                                                  Get Key (Lootlabs)
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Step 2 */}
-                                    <div className="relative mb-12">
-                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
-                                            <div className="z-10 w-12 h-12 rounded-full bg-klar flex items-center justify-center font-bold text-white text-2xl">2</div>
-                                        </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative pl-8 mb-12">
+                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">2</div>
+                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Prepare Your Script</h4>
                                             <p className="text-gray-400 mt-2">Paste the key you received from Step 1 into the box below. Then, click the copy button to get your final script.</p>
                                             <div className="mt-4 bg-background-dark p-4 rounded-lg relative">
@@ -890,11 +893,9 @@ const App = () => {
                                     </div>
 
                                     {/* Step 3 */}
-                                    <div className="relative">
-                                        <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
-                                            <div className="z-10 w-12 h-12 rounded-full bg-klar flex items-center justify-center font-bold text-white text-2xl">3</div>
-                                        </div>
-                                        <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
+                                    <div className="relative pl-8">
+                                        <div className="absolute left-[-18px] top-1/2 -translate-y-1/2 z-10 step-number">3</div>
+                                        <div className="p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Execute</h4>
                                             <p className="text-gray-400 mt-2">You're all set! Now just paste the full script you copied into your executor and run it in-game.</p>
                                         </div>
