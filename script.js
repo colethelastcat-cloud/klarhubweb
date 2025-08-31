@@ -639,11 +639,68 @@ const TosModal = ({ onClose }) => {
 // --- NEW PREVIEW MODAL ---
 const PreviewModal = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState('Catching');
-    const [previewState, setPreviewState] = useState({});
+    const [previewState, setPreviewState] = useState({
+        // Default values for a realistic preview
+        magnet_power: 25, magnet_chance: 100, arm_size: 3, football_size: 1,
+        dime_lead: 11, mag_lead: 12.5, bullet_lead: 4, lead_distance: 0, height_distance: 0,
+        walkspeed: 20, cframe_speed: 0, jump_power: 50, angle_power: 50, hip_height: 0, gravity: 196.1,
+        delay_auto_guard: 0.1, power_auto_boost: 0, swat_distance: 0, prediction_delay: 0,
+        hump_speed: 5, underground_size: 0.001, fps_cap: 60,
+    });
+    const [listeningForBind, setListeningForBind] = useState(null); // Tracks which feature is waiting for a keybind
 
     const handleValueChange = (key, value) => {
         setPreviewState(prev => ({ ...prev, [key]: value }));
     };
+    
+    // Effect to handle setting a keybind
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (listeningForBind) {
+                // Prevent binding keys like Tab, Alt, etc.
+                if (e.key.length === 1 && e.key.match(/[a-zA-Z0-9]/i)) {
+                    handleValueChange(`${listeningForBind}_bind`, e.key.toUpperCase());
+                } else if (e.key === " ") {
+                     handleValueChange(`${listeningForBind}_bind`, 'Space');
+                } else {
+                     handleValueChange(`${listeningForBind}_bind`, e.key);
+                }
+                setListeningForBind(null); // Stop listening after a key is pressed
+                e.preventDefault();
+            }
+        };
+
+        if (listeningForBind) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [listeningForBind]);
+
+    // Effect to handle toggling features with keybinds
+     useEffect(() => {
+        const handleKeyDown = (e) => {
+            const key = e.key.toUpperCase();
+            const spaceKey = e.key === " " ? "SPACE" : null;
+            
+            Object.keys(previewState).forEach(stateKey => {
+                if (stateKey.endsWith('_bind')) {
+                    const featureKey = stateKey.replace('_bind', '');
+                    if (previewState[stateKey] === key || previewState[stateKey] === spaceKey || previewState[stateKey] === e.key) {
+                        handleValueChange(featureKey, !previewState[featureKey]);
+                    }
+                }
+            });
+        };
+        
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [previewState]);
+
 
     const tabs = [
         { name: 'Catching', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /><path d="M5 3a1 1 0 000 2h10a1 1 0 100-2H5z" /></svg> },
@@ -655,19 +712,25 @@ const PreviewModal = ({ onClose }) => {
         { name: 'Trolling', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clipRule="evenodd" /></svg> },
         { name: 'UI Settings', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01-.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" /></svg> },
     ];
-
-    const FeatureCard = ({ title, icon, children }) => (
-        <div className="bg-[#18181C] p-3 rounded-md">
-            <div className="flex items-center justify-between text-gray-300 mb-3">
-                <div className="flex items-center gap-2">
-                    {icon}
-                    <h3 className="font-semibold text-sm">{title}</h3>
+    
+    const FeatureCard = ({ id, title, icon, children }) => {
+        const bindKey = previewState[`${id}_bind`];
+        const isListening = listeningForBind === id;
+        return(
+            <div className="bg-[#18181C] p-3 rounded-md">
+                <div className="flex items-center justify-between text-gray-300 mb-3">
+                    <div className="flex items-center gap-2">
+                        {icon}
+                        <h3 className="font-semibold text-sm">{title}</h3>
+                    </div>
+                    <button onClick={() => setListeningForBind(id)} className={`text-xs font-mono px-2 py-1 rounded transition-colors ${isListening ? 'bg-blue-500 text-white animate-pulse' : 'bg-black/30 text-gray-400 hover:bg-white/10'}`}>
+                        {isListening ? '...' : (bindKey || 'N/A')}
+                    </button>
                 </div>
-                <div className="text-gray-500 cursor-move">...</div>
+                <div className="space-y-3">{children}</div>
             </div>
-            <div className="space-y-3">{children}</div>
-        </div>
-    );
+        );
+    };
     
     const Checkbox = ({ id, label }) => {
         const checked = previewState[id] || false;
@@ -681,8 +744,8 @@ const PreviewModal = ({ onClose }) => {
         );
     };
 
-    const Slider = ({ id, label, value, max = 100 }) => {
-        const sliderValue = previewState[id] || value;
+    const Slider = ({ id, label, value, max = 100, step = 1 }) => {
+        const sliderValue = previewState[id] !== undefined ? previewState[id] : value;
         return (
              <div className="space-y-1">
                 <div className="flex items-center justify-between">
@@ -690,8 +753,8 @@ const PreviewModal = ({ onClose }) => {
                     <input 
                         type="number"
                         value={sliderValue}
-                        onChange={(e) => handleValueChange(id, e.target.value)}
-                        className="w-12 text-center text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded focus:outline-none focus:ring-1 focus:ring-klar"
+                        onChange={(e) => handleValueChange(id, parseFloat(e.target.value))}
+                        className="w-14 text-center text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded focus:outline-none focus:ring-1 focus:ring-klar no-arrows"
                     />
                 </div>
                 <div className="relative w-full h-2 flex items-center">
@@ -699,8 +762,9 @@ const PreviewModal = ({ onClose }) => {
                         type="range"
                         min="0"
                         max={max}
+                        step={step}
                         value={sliderValue}
-                        onChange={(e) => handleValueChange(id, e.target.value)}
+                        onChange={(e) => handleValueChange(id, parseFloat(e.target.value))}
                         className="w-full h-2 rounded-full appearance-none bg-black/30 slider-thumb"
                     />
                 </div>
@@ -721,79 +785,129 @@ const PreviewModal = ({ onClose }) => {
     };
     
     const Button = ({ label }) => <button className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded hover:bg-white/5 transition-colors">{label}</button>
+    const TextInput = ({ placeholder }) => <input type="text" placeholder={placeholder} className="w-full bg-black/30 text-xs p-2 rounded border border-gray-600 focus:outline-none focus:border-klar placeholder-gray-500" />
 
     const renderContent = () => {
         switch (activeTab) {
             case 'Catching':
                 return (
                     <>
-                        <FeatureCard title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
-                           <Checkbox id="magnets" label="Magnets" />
-                           <Slider id="magnet_power" label="Magnet Power" value="25" />
-                           <Slider id="magnet_chance" label="Magnet Chance" value="100" />
+                        <FeatureCard id="magnets" title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
+                           <Checkbox id="magnets_enabled" label="Magnets" />
+                           <Slider id="magnet_power" label="Magnet Power" value={25} />
+                           <Slider id="magnet_chance" label="Magnet Chance" value={100} />
                            <Checkbox id="show_hitbox" label="Show Hitbox" />
                            <Dropdown id="magnet_type" label="Magnet Type" options={["Regular", "Advanced"]} />
                            <Checkbox id="freefall_shape" label="Freefall Shape" />
                            <Dropdown id="hitbox_shape" label="Hitbox Shape" options={["Forcefield", "Box"]} />
                         </FeatureCard>
-                         <FeatureCard title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                           <Checkbox id="pull_vector" label="Pull Vector" />
+                         <FeatureCard id="pull_vector" title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                           <Checkbox id="pull_vector_enabled" label="Pull Vector" />
                            <Dropdown id="vector_type" label="Vector Type" options={["Tween", "Linear"]} />
-                           <Slider id="vector_distance" label="Distance" value="0" />
-                           <Slider id="vector_power" label="Power" value="0" />
+                           <Slider id="vector_distance" label="Distance" value={0} />
+                           <Slider id="vector_power" label="Power" value={0} />
                         </FeatureCard>
-                         <FeatureCard title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                           <Checkbox id="arm_resizement" label="Arm Resizement" />
-                           <Slider id="arm_size" label="Arm Size" value="3" max="10"/>
-                           <Checkbox id="football_resize" label="Football Resize" />
-                           <Slider id="football_size" label="Football Size" value="1" max="5"/>
+                         <FeatureCard id="resizements" title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                           <Checkbox id="arm_resizement_enabled" label="Arm Resizement" />
+                           <Slider id="arm_size" label="Arm Size" value={3} max="10"/>
+                           <Checkbox id="football_resize_enabled" label="Football Resize" />
+                           <Slider id="football_size" label="Football Size" value={1} max="5"/>
                         </FeatureCard>
-                         <FeatureCard title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
-                           <Checkbox id="freeze_tech" label="Freeze Tech" />
-                           <Slider id="freeze_duration" label="Duration" value="0" />
-                           <div className="flex items-center justify-between"><span className="text-xs text-gray-400">Manual Bind</span><button className="bg-black/30 text-xs text-gray-300 px-2 py-1 rounded">None</button></div>
+                         <FeatureCard id="freeze_tech" title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
+                           <Checkbox id="freeze_tech_enabled" label="Freeze Tech" />
+                           <Slider id="freeze_duration" label="Duration" value={0} />
                         </FeatureCard>
                     </>
                 );
             case 'Throwing':
                  return (
                     <>
-                         <FeatureCard title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                            <Checkbox id="qb_aimbot" label="QB Aimbot" />
-                            <Checkbox id="auto_angle" label="Auto Angle" />
-                            <Checkbox id="smart_fit" label="Smart Fit" />
+                         <FeatureCard id="qb_aimbot" title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                            <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
+                            <Checkbox id="auto_angle_enabled" label="Auto Angle" />
+                            <Checkbox id="smart_fit_enabled" label="Smart Fit" />
                          </FeatureCard>
-                         <FeatureCard title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                            <Slider id="dime_lead" label="Dime Lead" value="11" />
-                            <Slider id="mag_lead" label="Mag Lead" value="12.5" />
-                            <Slider id="bullet_lead" label="Bullet Lead" value="4" />
-                            <Slider id="lead_distance" label="Lead Distance" value="0" />
-                            <Slider id="height_distance" label="Height Distance" value="0" />
+                         <FeatureCard id="qb_settings" title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                            <Slider id="dime_lead" label="Dime Lead" value={11} />
+                            <Slider id="mag_lead" label="Mag Lead" value={12.5} step={0.1}/>
+                            <Slider id="bullet_lead" label="Bullet Lead" value={4} />
+                            <Slider id="lead_distance" label="Lead Distance" value={0} />
+                            <Slider id="height_distance" label="Height Distance" value={0} />
                          </FeatureCard>
                     </>
                  );
             case 'Player':
                  return (
                     <>
-                        <FeatureCard title="Walkspeed" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="speed" label="Speed" /><Dropdown id="speed_type" label="Speed Type" options={['Walkspeed', 'Jump']} /><Slider id="walkspeed" label="Walkspeed" value="20" /><Slider id="cframe_speed" label="CFrame Speed" value="0" /></FeatureCard>
-                        <FeatureCard title="Jump Power" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="jump_power_check" label="Jump Power" /><Dropdown id="jump_type" label="Type" options={['Normal', 'High']} /><Slider id="jump_power" label="Power" value="50" /></FeatureCard>
-                        <FeatureCard title="Angle Enhancer" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="angle_enhancer" label="Angle Enhancer" /><Slider id="angle_power" label="Power" value="50" /></FeatureCard>
-                        <FeatureCard title="Hip Height" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="hip_height_check" label="Hip Height" /><Slider id="hip_height" label="Height" value="0" /></FeatureCard>
-                        <FeatureCard title="No Jump Cooldown" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="no_jump_cooldown" label="No Jump Cooldown" /></FeatureCard>
-                        <FeatureCard title="Gravity" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="gravity_check" label="Gravity" /><Slider id="gravity" label="Gravity" value="196.1" max="500"/></FeatureCard>
+                        <FeatureCard id="walkspeed" title="Walkspeed" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="walkspeed_enabled" label="Speed" /><Dropdown id="speed_type" label="Speed Type" options={['Walkspeed', 'Jump']} /><Slider id="walkspeed_value" label="Walkspeed" value={20} /><Slider id="cframe_speed" label="CFrame Speed" value={0} /></FeatureCard>
+                        <FeatureCard id="jump_power" title="Jump Power" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="jump_power_enabled" label="Jump Power" /><Dropdown id="jump_type" label="Type" options={['Normal', 'High']} /><Slider id="jump_power_value" label="Power" value={50} /></FeatureCard>
+                        <FeatureCard id="angle_enhancer" title="Angle Enhancer" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="angle_enhancer_enabled" label="Angle Enhancer" /><Slider id="angle_power" label="Power" value={50} /></FeatureCard>
+                        <FeatureCard id="hip_height" title="Hip Height" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="hip_height_enabled" label="Hip Height" /><Slider id="hip_height_value" label="Height" value={0} /></FeatureCard>
+                        <FeatureCard id="no_jump" title="No Jump Cooldown" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="no_jump_cooldown_enabled" label="No Jump Cooldown" /></FeatureCard>
+                        <FeatureCard id="gravity" title="Gravity" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="gravity_enabled" label="Gravity" /><Slider id="gravity_value" label="Gravity" value={196.1} max="500" step={0.1}/></FeatureCard>
                     </>
                  );
+            case 'Automatic':
+                return (
+                    <>
+                        <FeatureCard id="auto_qb" title="Auto QB" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_qb_enabled" label="Auto QB"/><Dropdown label="Auto QB Type" options={['Walk', 'Run']}/></FeatureCard>
+                        <FeatureCard id="auto_captain" title="Auto Captain" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_captain_enabled" label="Auto Captain"/></FeatureCard>
+                        <FeatureCard id="auto_catch" title="Auto Catch" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_catch_enabled" label="Auto Catch (PC Only)"/></FeatureCard>
+                        <FeatureCard id="auto_swat" title="Auto Swat" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_swat_enabled" label="Auto Swat (PC Only)"/><Slider id="swat_distance" label="Swat Distance" value={0}/></FeatureCard>
+                        <FeatureCard id="auto_guard" title="Auto Guard" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_guard_enabled" label="Auto Guard"/><Slider id="delay_auto_guard" label="Delay" value={0.1} max={1} step={0.1}/></FeatureCard>
+                        <FeatureCard id="auto_rush" title="Auto Rush" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_rush_enabled" label="Auto Rush"/><Checkbox id="prediction" label="Prediction"/><Slider id="prediction_delay" label="Delay" value={0}/></FeatureCard>
+                        <FeatureCard id="auto_boost" title="Auto Boost" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_boost_enabled" label="Auto Boost"/><Slider id="power_auto_boost" label="Power" value={0}/></FeatureCard>
+                        <FeatureCard id="auto_kick" title="Auto Kick" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_kick_enabled" label="Auto Kick"/><Dropdown id="auto_kick_mode" label="Mode" options={['Perfect', 'Good']}/><Dropdown id="auto_kick_type" label="Type" options={['Normal', 'Weird']}/></FeatureCard>
+                        <FeatureCard id="auto_reset" title="Auto Reset" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg>}><Checkbox id="auto_reset_enabled" label="Auto Reset"/></FeatureCard>
+                    </>
+                );
+            case 'Physic':
+                return(
+                    <>
+                        <FeatureCard id="endzone_reach" title="Endzone Reach" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="endzone_reach_enabled" label="Endzone Reach"/><Slider id="endzone_reach_value" label="Reach" value={0}/></FeatureCard>
+                        <FeatureCard id="click_tackle" title="Click Tackle" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="click_tackle_enabled" label="Click Tackle"/><Slider id="click_tackle_distance" label="Distance" value={0}/></FeatureCard>
+                        <FeatureCard id="tackle_reach" title="Tackle Reach" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="tackle_reach_enabled" label="Tackle Reach"/><Slider id="custom_tackle" label="Custom Tackle" value={0}/></FeatureCard>
+                        <FeatureCard id="head_size" title="Head Size" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="head_size_enabled" label="Head Size"/><Slider id="resize_head" label="Resize Head" value={0}/><Slider id="transparency" label="Transparency" value={0}/></FeatureCard>
+                        <FeatureCard id="block_reach" title="Block Reach" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="block_reach_enabled" label="Block Reach"/><Slider id="custom_reach" label="Custom Reach" value={0}/><Checkbox id="show_hitbox_block" label="Show Hitbox"/></FeatureCard>
+                        <FeatureCard id="quick_tp" title="Quick TP" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="quick_tp_enabled" label="Quick TP"/><Slider id="tp_distance" label="TP Distance" value={0}/></FeatureCard>
+                        <FeatureCard id="anti" title="Anti" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="anti_jam" label="Anti Jam (Risky)"/><Checkbox id="anti_block" label="Anti Block (Risky)"/><Checkbox id="anti_bench" label="Anti Bench"/></FeatureCard>
+                        <FeatureCard id="dive_power" title="Dive Power" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" /></svg>}><Checkbox id="dive_power_enabled" label="Dive Power"/><Slider id="dive_power_value" label="Power" value={0}/></FeatureCard>
+                    </>
+                );
+            case 'Visual':
+                return(
+                    <>
+                        <FeatureCard id="viz_path" title="Visualize Football Path" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="viz_path_enabled" label="Visualize Football Path" /></FeatureCard>
+                        <FeatureCard id="jersey_changer" title="Jersey Changer" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><TextInput placeholder="Type something..."/><TextInput placeholder="Type something..."/><Button label="Apply Changes"/></FeatureCard>
+                        <FeatureCard id="fps_stuff" title="FPS Related Stuff" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="low_graphics" label="Low Graphics"/><Slider id="fps_cap" label="FPS Cap" value={60} max={240}/></FeatureCard>
+                        <FeatureCard id="time_of_day" title="Time of Day" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="time_of_day_enabled" label="Time Of Day"/><Dropdown id="time_choose" label="Choose" options={['Morning', 'Day', 'Night']}/></FeatureCard>
+                        <FeatureCard id="no_trail" title="No Football Trail" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="no_trail_enabled" label="No Football Trail"/></FeatureCard>
+                        <FeatureCard id="football_highlight" title="Football Highlight" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="football_highlight_enabled" label="Football Highlight"/></FeatureCard>
+                        <FeatureCard id="jump_predict" title="Jump/Dive Prediction" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="jump_predict_enabled" label="Jump/Dive Prediction"/><Dropdown id="predict_type" label="Prediction Type" options={['Jump', 'Dive']}/></FeatureCard>
+                        <FeatureCard id="destroy_stadium" title="Destroy Stadium" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="destroy_stadium_enabled" label="Destroy Stadium"/></FeatureCard>
+                        <FeatureCard id="catch_effect" title="Catch Effect" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" /></svg>}><Checkbox id="catch_effect_enabled" label="Catch Effect"/><Dropdown id="effect_style" label="Effect Style" options={['Expand', 'Shrink']}/></FeatureCard>
+                    </>
+                );
+            case 'Trolling':
+                return (
+                    <>
+                        <FeatureCard id="trash_talk" title="Trash Talk" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Button label="Send Trash Talk" /></FeatureCard>
+                        <FeatureCard id="underground" title="Underground" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="underground_enabled" label="Underground" /><Slider id="underground_size" label="Underground Size" value={0.001} max={1} step={0.001}/></FeatureCard>
+                        <FeatureCard id="hump" title="Hump Nearest Player" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="hump_enabled" label="Hump Nearest Player" /><Slider id="hump_speed" label="Hump Speed" value={5} /></FeatureCard>
+                        <FeatureCard id="no_oob" title="No OOB" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="no_oob_enabled" label="No OOB" /></FeatureCard>
+                    </>
+                );
              case 'UI Settings':
                 return (
-                    <FeatureCard title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
-                        <input type="text" placeholder="Type Config Name..." className="w-full bg-black/30 text-xs p-2 rounded border border-gray-600 focus:outline-none focus:border-klar" />
+                    <FeatureCard id="configs" title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
+                        <TextInput placeholder="Type Config Name..." />
                         <Button label="Save Config" />
                         <Button label="Load Config" />
                         <Button label="Reset Config" />
                     </FeatureCard>
                 );
             default:
-                return <div className="col-span-2 text-center text-gray-500 pt-10">Content for {activeTab} coming soon...</div>;
+                return <div className="col-span-2 text-center text-gray-500 pt-10">Content for {activeTab} not found.</div>;
         }
     };
 
