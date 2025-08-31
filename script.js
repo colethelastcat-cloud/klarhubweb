@@ -9,7 +9,6 @@ const useInteractiveCard = () => {
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            // Increased the tilt effect
             const rotateX = (y - rect.height / 2) / 8;
             const rotateY = (rect.width / 2 - x) / 8;
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
@@ -407,6 +406,97 @@ const AIHelperModal = ({ onClose }) => {
     );
 };
 
+const KlarClickerGameModal = ({ onClose }) => {
+    const [klars, setKlars] = useState(0);
+    const [clickLevel, setClickLevel] = useState(1);
+    const [autoLevel, setAutoLevel] = useState(0);
+
+    const klarsPerClick = 1 + (clickLevel - 1);
+    const klarsPerSecond = autoLevel * 0.5;
+    const clickUpgradeCost = Math.floor(10 * Math.pow(1.15, clickLevel));
+    const autoUpgradeCost = Math.floor(25 * Math.pow(1.2, autoLevel));
+
+    useEffect(() => {
+        if (klarsPerSecond === 0) return;
+        let lastUpdateTime = performance.now();
+        let animationFrameId;
+        const updateKlars = (currentTime) => {
+            const deltaTime = currentTime - lastUpdateTime;
+            lastUpdateTime = currentTime;
+            const klarsToAdd = (klarsPerSecond * deltaTime) / 1000;
+            setKlars(currentKlars => currentKlars + klarsToAdd);
+            animationFrameId = requestAnimationFrame(updateKlars);
+        };
+        animationFrameId = requestAnimationFrame(updateKlars);
+        return () => cancelAnimationFrame(animationFrameId);
+    }, [klarsPerSecond]);
+    
+    const handleLogoClick = () => {
+        setKlars(k => k + klarsPerClick);
+    };
+
+    const buyUpgrade = (type) => {
+        if (type === 'click' && klars >= clickUpgradeCost) {
+            setKlars(k => k - clickUpgradeCost);
+            setClickLevel(l => l + 1);
+        }
+        if (type === 'auto' && klars >= autoUpgradeCost) {
+            setKlars(k => k - autoUpgradeCost);
+            setAutoLevel(l => l + 1);
+        }
+    };
+
+    return (
+        <Modal onClose={onClose} animationClasses={{enterActive: 'opacity-100 scale-100', exitActive: 'opacity-0 scale-95'}}>
+            {(handleClose) => (
+                <div className="bg-modal-card-bg rounded-lg shadow-2xl w-full max-w-lg border border-klar/50 text-white p-4">
+                    <div className="flex justify-between items-center mb-4">
+                         <h3 className="text-xl font-bold">Klar Clicker</h3>
+                         <button onClick={handleClose} className="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    </div>
+                    <>
+                        <div className="text-center p-4 bg-background-dark rounded-lg mb-4">
+                            <h2 className="text-4xl font-bold text-klar">{klars.toLocaleString('en-US', {minimumFractionDigits: 1, maximumFractionDigits: 1})}</h2>
+                            <p className="text-sm text-text-secondary">Klars</p>
+                            <p className="text-xs text-text-secondary mt-1">{klarsPerSecond.toFixed(1)} per second</p>
+                        </div>
+                        <div 
+                            className="w-48 h-48 mx-auto my-4 cursor-pointer active:scale-95 transition-transform select-none flex items-center justify-center"
+                            onClick={handleLogoClick}
+                        >
+                            <Logo onScrollTo={() => {}}/>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-background-dark p-4 rounded-lg">
+                                <h4 className="font-bold">Click Power</h4>
+                                <p className="text-sm text-text-secondary mb-2">+{klarsPerClick.toLocaleString()} Klars per click (Lvl {clickLevel})</p>
+                                <button 
+                                    onClick={() => buyUpgrade('click')} 
+                                    disabled={klars < clickUpgradeCost}
+                                    className="w-full bg-klar disabled:bg-gray-500 text-white font-bold py-2 px-4 rounded transition"
+                                >
+                                    Cost: {clickUpgradeCost.toLocaleString()}
+                                </button>
+                            </div>
+                            <div className="bg-background-dark p-4 rounded-lg">
+                                <h4 className="font-bold">Auto Klars</h4>
+                                <p className="text-sm text-text-secondary mb-2">+{klarsPerSecond.toFixed(1)} Klars per second (Lvl {autoLevel})</p>
+                                <button 
+                                    onClick={() => buyUpgrade('auto')} 
+                                    disabled={klars < autoUpgradeCost}
+                                    className="w-full bg-klar disabled:bg-gray-500 text-white font-bold py-2 px-4 rounded transition"
+                                >
+                                    Cost: {autoUpgradeCost.toLocaleString()}
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                </div>
+            )}
+        </Modal>
+    );
+};
+
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -423,6 +513,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, activeSection, isMo
          <header ref={headerRef} style={{backgroundColor: 'var(--header-bg)'}} className="sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
                  <Logo onScrollTo={onScrollTo}/>
+                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-gray-300 hover:text-white transition border border-border-color hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
             </div>
             <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
                 {navItems.map(item => (
@@ -484,6 +575,7 @@ const Footer = () => (
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
+    const [isGameOpen, setIsGameOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeFaq, setActiveFaq] = useState(null);
     const [scriptCopied, setScriptCopied] = useState(false);
@@ -615,7 +707,7 @@ const App = () => {
                     onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     isMobileMenuOpen={isMobileMenuOpen}
                     activeSection={activeSection}
-                    onGameClick={() => { /* Removed */ }}
+                    onGameClick={() => setIsGameOpen(true)}
                     theme={theme}
                     setTheme={setTheme}
                 />
@@ -741,7 +833,10 @@ const App = () => {
                                         <div className="ml-4 p-6 bg-card-bg border border-border-color rounded-lg">
                                             <h4 className="text-2xl font-semibold text-white">Get Your Key</h4>
                                             <p className="text-gray-400 mt-2">Click the button below and complete the required steps on our partner's site to receive your script key.</p>
-                                            <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="inline-block mt-4 py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key</a>
+                                            <div className="flex flex-wrap gap-4 mt-4">
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">LOOTLABS</a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">LINKVERTISE</a>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="relative mb-12">
@@ -845,7 +940,7 @@ const App = () => {
                 <AIHelperButton onClick={() => setIsAiHelperOpen(true)} />
                 {isAiHelperOpen && <AIHelperModal onClose={() => setIsAiHelperOpen(false)} />}
                 {selectedGame && <GameFeaturesModal game={selectedGame} onClose={() => setSelectedGame(null)} />}
-                {/* The game component is no longer rendered here */}
+                {/* The game component is no longer rendered here to prevent loading issues */}
                 <BackToTopButton />
             </div>
         </div>
@@ -854,3 +949,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
