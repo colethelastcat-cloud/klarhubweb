@@ -103,7 +103,7 @@ const Logo = ({ onScrollTo }) => (
 
 const DiscordCounter = () => {
     const [onlineCount, setOnlineCount] = useState(null);
-    const serverId = '1357439616877072545'; // Your provided server ID
+    const serverId = '1357439616877072545';
 
     useEffect(() => {
         const fetchCount = () => {
@@ -119,13 +119,10 @@ const DiscordCounter = () => {
                     
                     if (discordData.code && discordData.message) {
                         setOnlineCount('N/A');
-                        console.error(`Discord API Error for Server ID ${serverId}: ${discordData.message} (Code: ${discordData.code})`);
-                        console.warn("Please double-check your Server ID and ensure the widget is enabled in Server Settings > Widget, and that you have saved the changes.");
                     } else if (discordData.presence_count !== undefined) {
                         setOnlineCount(discordData.presence_count);
                     } else {
                         setOnlineCount('N/A');
-                        console.warn("Could not fetch Discord presence count. The API response was unusual.");
                     }
                 })
                 .catch(error => {
@@ -623,6 +620,7 @@ const TosModal = ({ onClose }) => {
     );
 };
 
+// --- Page Layout Components (Moved before App) ---
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -685,7 +683,14 @@ const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
     return (
         <div className="fixed top-0 left-0 w-full h-full z-30 bg-theme-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
             {navItems.map(item => (
-                <button key={item.id} onClick={() => item.id === 'tos' ? onTosClick() : onScrollTo(item.id)} className="text-theme-secondary hover:text-klar transition">{item.label}</button>
+                <button key={item.id} onClick={() => {
+                    if (item.id === 'tos') {
+                        onTosClick();
+                    } else {
+                        onScrollTo(item.id);
+                    }
+                    onClose();
+                }} className="text-theme-secondary hover:text-klar transition">{item.label}</button>
             ))}
             <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
         </div>
@@ -738,6 +743,7 @@ const Footer = () => (
     </footer>
 );
 
+
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
@@ -756,31 +762,31 @@ const App = () => {
 
         const themes = {
             dark: {
-                '--background-dark': '#121212',
-                '--background-light': '#1E1E1E',
-                '--text-primary': '#F1F5F9', 
-                '--text-secondary': '#CBD5E1', // Made this much lighter for readability
-                '--border-color': '#475569',
-                '--header-bg': 'rgba(18, 18, 18, 0.5)',
-                '--card-bg': 'rgba(30, 30, 30, 0.3)',
-                '--modal-card-bg': '#1E1E1E',
-                '--button-secondary-bg': '#334155',
-                '--button-secondary-hover-bg': '#475569',
-                '--button-secondary-text': '#F1F5F9',
+                '--background-dark': '#111827',
+                '--background-light': '#1F2937',
+                '--text-primary': '#F9FAFB',
+                '--text-secondary': '#D1D5DB',
+                '--border-color': '#4B5563',
+                '--header-bg': 'rgba(17, 24, 39, 0.7)',
+                '--card-bg': 'rgba(31, 41, 55, 0.3)',
+                '--modal-card-bg': '#1F2937',
+                '--button-secondary-bg': '#374151',
+                '--button-secondary-hover-bg': '#4B5563',
+                '--button-secondary-text': '#F9FAFB',
                 '--aurora-opacity': '0.1'
             },
             light: {
-                '--background-dark': '#F8FAFC',
+                '--background-dark': '#F9FAFB',
                 '--background-light': '#FFFFFF',
-                '--text-primary': '#0F172A',
-                '--text-secondary': '#475569', // Made this darker for readability
-                '--border-color': '#CBD5E1', 
-                '--header-bg': 'rgba(248, 250, 252, 0.8)',
+                '--text-primary': '#111827',
+                '--text-secondary': '#374151',
+                '--border-color': '#D1D5DB',
+                '--header-bg': 'rgba(249, 250, 251, 0.8)',
                 '--card-bg': '#FFFFFF',
                 '--modal-card-bg': '#FFFFFF',
-                '--button-secondary-bg': '#E2E8F0',
-                '--button-secondary-hover-bg': '#CBD5E1',
-                '--button-secondary-text': '#0F172A',
+                '--button-secondary-bg': '#E5E7EB',
+                '--button-secondary-hover-bg': '#D1D5DB',
+                '--button-secondary-text': '#111827',
                 '--aurora-opacity': '0.05'
             }
         };
