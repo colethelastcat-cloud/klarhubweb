@@ -648,7 +648,7 @@ const PreviewModal = ({ onClose }) => {
         delay_auto_guard: 0.1, power_auto_boost: 0, swat_distance: 0, prediction_delay: 0,
         hump_speed: 5, underground_size: 0.001, fps_cap: 60,
     });
-    const [listeningForBind, setListeningForBind] = useState(null); // Tracks which feature is waiting for a keybind
+    const [listeningForBind, setListeningForBind] = useState(null);
 
     const handleTabClick = (tabName) => {
         if (tabName === activeTab) return;
@@ -685,7 +685,7 @@ const PreviewModal = ({ onClose }) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [listeningForBind]);
+    }, [listeningForBind, handleValueChange]);
 
      useEffect(() => {
         const handleKeyDown = (e) => {
@@ -705,7 +705,7 @@ const PreviewModal = ({ onClose }) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [previewState]);
+    }, [previewState, handleValueChange]);
 
 
     const tabs = [
@@ -750,30 +750,64 @@ const PreviewModal = ({ onClose }) => {
         );
     };
 
-    const Slider = ({ id, label, value, max = 100, step = 1 }) => {
+    const Slider = ({ id, label, value, min=0, max = 100, step = 1 }) => {
+        const sliderRef = useRef(null);
+        const [isDragging, setIsDragging] = useState(false);
         const sliderValue = previewState[id] !== undefined ? previewState[id] : value;
+        
+        const handleDrag = (e) => {
+            if (!sliderRef.current) return;
+            const rect = sliderRef.current.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            let newValue = (x / rect.width) * (max - min) + min;
+            newValue = Math.max(min, Math.min(max, newValue));
+            newValue = Math.round(newValue / step) * step;
+
+            if (step < 1) {
+                newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
+            }
+
+            handleValueChange(id, newValue);
+        };
+
+        const handleMouseDown = (e) => {
+            setIsDragging(true);
+            handleDrag(e);
+        };
+
+        useEffect(() => {
+            const handleMouseUp = () => setIsDragging(false);
+            const handleMouseMove = (e) => {
+                if(isDragging) handleDrag(e);
+            }
+
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+            return () => {
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('mouseup', handleMouseUp);
+            };
+        }, [isDragging, handleDrag]);
+
+
+        const percentage = ((sliderValue - min) / (max - min)) * 100;
+        
         return (
              <div className="space-y-1">
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{label}</span>
-                    <input 
-                        type="number"
-                        value={sliderValue}
-                        onChange={(e) => handleValueChange(id, parseFloat(e.target.value))}
-                        step={step}
-                        className="w-14 text-center text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded focus:outline-none focus:ring-1 focus:ring-klar no-arrows"
-                    />
+                    <span className="text-xs font-mono text-gray-300">{sliderValue}</span>
                 </div>
-                <div className="relative w-full h-2 flex items-center">
-                    <input 
-                        type="range"
-                        min="0"
-                        max={max}
-                        step={step}
-                        value={sliderValue}
-                        onChange={(e) => handleValueChange(id, parseFloat(e.target.value))}
-                        className="w-full h-2 rounded-full appearance-none bg-black/30 slider-thumb"
-                    />
+                <div 
+                    ref={sliderRef}
+                    onMouseDown={handleMouseDown}
+                    className="w-full h-2 rounded-full bg-black/30 cursor-pointer relative"
+                >
+                   <div className="h-full bg-klar rounded-full" style={{ width: `${percentage}%` }}></div>
+                   <div 
+                       className="w-4 h-4 bg-white border-2 border-klar rounded-full absolute top-1/2 -translate-x-1/2 -translate-y-1/2 slider-thumb"
+                       style={{ left: `${percentage}%` }}
+                   ></div>
                 </div>
             </div>
         );
@@ -899,7 +933,7 @@ const PreviewModal = ({ onClose }) => {
                 return (
                     <>
                         <FeatureCard id="trash_talk" title="Trash Talk" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Button label="Send Trash Talk" /></FeatureCard>
-                        <FeatureCard id="underground" title="Underground" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="underground_enabled" label="Underground" /><Slider id="underground_size" label="Underground Size" value={0.001} max={1} step={0.001}/></FeatureCard>
+                        <FeatureCard id="underground" title="Underground" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="underground_enabled" label="Underground" /><Slider id="underground_size" label="Underground Size" min={0.001} value={0.001} max={1} step={0.001}/></FeatureCard>
                         <FeatureCard id="hump" title="Hump Nearest Player" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="hump_enabled" label="Hump Nearest Player" /><Slider id="hump_speed" label="Hump Speed" value={5} /></FeatureCard>
                         <FeatureCard id="no_oob" title="No OOB" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" /></svg>}><Checkbox id="no_oob_enabled" label="No OOB" /></FeatureCard>
                     </>
@@ -907,12 +941,7 @@ const PreviewModal = ({ onClose }) => {
              case 'UI Settings':
                 return (
                     <div className="col-span-2">
-                        <FeatureCard id="configs" title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
-                            <TextInput placeholder="Type Config Name..." />
-                            <Button label="Save Config" />
-                            <Button label="Load Config" />
-                            <Button label="Reset Config" />
-                        </FeatureCard>
+                        {/* Content removed as per request */}
                     </div>
                 );
             default:
