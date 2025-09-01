@@ -5,40 +5,73 @@ const { useState, useEffect, useRef } = React;
 //=================================================
 
 const useInteractiveCard = () => {
-  useEffect(() => {
-    const cards = document.querySelectorAll('.interactive-card');
-    const handleMouseMove = (e) => {
-      const card = e.currentTarget;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const rotateX = (y - rect.height / 2) / 10;
-      const rotateY = (rect.width / 2 - x) / 10;
-      
-      let scale = '';
-      if (card.classList.contains('featured-card-js')) {
-          scale = 'scale(1.1)';
-      }
+    const animationFrame = useRef(null);
+    const cardsRef = useRef([]);
+    const stateRef = useRef({});
 
-      card.style.transform = `perspective(1000px) ${scale} rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
-    };
-    const handleMouseLeave = (e) => {
-      e.currentTarget.style.transform = ''; // Reverts to CSS-defined transform
-    };
-    cards.forEach(card => {
-      card.addEventListener('mousemove', handleMouseMove);
-      card.addEventListener('mouseleave', handleMouseLeave);
-    });
-    return () => {
-      cards.forEach(card => {
-        card.removeEventListener('mousemove', handleMouseMove);
-        card.removeEventListener('mouseleave', handleMouseLeave);
-      });
-    };
-  }, []);
+    useEffect(() => {
+        cardsRef.current = Array.from(document.querySelectorAll('.interactive-card'));
+        
+        cardsRef.current.forEach((card, index) => {
+            stateRef.current[index] = {
+                rotateX: 0, rotateY: 0,
+                targetX: 0, targetY: 0,
+                scale: card.classList.contains('featured-card-js') ? 1.1 : 1.0,
+            };
+
+            card.addEventListener('mousemove', handleMouseMove);
+            card.addEventListener('mouseleave', handleMouseLeave);
+        });
+
+        const handleMouseMove = (e) => {
+            const card = e.currentTarget;
+            const index = cardsRef.current.indexOf(card);
+            if (index === -1) return;
+
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            stateRef.current[index].targetY = (y - rect.height / 2) / 10;
+            stateRef.current[index].targetX = (rect.width / 2 - x) / 10;
+
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        };
+
+        const handleMouseLeave = (e) => {
+            const card = e.currentTarget;
+            const index = cardsRef.current.indexOf(card);
+             if (index === -1) return;
+            
+            stateRef.current[index].targetX = 0;
+            stateRef.current[index].targetY = 0;
+        };
+
+        const animate = () => {
+            cardsRef.current.forEach((card, index) => {
+                const state = stateRef.current[index];
+                if (state) {
+                    state.rotateX += (state.targetX - state.rotateX) * 0.1;
+                    state.rotateY += (state.targetY - state.rotateY) * 0.1;
+                    card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${state.rotateY}deg) rotateY(${state.rotateX}deg)`;
+                }
+            });
+            animationFrame.current = requestAnimationFrame(animate);
+        };
+        
+        animationFrame.current = requestAnimationFrame(animate);
+
+        return () => {
+            cancelAnimationFrame(animationFrame.current);
+            cardsRef.current.forEach(card => {
+                card.removeEventListener('mousemove', handleMouseMove);
+                card.removeEventListener('mouseleave', handleMouseLeave);
+            });
+        };
+    }, []);
 };
+
 
 const useFadeInSection = () => {
      useEffect(() => {
@@ -1023,11 +1056,6 @@ const PreviewModal = ({ onClose }) => {
     );
 };
 
-
-//=================================================
-// 4. CORE PAGE COMPONENTS
-//=================================================
-
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -1161,10 +1189,6 @@ const Footer = () => (
         </div>
     </footer>
 );
-
-//=================================================
-// 5. MAIN APP COMPONENT
-//=================================================
 
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
