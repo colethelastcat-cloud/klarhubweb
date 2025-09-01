@@ -14,28 +14,24 @@ const useInteractiveCard = () => {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            // Reduced the tilt to a more balanced level
-            const rotateY = (x - rect.width / 2) / 5;
-            const rotateX = (y - rect.height / 2) / -5;
+            // Final adjustment for a subtle, premium tilt
+            const rotateY = (x - rect.width / 2) / 6;
+            const rotateX = (y - rect.height / 2) / -6;
 
-            // Make the transform very responsive while moving the mouse
-            card.style.transition = 'transform 0.05s linear';
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
             
-            // These variables are still used for the background gradient effect
             card.style.setProperty('--mouse-x', `${x}px`);
             card.style.setProperty('--mouse-y', `${y}px`);
         };
 
         const handleMouseLeave = (e) => {
             const card = e.currentTarget;
-            // Use a smoother, slightly longer transition on mouse leave to prevent edge glitching
-            card.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
         };
 
         cards.forEach(card => {
-            // Transitions are now handled in the event listeners, so we don't set a global one here.
+            // A single, consistent transition fixes the flickering/glitching issue.
+            card.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             card.addEventListener('mousemove', handleMouseMove);
             card.addEventListener('mouseleave', handleMouseLeave);
         });
@@ -1640,11 +1636,3 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
-
-
-
-
-
-
-
