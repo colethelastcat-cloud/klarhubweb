@@ -40,11 +40,6 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Add smooth transitions to all links and buttons for a premium feel */
-a, button {
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-
 
 /*=================================================
   2. THEME VARIABLES & HELPERS
@@ -135,15 +130,19 @@ textarea.text-theme-primary {
 /* Interactive 3D Cards */
 .interactive-card {
     position: relative;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    /* The transform is now handled entirely by JavaScript for a smoother animation. The CSS transition was causing conflicts. */
+    transition: box-shadow 0.3s ease;
     transform-style: preserve-3d;
-}
-.interactive-card:hover { 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.1);
-    transform: translateY(-5px);
+    will-change: transform; /* Performance optimization */
 }
 
-/* This pseudo-element creates the glowing border effect on hover based on mouse position */
+.interactive-card.featured-card-js {
+    transform: scale(1.1); /* Base state for the featured card */
+}
+
+.interactive-card:hover { 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.2); 
+}
 .interactive-card::before {
     content: '';
     position: absolute;
@@ -166,17 +165,17 @@ textarea.text-theme-primary {
     border-color: var(--klar-primary);
 }
 
-/* Custom Sliders & Inputs */
+/* Sliders & Inputs */
 .slider-thumb {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.slider-thumb.dragging {
+.slider-thumb.dragging, .slider-thumb:active {
     transform: scale(1.2);
     box-shadow: 0 0 10px var(--klar-primary);
     cursor: grabbing;
 }
 
-/* Hide default arrows from number inputs */
+/* Hide arrows from number inputs */
 .no-arrows::-webkit-inner-spin-button,
 .no-arrows::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -190,8 +189,6 @@ textarea.text-theme-primary {
 /*=================================================
   5. PAGE SECTIONS & COMPONENTS
 =================================================*/
-
-/* Preloader */
 #preloader {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -215,7 +212,6 @@ textarea.text-theme-primary {
     animation: spin 1s linear infinite;
 }
 
-/* Aurora Background Effect */
 .aurora-background {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -233,7 +229,6 @@ textarea.text-theme-primary {
     opacity: var(--aurora-opacity);
 }
 
-/* Floating Action Buttons */
 .action-button-wrapper {
     animation: button-pop-in 1s 1s forwards cubic-bezier(0.16, 1, 0.3, 1);
     opacity: 0;
@@ -247,42 +242,13 @@ textarea.text-theme-primary {
 /*=================================================
   6. MODALS & OVERLAYS
 =================================================*/
-
-/* Required for 3D carousel effect in Video Modal */
 .perspective-1000 { perspective: 1000px; }
 .transform-style-3d { transform-style: preserve-3d; }
-
-/* Preview Hub UI Animation */
-.hub-content-inner {
-    animation: hub-content-fade-in 0.3s ease-out forwards;
-}
-
-.preview-animation-container {
-    position: relative;
-    width: 250px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-.scanner-line {
-    position: absolute;
-    top: 0;
-    left: -10%;
-    width: 10px;
-    height: 100%;
-    background-color: var(--klar-primary);
-    box-shadow: 0 0 15px 5px var(--klar-primary);
-    filter: blur(2px);
-    animation: scan 1.2s ease-in-out forwards;
-}
 
 
 /*=================================================
   7. ANIMATIONS & KEYFRAMES
 =================================================*/
-
 @keyframes spin { 
     to { transform: rotate(360deg); } 
 }
@@ -307,6 +273,31 @@ textarea.text-theme-primary {
         opacity: 1;
         transform: translateY(0);
     }
+}
+.hub-content-inner {
+    animation: hub-content-fade-in 0.3s ease-out forwards;
+}
+
+.preview-animation-container {
+    position: relative;
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.scanner-line {
+    position: absolute;
+    top: 0;
+    left: -10%;
+    width: 10px;
+    height: 100%;
+    background-color: var(--klar-primary);
+    box-shadow: 0 0 15px 5px var(--klar-primary);
+    filter: blur(2px);
+    animation: scan 1.2s ease-in-out forwards;
 }
 
 @keyframes scan {
