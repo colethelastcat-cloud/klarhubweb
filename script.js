@@ -14,8 +14,8 @@ const useInteractiveCard = () => {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            const rotateY = (x - rect.width / 2) / 5;
-            const rotateX = (y - rect.height / 2) / -5;
+            const rotateY = (x - rect.width / 2) / 2.5;
+            const rotateX = (y - rect.height / 2) / -2.5;
 
             card.style.setProperty('--rotateX', `${rotateX}deg`);
             card.style.setProperty('--rotateY', `${rotateY}deg`);
@@ -798,21 +798,19 @@ const PreviewModal = ({ onClose }) => {
 
         useEffect(() => {
             const handleMouseMove = (e) => {
-                handleValueUpdate(e.clientX);
+                if (isDragging) handleValueUpdate(e.clientX);
             };
             const handleTouchMove = (e) => {
-                handleValueUpdate(e.touches[0].clientX);
+                if (isDragging) handleValueUpdate(e.touches[0].clientX);
             };
             const handleInteractionEnd = () => {
                 setIsDragging(false);
             };
 
-            if (isDragging) {
-                window.addEventListener('mousemove', handleMouseMove);
-                window.addEventListener('mouseup', handleInteractionEnd);
-                window.addEventListener('touchmove', handleTouchMove);
-                window.addEventListener('touchend', handleInteractionEnd);
-            }
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleInteractionEnd);
+            window.addEventListener('touchmove', handleTouchMove);
+            window.addEventListener('touchend', handleInteractionEnd);
 
             return () => {
                 window.removeEventListener('mousemove', handleMouseMove);
@@ -1636,5 +1634,6 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
