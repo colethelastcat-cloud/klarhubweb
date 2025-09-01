@@ -1210,9 +1210,9 @@ const App = () => {
     };
 
     const demoVideos = [
-        "https://www.youtube.com/embed/your_video_id_1",
-        "https://www.youtube.com/embed/your_video_id_2",
-        "https://www.youtube.com/embed/your_video_id_3"
+        "https://www.youtube.com/embed/d2hR2gRhME0?autoplay=1",
+        "https://www.youtube.com/embed/97osD4zLYpA?autoplay=1",
+        "https://www.youtube.com/embed/03Y0NuUEOV8?autoplay=1"
     ];
 
     const pricingTiers = [
@@ -1552,4 +1552,5 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
