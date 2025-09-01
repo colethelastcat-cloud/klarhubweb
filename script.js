@@ -52,9 +52,17 @@ const useInteractiveCard = () => {
             cardsRef.current.forEach((card, index) => {
                 const state = stateRef.current[index];
                 if (state) {
+                    // Smoother interpolation
                     state.rotateX += (state.targetX - state.rotateX) * 0.1;
                     state.rotateY += (state.targetY - state.rotateY) * 0.1;
-                    card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${state.rotateY}deg) rotateY(${state.rotateX}deg)`;
+
+                    // Apply a small tolerance check to stop animation when idle
+                    if (Math.abs(state.targetX - state.rotateX) > 0.01 || Math.abs(state.targetY - state.rotateY) > 0.01) {
+                         card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${state.rotateY}deg) rotateY(${state.rotateX}deg)`;
+                    } else if (card.style.transform !== '') {
+                        // Snap to final position if close enough
+                        card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(0deg) rotateY(0deg)`;
+                    }
                 }
             });
             animationFrame.current = requestAnimationFrame(animate);
@@ -65,8 +73,10 @@ const useInteractiveCard = () => {
         return () => {
             cancelAnimationFrame(animationFrame.current);
             cardsRef.current.forEach(card => {
-                card.removeEventListener('mousemove', handleMouseMove);
-                card.removeEventListener('mouseleave', handleMouseLeave);
+                if (card) {
+                    card.removeEventListener('mousemove', handleMouseMove);
+                    card.removeEventListener('mouseleave', handleMouseLeave);
+                }
             });
         };
     }, []);
@@ -237,11 +247,6 @@ const AuroraBackground = () => {
         </div>
     );
 };
-
-
-//=================================================
-// 2. MODAL & OVERLAY COMPONENTS
-//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -1190,6 +1195,10 @@ const Footer = () => (
     </footer>
 );
 
+//=================================================
+// 5. MAIN APP COMPONENT
+//=================================================
+
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
@@ -1463,7 +1472,7 @@ const App = () => {
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8 items-center">
                                 {topTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-all duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 transform md:scale-110 featured-card-js' : 'border-theme'}`}>
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-all duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 featured-card-js' : 'border-theme'}`}>
                                         {(tier.isFeatured || tier.specialTag) && (
                                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md ${
                                                 tier.isFeatured ? 'bg-klar' : 
