@@ -1,6 +1,9 @@
 const { useState, useEffect, useRef } = React;
 
-// --- Helper Hooks ---
+//=================================================
+// 1. HELPER HOOKS
+//=================================================
+
 const useInteractiveCard = () => {
   useEffect(() => {
     const cards = document.querySelectorAll('.interactive-card');
@@ -41,7 +44,9 @@ const useFadeInSection = () => {
         }, { threshold: 0.1 });
         sections.forEach(section => observer.observe(section));
         return () => {
-            sections.forEach(section => observer.unobserve(section));
+            sections.forEach(section => {
+                if(section) observer.unobserve(section)
+            });
         }
     }, []);
 };
@@ -101,100 +106,10 @@ const useActiveNav = (headerHeight) => {
     return activeSection;
 };
 
-// --- Components ---
-const Logo = ({ onScrollTo }) => (
-    <svg
-        onClick={() => onScrollTo('home')}
-        className="h-8 w-auto cursor-pointer"
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
-    </svg>
-);
 
-
-const DiscordCounter = () => {
-    const [onlineCount, setOnlineCount] = useState(null);
-    const serverId = '1357439616877072545';
-
-    useEffect(() => {
-        const fetchCount = () => {
-            const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://discord.com/api/guilds/${serverId}/widget.json`)}`;
-
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok.');
-                    return response.json();
-                })
-                .then(data => {
-                    const discordData = JSON.parse(data.contents);
-
-                    if (discordData.code && discordData.message) {
-                        setOnlineCount('N/A');
-                    } else if (discordData.presence_count !== undefined) {
-                        setOnlineCount(discordData.presence_count);
-                    } else {
-                        setOnlineCount('N/A');
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching Discord data:", error);
-                    setOnlineCount('Error');
-                });
-        };
-
-        fetchCount();
-        const interval = setInterval(fetchCount, 30000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <div className="mt-4 text-lg text-theme-secondary">
-            Join <span className="font-bold text-klar">{onlineCount === null ? '...' : onlineCount}</span> members online now!
-        </div>
-    );
-};
-
-const AuroraBackground = () => {
-    const [spots] = useState(() =>
-        Array.from({ length: 15 }).map(() => ({
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            size: `${Math.floor(Math.random() * 300 + 200)}px`,
-            parallaxFactor: Math.random() * 0.5 + 0.2,
-        }))
-    );
-    const spotRefs = useRef(spots.map(() => React.createRef()));
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrollY = window.scrollY;
-            spotRefs.current.forEach((ref, i) => {
-                if (ref.current) {
-                    ref.current.style.transform = `translateY(${scrollY * spots[i].parallaxFactor}px)`;
-                }
-            });
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [spots]);
-
-    return (
-        <div className="aurora-background">
-            {spots.map((spot, i) => (
-                <div
-                    key={i}
-                    ref={spotRefs.current[i]}
-                    className="aurora-spot"
-                    style={{ top: spot.top, left: spot.left, width: spot.size, height: spot.size }}
-                />
-            ))}
-        </div>
-    );
-};
+//=================================================
+// 2. MODAL & OVERLAY COMPONENTS
+//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -638,7 +553,26 @@ const TosModal = ({ onClose }) => {
     );
 };
 
-// --- NEW PREVIEW MODAL ---
+const PreviewAnimation = ({ onAnimationEnd }) => {
+    useEffect(() => {
+        const timer = setTimeout(onAnimationEnd, 1200); // Duration of the animation
+        return () => clearTimeout(timer);
+    }, [onAnimationEnd]);
+
+    return (
+        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+            <div className="preview-animation-container">
+                <div className="scanner-line"></div>
+                <div className="text-lg text-white font-bold tracking-widest uppercase">Initializing Preview</div>
+            </div>
+        </div>
+    );
+};
+
+//=================================================
+// 3. UI PREVIEW COMPONENTS
+//=================================================
+
 const PreviewModal = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState('Catching');
     const [isFading, setIsFading] = useState(false);
@@ -788,8 +722,10 @@ const PreviewModal = ({ onClose }) => {
             if (!sliderRef.current) return;
             const rect = sliderRef.current.getBoundingClientRect();
             const x = e.clientX - rect.left;
-            let newValue = (x / rect.width) * (max - min) + min;
-            newValue = Math.max(min, Math.min(max, newValue));
+            let percentage = (x / rect.width) * 100;
+            percentage = Math.max(0, Math.min(100, percentage));
+            
+            let newValue = (percentage / 100) * (max - min) + min;
             newValue = Math.round(newValue / step) * step;
 
             if (step < 1) {
@@ -800,7 +736,7 @@ const PreviewModal = ({ onClose }) => {
 
         const handleMouseDown = (e) => {
             setIsDragging(true);
-            handleValueUpdate(e);
+            handleValueUpdate(e.nativeEvent);
         };
 
         useEffect(() => {
@@ -822,7 +758,7 @@ const PreviewModal = ({ onClose }) => {
              <div className="space-y-1">
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{label}</span>
-                    <CustomNumberInput value={sliderValue} onChange={(v) => handleValueChange(id, v)} min={min} max={max} step={step} />
+                    <span className="text-xs font-mono text-gray-300 w-12 text-center">{sliderValue}</span>
                 </div>
                 <div 
                     ref={sliderRef}
@@ -851,7 +787,7 @@ const PreviewModal = ({ onClose }) => {
         );
     };
     
-    const Button = ({ label }) => <button className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded hover:bg-white/5 transition-colors">{label}</button>
+    const Button = ({ label }) => <button className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded active:scale-95 transition-all">{label}</button>
     const TextInput = ({ placeholder }) => <input type="text" placeholder={placeholder} className="w-full bg-black/30 text-xs p-2 rounded border border-gray-600 focus:outline-none focus:border-klar placeholder-gray-500" />
 
     const renderContent = () => {
@@ -1010,6 +946,10 @@ const PreviewModal = ({ onClose }) => {
 };
 
 
+//=================================================
+// 4. CORE PAGE COMPONENTS
+//=================================================
+
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -1126,22 +1066,6 @@ const AIHelperButton = ({ onClick }) => {
     );
 };
 
-const PreviewAnimation = ({ onAnimationEnd }) => {
-    useEffect(() => {
-        const timer = setTimeout(onAnimationEnd, 1200); // Duration of the animation
-        return () => clearTimeout(timer);
-    }, [onAnimationEnd]);
-
-    return (
-        <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-            <div className="preview-animation-container">
-                <div className="scanner-line"></div>
-                <div className="text-lg text-white font-bold tracking-widest uppercase">Initializing Preview</div>
-            </div>
-        </div>
-    );
-};
-
 const Footer = () => (
      <footer className="w-full p-8 text-center text-gray-500 text-sm">
         <p>© 2025 Klar Hub. All rights reserved.</p>
@@ -1160,6 +1084,9 @@ const Footer = () => (
     </footer>
 );
 
+//=================================================
+// 5. MAIN APP COMPONENT
+//=================================================
 
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -1277,7 +1204,7 @@ const App = () => {
             console.error('Failed to copy script: ', err);
         });
     };
-
+    
     const handlePreviewClick = () => {
         setIsPreviewAnimating(true);
     };
@@ -1578,6 +1505,9 @@ const App = () => {
     );
 };
 
+//=================================================
+// 6. RENDER APP
+//=================================================
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
