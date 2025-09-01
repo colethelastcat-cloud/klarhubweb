@@ -1192,10 +1192,6 @@ const Footer = () => (
     </footer>
 );
 
-//=================================================
-// 5. MAIN APP COMPONENT
-//=================================================
-
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
@@ -1207,6 +1203,7 @@ const App = () => {
     const [isTosModalOpen, setIsTosModalOpen] = useState(false);
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
     const [isPreviewAnimating, setIsPreviewAnimating] = useState(false);
+    const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
@@ -1566,8 +1563,15 @@ const App = () => {
                                                         placeholder="Paste your key here"
                                                         className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-2"
                                                     />
-                                                    <button onClick={handleCopyScript} className="flex-shrink-0 bg-klar hover:bg-klar-light text-white px-4 py-2 text-sm font-semibold rounded-lg transition">
-                                                        {scriptCopied ? 'Copied!' : 'Copy Script'}
+                                                    <button onClick={handleCopyScript} className="flex-shrink-0 bg-klar hover:bg-klar-light text-white px-4 py-2 text-sm font-semibold rounded-lg transition relative overflow-hidden">
+                                                        <span className={`flex items-center gap-2 transition-transform duration-300 ${scriptCopied ? '-translate-y-full' : 'translate-y-0'}`}>
+                                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z" /></svg>
+                                                            Copy Script
+                                                        </span>
+                                                         <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-300 ${scriptCopied ? 'translate-y-0' : 'translate-y-full'}`}>
+                                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                            Copied!
+                                                        </span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -1641,6 +1645,7 @@ const App = () => {
                 {isGameOpen && <KlarClickerGameModal onClose={() => setIsGameOpen(false)} />}
                 {isPreviewAnimating && <PreviewAnimation onAnimationEnd={() => { setIsPreviewAnimating(false); setIsPreviewModalOpen(true); }} />}
                 {isPreviewModalOpen && <PreviewModal onClose={() => setIsPreviewModalOpen(false)} />}
+                {isCompareModalOpen && <ComparePlansModal onClose={() => setIsCompareModalOpen(false)} />}
                 <BackToTopButton />
             </div>
         </div>
