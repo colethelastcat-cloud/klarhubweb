@@ -14,22 +14,27 @@ const useInteractiveCard = () => {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            const rotateY = (x - rect.width / 2) / 0.5;
-            const rotateX = (y - rect.height / 2) / -0.5;
+            // This creates a very strong, noticeable tilt
+            const rotateY = (x - rect.width / 2) / 2;
+            const rotateX = (y - rect.height / 2) / -2;
 
-            card.style.setProperty('--rotateX', `${rotateX}deg`);
-            card.style.setProperty('--rotateY', `${rotateY}deg`);
+            // Apply the transform directly to the card's style
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            
+            // These variables are still used for the background gradient effect
             card.style.setProperty('--mouse-x', `${x}px`);
             card.style.setProperty('--mouse-y', `${y}px`);
         };
 
         const handleMouseLeave = (e) => {
             const card = e.currentTarget;
-            card.style.setProperty('--rotateX', '0deg');
-            card.style.setProperty('--rotateY', '0deg');
+            // Reset the card's transform when the mouse leaves
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
         };
 
         cards.forEach(card => {
+            // This adds a smoothing effect to the tilt and scale
+            card.style.transition = 'transform 0.1s linear';
             card.addEventListener('mousemove', handleMouseMove);
             card.addEventListener('mouseleave', handleMouseLeave);
         });
@@ -1634,6 +1639,7 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
 
