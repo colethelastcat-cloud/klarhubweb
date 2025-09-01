@@ -15,8 +15,8 @@ const useInteractiveCard = () => {
             const y = e.clientY - rect.top;
             
             // This creates a very strong, noticeable tilt
-            const rotateY = (x - rect.width / 2) / 2;
-            const rotateX = (y - rect.height / 2) / -2;
+            const rotateY = (x - rect.width / 2) / 4;
+            const rotateX = (y - rect.height / 2) / -4;
 
             // Apply the transform directly to the card's style
             card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
@@ -1639,6 +1639,7 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
 
 
