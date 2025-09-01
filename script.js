@@ -718,10 +718,10 @@ const PreviewModal = ({ onClose }) => {
         const [isDragging, setIsDragging] = useState(false);
         const sliderValue = previewState[id] !== undefined ? previewState[id] : min;
         
-        const handleValueUpdate = (e) => {
+        const handleValueUpdate = (clientX) => {
             if (!sliderRef.current) return;
             const rect = sliderRef.current.getBoundingClientRect();
-            const x = e.clientX - rect.left;
+            const x = clientX - rect.left;
             let percentage = (x / rect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage));
             
@@ -729,23 +729,28 @@ const PreviewModal = ({ onClose }) => {
             newValue = Math.round(newValue / step) * step;
 
             if (step < 1) {
-                newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
+                const decimalPlaces = String(step).split('.')[1]?.length || 2;
+                newValue = parseFloat(newValue.toFixed(decimalPlaces));
             }
             handleValueChange(id, newValue);
         };
 
         const handleMouseDown = (e) => {
             setIsDragging(true);
-            handleValueUpdate(e.nativeEvent);
+            handleValueUpdate(e.clientX);
         };
 
         useEffect(() => {
             const handleMouseUp = () => setIsDragging(false);
             const handleMouseMove = (e) => {
-                if(isDragging) handleValueUpdate(e);
+                if(isDragging) handleValueUpdate(e.clientX);
             }
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
+            
+            if (isDragging) {
+                window.addEventListener('mousemove', handleMouseMove);
+                window.addEventListener('mouseup', handleMouseUp);
+            }
+            
             return () => {
                 window.removeEventListener('mousemove', handleMouseMove);
                 window.removeEventListener('mouseup', handleMouseUp);
@@ -758,7 +763,7 @@ const PreviewModal = ({ onClose }) => {
              <div className="space-y-1">
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{label}</span>
-                    <span className="text-xs font-mono text-gray-300 w-12 text-center">{sliderValue}</span>
+                     <span className="text-xs font-mono text-gray-300 w-12 text-center">{sliderValue}</span>
                 </div>
                 <div 
                     ref={sliderRef}
