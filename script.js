@@ -51,7 +51,6 @@ const useInteractiveCard = () => {
                     state.rotateX += (state.targetX - state.rotateX) * 0.1;
                     state.rotateY += (state.targetY - state.rotateY) * 0.1;
                     
-                    // Round to avoid floating point inaccuracies keeping the animation "jittery"
                     const finalRotateX = Math.round(state.rotateX * 100) / 100;
                     const finalRotateY = Math.round(state.rotateY * 100) / 100;
 
@@ -1470,7 +1469,7 @@ const App = () => {
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8 items-center">
                                 {topTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-all duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 featured-card-js' : 'border-theme'}`}>
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 featured-card-js' : 'border-theme'}`}>
                                         {(tier.isFeatured || tier.specialTag) && (
                                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md ${
                                                 tier.isFeatured ? 'bg-klar' : 
