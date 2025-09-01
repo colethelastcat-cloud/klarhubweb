@@ -1,78 +1,149 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+/*
+=================================================
+  Klar Hub - styles.css
+=================================================
+  TABLE OF CONTENTS
+-------------------------------------------------
+  1.  IMPORTS & GLOBAL STYLES
+  2.  THEME VARIABLES & HELPERS
+  3.  CORE LAYOUT & TYPOGRAPHY
+  4.  INTERACTIVE ELEMENTS
+      - Interactive Cards
+      - FAQ Items
+      - Sliders & Inputs
+  5.  PAGE SECTIONS & COMPONENTS
+      - Preloader
+      - Aurora Background
+      - Buttons (Back to Top, AI Helper)
+  6.  MODALS & OVERLAYS
+      - Video Modal Carousel
+      - Preview Hub UI
+  7.  ANIMATIONS & KEYFRAMES
+=================================================
+*/
+
+
+/*=================================================
+  1. IMPORTS & GLOBAL STYLES
+=================================================*/
+
+/* Font is now loaded in index.html for better performance */
+
+html { 
+    scroll-behavior: smooth; 
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Add smooth transitions to all links and buttons for a premium feel */
+a, button {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+
+/*=================================================
+  2. THEME VARIABLES & HELPERS
+=================================================*/
 
 :root {
     --klar-primary: #5586D6;
     --klar-darker: #2c4a8a;
     --klar-light: #73a1e8;
     
-    /* Default to dark theme variables */
+    /* These variables are controlled by React */
     --background-dark: #121212;
     --background-light: #1E1E1E;
-    --text-primary: #FFFFFF;
-    --text-secondary: #E5E7EB;
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
     --border-color: #4B5563;
     --header-bg: rgba(18, 18, 18, 0.7);
     --card-bg: rgba(30, 30, 30, 0.4);
-    --modal-card-bg: #1E1E1E;
+    --modal-card-bg: #1F2937;
     --button-secondary-bg: #374151;
     --button-secondary-hover-bg: #4B5563;
     --button-secondary-text: #F9FAFB;
     --aurora-opacity: 0.1;
 }
 
-html { scroll-behavior: smooth; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background-dark);
-    color: var(--text-primary);
-    transition: background-color 0.3s, color 0.3s;
-}
-
+/* Helper classes to use theme colors with Tailwind */
 .bg-theme-dark { background-color: var(--background-dark); }
 .bg-theme-light { background-color: var(--background-light); }
 .bg-theme-header { background-color: var(--header-bg); }
 .bg-theme-card { background-color: var(--card-bg); }
 .bg-theme-modal-card { background-color: var(--modal-card-bg); }
+.bg-theme-button-secondary { background-color: var(--button-secondary-bg); }
+.hover\\:bg-theme-button-secondary-hover:hover { background-color: var(--button-secondary-hover-bg); }
 
 .text-theme-primary { color: var(--text-primary); }
 .text-theme-secondary { color: var(--text-secondary); }
+.text-theme-button-secondary-text { color: var(--text-secondary); }
 
-/* --- FIX: Added higher specificity for form elements --- */
+/* FIX for input text color */
 input.text-theme-primary,
 textarea.text-theme-primary {
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
 }
-.placeholder-theme-secondary::placeholder {
-    color: var(--text-secondary);
-    opacity: 1; /* Override browser defaults */
-}
-/* -------------------------------------------------------- */
 
+.placeholder-theme-secondary::placeholder { 
+    color: var(--text-secondary);
+    opacity: 1;
+}
 
 .border-theme { border-color: var(--border-color); }
 
 .fill-theme-primary { fill: var(--text-primary); }
 .stroke-theme-primary { stroke: var(--text-primary); }
 
-
-.bg-theme-button-secondary { background-color: var(--button-secondary-bg); }
-.hover\\:bg-theme-button-secondary-hover:hover { background-color: var(--button-secondary-hover-bg); }
-.text-theme-button-secondary-text { color: var(--button-secondary-text); }
-
-
 .bg-klar { background-color: var(--klar-primary); }
 .hover\:bg-klar-light:hover { background-color: var(--klar-light); }
 .text-klar { color: var(--klar-primary); }
 .border-klar { border-color: var(--klar-primary); }
 .shadow-klar { box-shadow: 0 4px 14px 0 rgba(85, 134, 214, 0.3); }
+.focus\\:ring-klar:focus {
+  --tw-ring-color: var(--klar-primary);
+}
 
+
+/*=================================================
+  3. CORE LAYOUT & TYPOGRAPHY
+=================================================*/
+.nav-active {
+    color: var(--klar-primary) !important;
+    font-weight: 700;
+}
+
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-in-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/*=================================================
+  4. INTERACTIVE ELEMENTS
+=================================================*/
+
+/* Interactive 3D Cards */
 .interactive-card {
     position: relative;
     transition: transform 0.2s ease, box-shadow 0.3s ease;
     transform-style: preserve-3d;
 }
-.interactive-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.interactive-card:hover { 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.1);
+    transform: translateY(-5px);
+}
+
+/* This pseudo-element creates the glowing border effect on hover based on mouse position */
 .interactive-card::before {
     content: '';
     position: absolute;
@@ -85,44 +156,46 @@ textarea.text-theme-primary {
     pointer-events: none;
 }
 .interactive-card:hover::before { opacity: 1; }
-.faq-item { transition: transform 0.3s ease, border-color 0.3s ease; }
+
+/* FAQ Items */
+.faq-item { 
+    transition: transform 0.3s ease, border-color 0.3s ease; 
+}
 .faq-item:hover {
     transform: scale(1.02);
     border-color: var(--klar-primary);
 }
-.fade-in-section {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+/* Custom Sliders & Inputs */
+.slider-thumb {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.fade-in-section.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+.slider-thumb.dragging {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px var(--klar-primary);
+    cursor: grabbing;
 }
-.nav-active {
-    color: var(--klar-primary) !important;
-    font-weight: 700;
+
+/* Hide default arrows from number inputs */
+.no-arrows::-webkit-inner-spin-button,
+.no-arrows::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
-#back-to-top { transition: opacity 0.3s, transform 0.3s; }
-.aurora-background {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1;
-    overflow: hidden;
+.no-arrows {
+  -moz-appearance: textfield; /* Firefox */
 }
-.aurora-spot {
-    position: absolute;
-    background-image: radial-gradient(circle, rgba(85, 134, 214, 0.1) 0%, transparent 60%);
-    border-radius: 50%;
-    filter: blur(100px);
-    will-change: transform;
-    pointer-events: none;
-    transition: transform 0.5s ease-out;
-}
+
+
+/*=================================================
+  5. PAGE SECTIONS & COMPONENTS
+=================================================*/
+
+/* Preloader */
 #preloader {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #121212;
+    background-color: var(--background-dark);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -141,17 +214,83 @@ textarea.text-theme-primary {
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Aurora Background Effect */
+.aurora-background {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+.aurora-spot {
+    position: absolute;
+    background-image: radial-gradient(circle, var(--klar-primary) 0%, transparent 60%);
+    border-radius: 50%;
+    filter: blur(100px);
+    will-change: transform;
+    pointer-events: none;
+    transition: transform 0.5s ease-out;
+    opacity: var(--aurora-opacity);
+}
+
+/* Floating Action Buttons */
 .action-button-wrapper {
     animation: button-pop-in 1s 1s forwards cubic-bezier(0.16, 1, 0.3, 1);
     opacity: 0;
     transform: scale(0.5);
 }
-@keyframes button-pop-in { to { opacity: 1; transform: scale(1); } }
 .initial-tooltip {
     animation: tooltip-fade 7s 1.5s forwards ease-in-out;
     opacity: 0;
 }
+
+/*=================================================
+  6. MODALS & OVERLAYS
+=================================================*/
+
+/* Required for 3D carousel effect in Video Modal */
+.perspective-1000 { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+
+/* Preview Hub UI Animation */
+.hub-content-inner {
+    animation: hub-content-fade-in 0.3s ease-out forwards;
+}
+
+.preview-animation-container {
+    position: relative;
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.scanner-line {
+    position: absolute;
+    top: 0;
+    left: -10%;
+    width: 10px;
+    height: 100%;
+    background-color: var(--klar-primary);
+    box-shadow: 0 0 15px 5px var(--klar-primary);
+    filter: blur(2px);
+    animation: scan 1.2s ease-in-out forwards;
+}
+
+
+/*=================================================
+  7. ANIMATIONS & KEYFRAMES
+=================================================*/
+
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
+}
+
+@keyframes button-pop-in { 
+    to { opacity: 1; transform: scale(1); } 
+}
+
 @keyframes tooltip-fade {
     0% { opacity: 0; transform: translateY(0); }
     10% { opacity: 1; transform: translateY(-0.5rem); }
@@ -159,6 +298,28 @@ textarea.text-theme-primary {
     100% { opacity: 0; transform: translateY(0); }
 }
 
-.perspective-1000 { perspective: 1000px; }
-.transform-style-3d { transform-style: preserve-3d; }
+@keyframes hub-content-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scan {
+    0% {
+        left: -10%;
+    }
+    50% {
+        left: 110%;
+        width: 40px;
+    }
+    100% {
+        left: 110%;
+        width: 10px;
+    }
+}
 
