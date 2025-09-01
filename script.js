@@ -1,9 +1,5 @@
 const { useState, useEffect, useRef } = React;
 
-//=================================================
-// 1. HELPER HOOKS
-//=================================================
-
 const useInteractiveCard = () => {
   useEffect(() => {
     const cards = document.querySelectorAll('.interactive-card');
@@ -105,11 +101,6 @@ const useActiveNav = (headerHeight) => {
     }, [headerHeight]);
     return activeSection;
 };
-
-
-//=================================================
-// 2. MODAL & OVERLAY COMPONENTS
-//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
