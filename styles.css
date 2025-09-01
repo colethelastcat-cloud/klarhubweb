@@ -72,7 +72,7 @@ body {
 .bg-theme-card { background-color: var(--card-bg); }
 .bg-theme-modal-card { background-color: var(--modal-card-bg); }
 .bg-theme-button-secondary { background-color: var(--button-secondary-bg); }
-.hover\\:bg-theme-button-secondary-hover:hover { background-color: var(--button-secondary-hover-bg); }
+.hover\:bg-theme-button-secondary-hover:hover { background-color: var(--button-secondary-hover-bg); }
 
 .text-theme-primary { color: var(--text-primary); }
 .text-theme-secondary { color: var(--text-secondary); }
@@ -99,7 +99,7 @@ textarea.text-theme-primary {
 .text-klar { color: var(--klar-primary); }
 .border-klar { border-color: var(--klar-primary); }
 .shadow-klar { box-shadow: 0 4px 14px 0 rgba(85, 134, 214, 0.3); }
-.focus\\:ring-klar:focus {
+.focus\:ring-klar:focus {
   --tw-ring-color: var(--klar-primary);
 }
 
@@ -313,4 +313,3 @@ textarea.text-theme-primary {
         width: 10px;
     }
 }
-
