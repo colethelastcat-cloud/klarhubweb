@@ -1,5 +1,9 @@
 const { useState, useEffect, useRef } = React;
 
+//=================================================
+// 1. HELPER HOOKS & CORE COMPONENTS
+//=================================================
+
 const useInteractiveCard = () => {
   useEffect(() => {
     const cards = document.querySelectorAll('.interactive-card');
@@ -83,6 +87,7 @@ const useAnimatedCounter = (target, duration = 2000) => {
     return [ref, count];
 };
 
+
 const useActiveNav = (headerHeight) => {
     const [activeSection, setActiveSection] = useState('home');
     useEffect(() => {
@@ -100,6 +105,104 @@ const useActiveNav = (headerHeight) => {
     }, [headerHeight]);
     return activeSection;
 };
+
+const Logo = ({ onScrollTo }) => (
+    <svg 
+        onClick={() => onScrollTo('home')}
+        className="h-8 w-auto cursor-pointer" 
+        viewBox="0 0 100 100" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+    >
+        <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
+    </svg>
+);
+
+const DiscordCounter = () => {
+    const [onlineCount, setOnlineCount] = useState(null);
+    const serverId = '1357439616877072545';
+
+    useEffect(() => {
+        const fetchCount = () => {
+            const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://discord.com/api/guilds/${serverId}/widget.json`)}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok.');
+                    return response.json();
+                })
+                .then(data => {
+                    const discordData = JSON.parse(data.contents);
+
+                    if (discordData.code && discordData.message) {
+                        setOnlineCount('N/A');
+                    } else if (discordData.presence_count !== undefined) {
+                        setOnlineCount(discordData.presence_count);
+                    } else {
+                        setOnlineCount('N/A');
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching Discord data:", error);
+                    setOnlineCount('Error');
+                });
+        };
+
+        fetchCount();
+        const interval = setInterval(fetchCount, 30000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="mt-4 text-lg text-theme-secondary">
+            Join <span className="font-bold text-klar">{onlineCount === null ? '...' : onlineCount}</span> members online now!
+        </div>
+    );
+};
+
+const AuroraBackground = () => {
+    const [spots] = useState(() =>
+        Array.from({ length: 15 }).map(() => ({
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            size: `${Math.floor(Math.random() * 300 + 200)}px`,
+            parallaxFactor: Math.random() * 0.5 + 0.2,
+        }))
+    );
+    const spotRefs = useRef(spots.map(() => React.createRef()));
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            spotRefs.current.forEach((ref, i) => {
+                if (ref.current) {
+                    ref.current.style.transform = `translateY(${scrollY * spots[i].parallaxFactor}px)`;
+                }
+            });
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [spots]);
+
+    return (
+        <div className="aurora-background">
+            {spots.map((spot, i) => (
+                <div
+                    key={i}
+                    ref={spotRefs.current[i]}
+                    className="aurora-spot"
+                    style={{ top: spot.top, left: spot.left, width: spot.size, height: spot.size }}
+                />
+            ))}
+        </div>
+    );
+};
+
+
+//=================================================
+// 2. MODAL & OVERLAY COMPONENTS
+//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -913,18 +1016,6 @@ const PreviewModal = ({ onClose }) => {
         </Modal>
     );
 };
-
-const Logo = ({ onScrollTo }) => (
-    <svg 
-        onClick={() => onScrollTo('home')}
-        className="h-8 w-auto cursor-pointer" 
-        viewBox="0 0 100 100" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
-    </svg>
-);
 
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
