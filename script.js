@@ -5,70 +5,39 @@ const { useState, useEffect, useRef } = React;
 //=================================================
 
 const useInteractiveCard = () => {
-    const animationFrame = useRef(null);
-    const cardsRef = useRef([]);
-    const stateRef = useRef({});
-
     useEffect(() => {
-        cardsRef.current = Array.from(document.querySelectorAll('.interactive-card'));
-        
-        cardsRef.current.forEach((card, index) => {
-            stateRef.current[index] = {
-                rotateX: 0, rotateY: 0,
-                targetX: 0, targetY: 0,
-                scale: card.classList.contains('featured-card-js') ? 1.1 : 1.0,
-            };
+        const cards = document.querySelectorAll('.interactive-card');
 
-            card.addEventListener('mousemove', (e) => handleMouseMove(e, index));
-            card.addEventListener('mouseleave', (e) => handleMouseLeave(e, index));
-        });
-
-        const handleMouseMove = (e, index) => {
-            const card = cardsRef.current[index];
-            if (!card) return;
-            
+        const handleMouseMove = (e) => {
+            const card = e.currentTarget;
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            stateRef.current[index].targetY = (y - rect.height / 2) / 10;
-            stateRef.current[index].targetX = (rect.width / 2 - x) / 10;
+            const rotateY = (x - rect.width / 2) / 10;
+            const rotateX = (y - rect.height / 2) / -10;
 
+            card.style.setProperty('--rotateX', `${rotateX}deg`);
+            card.style.setProperty('--rotateY', `${rotateY}deg`);
             card.style.setProperty('--mouse-x', `${x}px`);
             card.style.setProperty('--mouse-y', `${y}px`);
         };
 
-        const handleMouseLeave = (e, index) => {
-            if (!stateRef.current[index]) return;
-            stateRef.current[index].targetX = 0;
-            stateRef.current[index].targetY = 0;
+        const handleMouseLeave = (e) => {
+            const card = e.currentTarget;
+            card.style.setProperty('--rotateX', '0deg');
+            card.style.setProperty('--rotateY', '0deg');
         };
 
-        const animate = () => {
-            cardsRef.current.forEach((card, index) => {
-                const state = stateRef.current[index];
-                if (state) {
-                    state.rotateX += (state.targetX - state.rotateX) * 0.1;
-                    state.rotateY += (state.targetY - state.rotateY) * 0.1;
-                    
-                    const finalRotateX = Math.round(state.rotateX * 100) / 100;
-                    const finalRotateY = Math.round(state.rotateY * 100) / 100;
-
-                    card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${finalRotateY}deg) rotateY(${finalRotateX}deg)`;
-                }
-            });
-            animationFrame.current = requestAnimationFrame(animate);
-        };
-        
-        animationFrame.current = requestAnimationFrame(animate);
+        cards.forEach(card => {
+            card.addEventListener('mousemove', handleMouseMove);
+            card.addEventListener('mouseleave', handleMouseLeave);
+        });
 
         return () => {
-            cancelAnimationFrame(animationFrame.current);
-            cardsRef.current.forEach((card, index) => {
-                if (card) {
-                    card.removeEventListener('mousemove', (e) => handleMouseMove(e, index));
-                    card.removeEventListener('mouseleave', (e) => handleMouseLeave(e, index));
-                }
+            cards.forEach(card => {
+                card.removeEventListener('mousemove', handleMouseMove);
+                card.removeEventListener('mouseleave', handleMouseLeave);
             });
         };
     }, []);
@@ -1520,6 +1489,11 @@ const App = () => {
                                     </div>
                                 ))}
                             </div>
+                            <div className="text-center mt-8">
+                                <button onClick={() => setIsCompareModalOpen(true)} className="py-2 px-6 rounded-lg font-semibold text-center transition bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text">
+                                    Compare All Plans
+                                </button>
+                            </div>
                         </section>
                         <section id="free" className="py-12 fade-in-section">
                             <div className="text-center">
@@ -1645,7 +1619,7 @@ const App = () => {
                 {isGameOpen && <KlarClickerGameModal onClose={() => setIsGameOpen(false)} />}
                 {isPreviewAnimating && <PreviewAnimation onAnimationEnd={() => { setIsPreviewAnimating(false); setIsPreviewModalOpen(true); }} />}
                 {isPreviewModalOpen && <PreviewModal onClose={() => setIsPreviewModalOpen(false)} />}
-                {isCompareModalOpen && <ComparePlansModal onClose={() => setIsCompareModalOpen(false)} />}
+                {isCompareModalOpen && <ComparePlansModal onClose={() => setIsCompareModalOpen(false)} allTiers={pricingTiers} />}
                 <BackToTopButton />
             </div>
         </div>
