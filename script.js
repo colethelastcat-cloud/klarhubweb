@@ -971,7 +971,6 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
        <header ref={headerRef} className="bg-theme-header sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
                  <Logo onScrollTo={onScrollTo}/>
-                 <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-theme-secondary hover:text-theme-primary transition border border-theme hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
             </div>
             <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
                 {navItems.map(item => (
@@ -1015,7 +1014,7 @@ const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
         { id: 'tos', label: 'Terms' }
     ];
     return (
-        <div className="fixed top-0 left-0 w-full h-full z-30 bg-theme-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
+        <div className="fixed top-0 left-0 w-full h-full z-30 bg-theme-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md-hidden">
             {navItems.map(item => (
                 <button key={item.id} onClick={() => {
                     if (item.id === 'tos') {
@@ -1051,10 +1050,47 @@ const BackToTopButton = () => {
 
 const AIHelperButton = ({ onClick }) => {
     const [showTooltip, setShowTooltip] = useState(true);
+    useEffect(() => {
+        const timer = setTimeout(() => setShowTooltip(false), 7000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    return (
+        <div className="action-button-wrapper fixed bottom-8 right-8 z-40">
+             {showTooltip && (
+                 <div className="initial-tooltip absolute bottom-full mb-3 right-0 w-max bg-gray-800 text-white text-sm rounded-md px-3 py-1.5 pointer-events-none">
+                     Have questions? Ask our AI!
+                     <div className="absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+                 </div>
+            )}
+            <button id="ai-helper-button" onClick={onClick} className="bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto shadow-lg shadow-klar">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 16.5v-1.5m3.75-12H21M12 21v-1.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75v16.5M16.5 4.5l-9 15M16.5 19.5l-9-15" /></svg>
+            </button>
+        </div>
+    );
+};
+
+const Footer = () => (
+     <footer className="w-full p-8 text-center text-gray-500 text-sm">
+        <p>© 2025 Klar Hub. All rights reserved.</p>
+        <p className="mt-2">made by auaqa</p>
+         <div className="flex justify-center gap-6 mt-4">
+             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Discord">
+                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.36981C18.7915 3.74873 17.189 3.28434 15.5298 3.00003C15.5298 3.00003 15.1518 3.42189 14.865 3.76878C13.0476 3.22018 11.1492 3.22018 9.423 3.76878C9.135 3.42189 8.7582 3 8.7582 3C7.09901 3.28434 5.49652 3.74873 3.97017 4.36981C0.324569 9.87328 -0.463321 15.1072 0.871542 20.2078C2.6516 21.6213 4.59436 22.548 6.65283 23C7.26284 22.3486 7.80165 21.631 8.256 20.8522C7.38573 20.4866 6.58162 20.021 5.84279 19.4515C6.11591 19.2633 6.3802 19.0664 6.6346 18.8608C10.0322 20.6453 14.2523 20.6453 17.6487 18.8608C17.9031 19.0664 18.1674 19.2633 18.4405 19.4515C17.7017 20.021 16.9064 20.4866 16.0273 20.8522C16.4817 21.631 17.0205 22.3486 17.6305 23C19.689 22.548 21.6317 21.6213 23.4118 20.2078C24.5828 14.2458 23.5938 8.81315 20.317 4.36981ZM8.02004 16.5392C6.88337 16.5392 6.00004 15.503 6.00004 14.1682C6.00004 12.8334 6.88337 11.7972 8.02004 11.7972C9.15671 11.7972 10.04 12.8334 10.0203 14.1682C10.0203 15.503 9.15671 16.5392 8.02004 16.5392ZM16.2687 16.5392C15.132 16.5392 14.2487 15.503 14.2487 14.1682C14.2487 12.8334 15.132 11.7972 16.2687 11.7972C17.4054 11.7972 18.2887 12.8334 18.2689 14.1682C18.2689 15.503 17.4054 16.5392 16.2687 16.5392Z" /></svg>
+             </a>
+             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Telegram">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24a12 12 0 1 1 12-12 12.013 12.013 0 0 1-12 12Zm5.74-15.652L6.44 12.27c-.88.39-1.01.76-.23 1.1l2.58 1.12 6.09-3.79c.33-.2.62-.09.35.13l-4.93 4.45-1.15 3.39c.83 0 .81-.38 1.12-.66l1.79-1.63 3.4 2.45c.6.35 1.01.16 1.18-.52l2.1-9.84c.21-.83-.3-1.18-1.04-.84Z"/></svg>
+             </a>
+             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Youtube">
+                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z" /></svg>
+             </a>
+         </div>
+     </footer>
+);
+
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
-    const [isGameOpen, setIsGameOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeFaq, setActiveFaq] = useState(null);
     const [scriptCopied, setScriptCopied] = useState(false);
@@ -1174,9 +1210,9 @@ const App = () => {
     };
 
     const demoVideos = [
-        "https://www.youtube.com/embed/d2hR2gRhME0?autoplay=1",
-        "https://www.youtube.com/embed/97osD4zLYpA?autoplay=1",
-        "https://www.youtube.com/embed/03Y0NuUEOV8?autoplay=1"
+        "https://www.youtube.com/embed/your_video_id_1",
+        "https://www.youtube.com/embed/your_video_id_2",
+        "https://www.youtube.com/embed/your_video_id_3"
     ];
 
     const pricingTiers = [
@@ -1225,7 +1261,6 @@ const App = () => {
                     onTosClick={() => setIsTosModalOpen(true)}
                     isMobileMenuOpen={isMobileMenuOpen}
                     activeSection={activeSection}
-                    onGameClick={() => setIsGameOpen(true)}
                     theme={theme}
                     setTheme={setTheme}
                 />
@@ -1506,7 +1541,6 @@ const App = () => {
                 {isAiHelperOpen && <AIHelperModal onClose={() => setIsAiHelperOpen(false)} />}
                 {selectedGame && <GameFeaturesModal game={selectedGame} onClose={() => setSelectedGame(null)} />}
                 {isTosModalOpen && <TosModal onClose={() => setIsTosModalOpen(false)} />}
-                {isGameOpen && <KlarClickerGameModal onClose={() => setIsGameOpen(false)} />}
                 {isPreviewAnimating && <PreviewAnimation onAnimationEnd={() => { setIsPreviewAnimating(false); setIsPreviewModalOpen(true); }} />}
                 {isPreviewModalOpen && <PreviewModal onClose={() => setIsPreviewModalOpen(false)} />}
                 {isCompareModalOpen && <ComparePlansModal onClose={() => setIsCompareModalOpen(false)} allTiers={pricingTiers} />}
@@ -1518,6 +1552,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
-
 
