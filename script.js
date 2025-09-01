@@ -19,15 +19,14 @@ const useInteractiveCard = () => {
                 scale: card.classList.contains('featured-card-js') ? 1.1 : 1.0,
             };
 
-            card.addEventListener('mousemove', handleMouseMove);
-            card.addEventListener('mouseleave', handleMouseLeave);
+            card.addEventListener('mousemove', (e) => handleMouseMove(e, index));
+            card.addEventListener('mouseleave', (e) => handleMouseLeave(e, index));
         });
 
-        const handleMouseMove = (e) => {
-            const card = e.currentTarget;
-            const index = cardsRef.current.indexOf(card);
-            if (index === -1) return;
-
+        const handleMouseMove = (e, index) => {
+            const card = cardsRef.current[index];
+            if (!card) return;
+            
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -39,11 +38,8 @@ const useInteractiveCard = () => {
             card.style.setProperty('--mouse-y', `${y}px`);
         };
 
-        const handleMouseLeave = (e) => {
-            const card = e.currentTarget;
-            const index = cardsRef.current.indexOf(card);
-             if (index === -1) return;
-            
+        const handleMouseLeave = (e, index) => {
+            if (!stateRef.current[index]) return;
             stateRef.current[index].targetX = 0;
             stateRef.current[index].targetY = 0;
         };
@@ -52,17 +48,14 @@ const useInteractiveCard = () => {
             cardsRef.current.forEach((card, index) => {
                 const state = stateRef.current[index];
                 if (state) {
-                    // Smoother interpolation
                     state.rotateX += (state.targetX - state.rotateX) * 0.1;
                     state.rotateY += (state.targetY - state.rotateY) * 0.1;
+                    
+                    // Round to avoid floating point inaccuracies keeping the animation "jittery"
+                    const finalRotateX = Math.round(state.rotateX * 100) / 100;
+                    const finalRotateY = Math.round(state.rotateY * 100) / 100;
 
-                    // Apply a small tolerance check to stop animation when idle
-                    if (Math.abs(state.targetX - state.rotateX) > 0.01 || Math.abs(state.targetY - state.rotateY) > 0.01) {
-                         card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${state.rotateY}deg) rotateY(${state.rotateX}deg)`;
-                    } else if (card.style.transform !== '') {
-                        // Snap to final position if close enough
-                        card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(0deg) rotateY(0deg)`;
-                    }
+                    card.style.transform = `perspective(1000px) scale(${state.scale}) rotateX(${finalRotateY}deg) rotateY(${finalRotateX}deg)`;
                 }
             });
             animationFrame.current = requestAnimationFrame(animate);
@@ -72,10 +65,10 @@ const useInteractiveCard = () => {
 
         return () => {
             cancelAnimationFrame(animationFrame.current);
-            cardsRef.current.forEach(card => {
+            cardsRef.current.forEach((card, index) => {
                 if (card) {
-                    card.removeEventListener('mousemove', handleMouseMove);
-                    card.removeEventListener('mouseleave', handleMouseLeave);
+                    card.removeEventListener('mousemove', (e) => handleMouseMove(e, index));
+                    card.removeEventListener('mouseleave', (e) => handleMouseLeave(e, index));
                 }
             });
         };
@@ -247,6 +240,11 @@ const AuroraBackground = () => {
         </div>
     );
 };
+
+
+//=================================================
+// 2. MODAL & OVERLAY COMPONENTS
+//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
