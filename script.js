@@ -14,12 +14,18 @@ const useInteractiveCard = () => {
       const y = e.clientY - rect.top;
       const rotateX = (y - rect.height / 2) / 10;
       const rotateY = (rect.width / 2 - x) / 10;
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      
+      let scale = '';
+      if (card.classList.contains('featured-card-js')) {
+          scale = 'scale(1.1)';
+      }
+
+      card.style.transform = `perspective(1000px) ${scale} rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
       card.style.setProperty('--mouse-x', `${x}px`);
       card.style.setProperty('--mouse-y', `${y}px`);
     };
     const handleMouseLeave = (e) => {
-      e.currentTarget.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+      e.currentTarget.style.transform = ''; // Reverts to CSS-defined transform
     };
     cards.forEach(card => {
       card.addEventListener('mousemove', handleMouseMove);
@@ -1017,6 +1023,11 @@ const PreviewModal = ({ onClose }) => {
     );
 };
 
+
+//=================================================
+// 4. CORE PAGE COMPONENTS
+//=================================================
+
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
     const navItems = [
@@ -1428,7 +1439,7 @@ const App = () => {
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8 items-center">
                                 {topTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-all duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 transform md:scale-110' : 'border-theme'}`}>
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-all duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 transform md:scale-110 featured-card-js' : 'border-theme'}`}>
                                         {(tier.isFeatured || tier.specialTag) && (
                                             <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md ${
                                                 tier.isFeatured ? 'bg-klar' : 
@@ -1606,9 +1617,6 @@ const App = () => {
     );
 };
 
-//=================================================
-// 6. RENDER APP
-//=================================================
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
