@@ -1247,7 +1247,7 @@ const App = () => {
     const handleScrollTo = (id) => {
         const element = document.getElementById(id);
         if (element) {
-            const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+            const offsetPosition = element.offsetTop - headerHeight;
             window.scrollTo({ top: offsetPosition, behavior: "smooth" });
             history.pushState(null, null, `#${id}`);
         }
@@ -1260,7 +1260,7 @@ const App = () => {
             if (hash) {
                 const element = document.getElementById(hash);
                 if (element) {
-                    const offsetPosition = element.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    const offsetPosition = element.offsetTop - headerHeight;
                     window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 }
             }
