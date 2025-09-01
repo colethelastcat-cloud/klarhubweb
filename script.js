@@ -1076,8 +1076,8 @@ const ComparePlansModal = ({ onClose, allTiers }) => {
         },
         { 
             name: 'Premium Support',
-            // Render a checkmark only for the Lifetime plan
-            getValue: (tier) => tier.name.includes('Lifetime') ? '✔️' : '❌'
+            // Render a checkmark for all paid plans
+            getValue: (tier) => '✔️'
         },
     ];
 
@@ -1751,4 +1751,5 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
