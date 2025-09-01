@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
 
 //=================================================
 // 1. HELPER HOOKS & CORE COMPONENTS
@@ -14,8 +14,8 @@ const useInteractiveCard = () => {
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
-            const rotateY = (x - rect.width / 2) / 10;
-            const rotateX = (y - rect.height / 2) / -10;
+            const rotateY = (x - rect.width / 2) / 5;
+            const rotateX = (y - rect.height / 2) / -5;
 
             card.style.setProperty('--rotateX', `${rotateX}deg`);
             card.style.setProperty('--rotateY', `${rotateY}deg`);
@@ -664,9 +664,9 @@ const PreviewModal = ({ onClose }) => {
         }, 150);
     };
 
-    const handleValueChange = (key, value) => {
+    const handleValueChange = useCallback((key, value) => {
         setPreviewState(prev => ({ ...prev, [key]: value }));
-    };
+    }, []);
     
     const handleButtonInteraction = (e) => {
         e.target.classList.add('active');
@@ -715,7 +715,7 @@ const PreviewModal = ({ onClose }) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [previewState, handleValueChange]);
+        }, [previewState, handleValueChange]);
 
 
     const tabs = [
@@ -760,45 +760,18 @@ const PreviewModal = ({ onClose }) => {
         );
     };
 
-    const CustomNumberInput = ({ value, onChange, step = 1, min = 0, max = 100 }) => {
-        const handleIncrement = () => {
-            let newValue = value + step;
-            if (step < 1) newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
-            onChange(Math.min(max, newValue));
-        };
-        const handleDecrement = () => {
-            let newValue = value - step;
-            if (step < 1) newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
-            onChange(Math.max(min, newValue));
-        };
-
-        return (
-            <div className="flex items-center gap-1">
-                <span className="text-xs font-mono text-gray-300 w-12 text-center">{value}</span>
-                <div className="flex flex-col">
-                    <button onClick={handleIncrement} className="w-4 h-4 flex items-center justify-center bg-black/30 rounded-sm hover:bg-white/10 transition-colors">
-                        <svg className="w-2 h-2 text-gray-400" fill="none" viewBox="0 0 8 5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 4l3-3 3 3" /></svg>
-                    </button>
-                    <button onClick={handleDecrement} className="w-4 h-4 flex items-center justify-center bg-black/30 rounded-sm hover:bg-white/10 transition-colors">
-                         <svg className="w-2 h-2 text-gray-400" fill="none" viewBox="0 0 8 5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 1l3 3 3-3" /></svg>
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
-    const Slider = ({ id, label, min=0, max = 100, step = 1 }) => {
+    const Slider = ({ id, label, min = 0, max = 100, step = 1 }) => {
         const sliderRef = useRef(null);
         const [isDragging, setIsDragging] = useState(false);
         const sliderValue = previewState[id] !== undefined ? previewState[id] : min;
-        
-        const handleValueUpdate = (clientX) => {
+
+        const handleValueUpdate = useCallback((clientX) => {
             if (!sliderRef.current) return;
             const rect = sliderRef.current.getBoundingClientRect();
             const x = clientX - rect.left;
             let percentage = (x / rect.width) * 100;
             percentage = Math.max(0, Math.min(100, percentage));
-            
+
             let newValue = (percentage / 100) * (max - min) + min;
             newValue = Math.round(newValue / step) * step;
 
@@ -807,48 +780,67 @@ const PreviewModal = ({ onClose }) => {
                 newValue = parseFloat(newValue.toFixed(decimalPlaces));
             }
             handleValueChange(id, newValue);
+        }, [id, min, max, step, handleValueChange]);
+
+        const handleInteractionStart = (clientX) => {
+            setIsDragging(true);
+            handleValueUpdate(clientX);
         };
 
         const handleMouseDown = (e) => {
-            setIsDragging(true);
-            handleValueUpdate(e.clientX);
+            e.preventDefault();
+            handleInteractionStart(e.clientX);
+        };
+
+        const handleTouchStart = (e) => {
+            handleInteractionStart(e.touches[0].clientX);
         };
 
         useEffect(() => {
-            const handleMouseUp = () => setIsDragging(false);
             const handleMouseMove = (e) => {
-                if(isDragging) handleValueUpdate(e.clientX);
-            }
-            
+                handleValueUpdate(e.clientX);
+            };
+            const handleTouchMove = (e) => {
+                handleValueUpdate(e.touches[0].clientX);
+            };
+            const handleInteractionEnd = () => {
+                setIsDragging(false);
+            };
+
             if (isDragging) {
                 window.addEventListener('mousemove', handleMouseMove);
-                window.addEventListener('mouseup', handleMouseUp);
+                window.addEventListener('mouseup', handleInteractionEnd);
+                window.addEventListener('touchmove', handleTouchMove);
+                window.addEventListener('touchend', handleInteractionEnd);
             }
-            
+
             return () => {
                 window.removeEventListener('mousemove', handleMouseMove);
-                window.removeEventListener('mouseup', handleMouseUp);
+                window.removeEventListener('mouseup', handleInteractionEnd);
+                window.removeEventListener('touchmove', handleTouchMove);
+                window.removeEventListener('touchend', handleInteractionEnd);
             };
         }, [isDragging, handleValueUpdate]);
 
         const percentage = ((sliderValue - min) / (max - min)) * 100;
-        
+
         return (
-             <div className="space-y-1">
+            <div className="space-y-1">
                 <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-400">{label}</span>
-                     <span className="text-xs font-mono text-gray-300 w-12 text-center">{sliderValue}</span>
+                    <span className="text-xs font-mono text-gray-300 w-12 text-center">{sliderValue}</span>
                 </div>
-                <div 
+                <div
                     ref={sliderRef}
                     onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
                     className="w-full h-2 rounded-full bg-black/30 cursor-pointer relative group"
                 >
-                   <div className="h-full bg-klar rounded-full" style={{ width: `${percentage}%` }}></div>
-                   <div 
-                       className={`w-4 h-4 bg-white border-2 border-klar rounded-full absolute top-1/2 -translate-y-1/2 -translate-x-1/2 slider-thumb ${isDragging ? 'dragging' : ''}`}
-                       style={{ left: `${percentage}%` }}
-                   ></div>
+                    <div className="h-full bg-klar rounded-full" style={{ width: `${percentage}%` }}></div>
+                    <div
+                        className={`w-4 h-4 bg-white border-2 border-klar rounded-full absolute top-1/2 -translate-y-1/2 -translate-x-1/2 slider-thumb ${isDragging ? 'dragging' : ''}`}
+                        style={{ left: `${percentage}%` }}
+                    ></div>
                 </div>
             </div>
         );
@@ -1644,4 +1636,5 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
