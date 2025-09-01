@@ -1279,13 +1279,17 @@ const App = () => {
     ];
 
     const pricingTiers = [
-        { name: '1 Week Klar Access', price: '$1.50', url: 'https://klarhub.sellhub.cx/product/1-Week/' },
+        { name: '1 Week Klar Access', price: '$1.50', url: 'https://klarhub.sellhub.cx/product/1-Week/', specialTag: 'Most Popular'},
+        { name: 'Extreme Alt Gen', price: '$1.00', url: 'https://klarhub.sellhub.cx/product/Extreme-Alt-Gen/', specialTag: 'On Sale' },
+        { name: 'Lifetime Klar', price: '$15.00', url: 'https://klarhub.sellhub.cx/product/New-product/', isFeatured: true },
         { name: '1 Month Klar Access', price: '$2.50', url: 'https://klarhub.sellhub.cx/product/1-Month-Klar-Access/', robuxPrice: '450', robuxUrl: 'https://www.roblox.com/catalog/116340932269907/KLAR-1-month' },
         { name: '3 Month Klar Access', price: '$3.75', url: 'https://klarhub.sellhub.cx/product/3-Month-Access/', robuxPrice: '800', robuxUrl: 'https://www.roblox.com/catalog/71184399134072/KLAR-3-Month' },
         { name: '6 Month Klar Access', price: '$5.50', url: 'https://klarhub.sellhub.cx/product/6-Month-Klar-Access/', robuxPrice: '1225', robuxUrl: 'https://www.roblox.com/catalog/134764715699815/KLAR-6-Month' },
-        { name: 'Lifetime Klar', price: '$15.00', url: 'https://klarhub.sellhub.cx/product/New-product/', isFeatured: true },
-        { name: 'Extreme Alt Gen', price: '$1.00', url: 'https://klarhub.sellhub.cx/product/Extreme-Alt-Gen/' }
     ];
+    
+    const topTiers = pricingTiers.slice(0, 3);
+    const bottomTiers = pricingTiers.slice(3);
+
      const testimonials = [
         { name: 'Customer', stars: 5, text: "easiest checkout", date: "Wed Jul 23 2025" },
         { name: 'Customer', stars: 5, text: "Amazing and easy", date: "Wed Jul 16 2025" },
@@ -1418,14 +1422,38 @@ const App = () => {
                         </section>
                         <section id="pricing" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
-                            <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-                                {pricingTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-theme'}`}>
-                                        {tier.isFeatured && (
-                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-klar px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md">
-                                                Best Value
+                            <div className="mt-12 grid md:grid-cols-3 gap-8 items-center">
+                                {topTiers.map(tier => (
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-2xl shadow-klar/40 transform md:scale-110' : 'border-theme'}`}>
+                                        {(tier.isFeatured || tier.specialTag) && (
+                                            <div className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md ${tier.isFeatured ? 'bg-klar' : 'bg-orange-500'}`}>
+                                                {tier.isFeatured ? 'Best Value' : tier.specialTag}
                                             </div>
                                         )}
+                                        <h4 className="text-xl font-bold mb-2 h-12 flex items-center justify-center">{tier.name}</h4>
+                                        <div className="flex justify-center items-end gap-2 mb-4">
+                                            <p className="text-4xl font-extrabold text-klar">{tier.price}</p>
+                                            {tier.robuxPrice && (
+                                                <>
+                                                    <span className="text-xl text-theme-secondary pb-1">or</span>
+                                                    <p className="text-4xl font-extrabold text-klar">R${tier.robuxPrice}</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-2 mt-auto">
+                                            <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Purchase (USD)</a>
+                                            {tier.robuxUrl && (
+                                                <a href={tier.robuxUrl} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-[#00A2FF]/20 hover:bg-[#00A2FF]/30 text-[#00A2FF] border border-[#00A2FF]">
+                                                    Purchase (Robux)
+                                                </a>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-8 grid md:grid-cols-3 gap-8">
+                                {bottomTiers.map(tier => (
+                                     <div key={tier.name} className="relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 border-theme">
                                         <h4 className="text-xl font-bold mb-2 h-12 flex items-center justify-center">{tier.name}</h4>
                                         <div className="flex justify-center items-end gap-2 mb-4">
                                             <p className="text-4xl font-extrabold text-klar">{tier.price}</p>
