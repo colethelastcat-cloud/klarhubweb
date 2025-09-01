@@ -704,9 +704,9 @@ const PreviewModal = ({ onClose }) => {
             Object.keys(previewState).forEach(stateKey => {
                 if (stateKey.endsWith('_bind') && previewState[stateKey] && previewState[stateKey].toUpperCase() === key) {
                      const featureKey = stateKey.replace('_bind', '_enabled');
-                      if (previewState.hasOwnProperty(featureKey)) {
-                         handleValueChange(featureKey, !previewState[featureKey]);
-                      }
+                     if (previewState.hasOwnProperty(featureKey)) {
+                        handleValueChange(featureKey, !previewState[featureKey]);
+                     }
                 }
             });
         };
@@ -905,17 +905,17 @@ const PreviewModal = ({ onClose }) => {
                  return (
                     <>
                          <FeatureCard id="qb_aimbot" title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                            <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
-                            <Checkbox id="auto_angle_enabled" label="Auto Angle" />
-                            <Checkbox id="smart_fit_enabled" label="Smart Fit" />
-                         </FeatureCard>
+                             <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
+                             <Checkbox id="auto_angle_enabled" label="Auto Angle" />
+                             <Checkbox id="smart_fit_enabled" label="Smart Fit" />
+                          </FeatureCard>
                          <FeatureCard id="qb_settings" title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                            <Slider id="dime_lead" label="Dime Lead" min={0} max={20} step={1} />
-                            <Slider id="mag_lead" label="Mag Lead" min={0} max={20} step={0.1}/>
-                            <Slider id="bullet_lead" label="Bullet Lead" min={0} max={20} step={1} />
-                            <Slider id="lead_distance" label="Lead Distance" min={0} max={20} step={1} />
-                            <Slider id="height_distance" label="Height Distance" min={0} max={20} step={1} />
-                         </FeatureCard>
+                             <Slider id="dime_lead" label="Dime Lead" min={0} max={20} step={1} />
+                             <Slider id="mag_lead" label="Mag Lead" min={0} max={20} step={0.1}/>
+                             <Slider id="bullet_lead" label="Bullet Lead" min={0} max={20} step={1} />
+                             <Slider id="lead_distance" label="Lead Distance" min={0} max={20} step={1} />
+                             <Slider id="height_distance" label="Height Distance" min={0} max={20} step={1} />
+                          </FeatureCard>
                     </>
                  );
             case 'Player':
@@ -1040,7 +1040,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
     ];
 
     return (
-         <header ref={headerRef} className="bg-theme-header sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
+       <header ref={headerRef} className="bg-theme-header sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
                  <Logo onScrollTo={onScrollTo}/>
                  <button onClick={onGameClick} className="hidden md:block text-sm font-semibold text-theme-secondary hover:text-theme-primary transition border border-theme hover:border-klar px-4 py-2 rounded-lg">Play a Game</button>
@@ -1149,14 +1149,14 @@ const Footer = () => (
         <p className="mt-2">made by auaqa</p>
          <div className="flex justify-center gap-6 mt-4">
              <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Discord">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.36981C18.7915 3.74873 17.189 3.28434 15.5298 3.00003C15.5298 3.00003 15.1518 3.42189 14.865 3.76878C13.0476 3.22018 11.1492 3.22018 9.423 3.76878C9.135 3.42189 8.7582 3 8.7582 3C7.09901 3.28434 5.49652 3.74873 3.97017 4.36981C0.324569 9.87328 -0.463321 15.1072 0.871542 20.2078C2.6516 21.6213 4.59436 22.548 6.65283 23C7.26284 22.3486 7.80165 21.631 8.256 20.8522C7.38573 20.4866 6.58162 20.021 5.84279 19.4515C6.11591 19.2633 6.3802 19.0664 6.6346 18.8608C10.0322 20.6453 14.2523 20.6453 17.6487 18.8608C17.9031 19.0664 18.1674 19.2633 18.4405 19.4515C17.7017 20.021 16.9064 20.4866 16.0273 20.8522C16.4817 21.631 17.0205 22.3486 17.6305 23C19.689 22.548 21.6317 21.6213 23.4118 20.2078C24.5828 14.2458 23.5938 8.81315 20.317 4.36981ZM8.02004 16.5392C6.88337 16.5392 6.00004 15.503 6.00004 14.1682C6.00004 12.8334 6.88337 11.7972 8.02004 11.7972C9.15671 11.7972 10.04 12.8334 10.0203 14.1682C10.0203 15.503 9.15671 16.5392 8.02004 16.5392ZM16.2687 16.5392C15.132 16.5392 14.2487 15.503 14.2487 14.1682C14.2487 12.8334 15.132 11.7972 16.2687 11.7972C17.4054 11.7972 18.2887 12.8334 18.2689 14.1682C18.2689 15.503 17.4054 16.5392 16.2687 16.5392Z" /></svg>
-            </a>
-            <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Telegram">
-                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24a12 12 0 1 1 12-12 12.013 12.013 0 0 1-12 12Zm5.74-15.652L6.44 12.27c-.88.39-1.01.76-.23 1.1l2.58 1.12 6.09-3.79c.33-.2.62-.09.35.13l-4.93 4.45-1.15 3.39c.83 0 .81-.38 1.12-.66l1.79-1.63 3.4 2.45c.6.35 1.01.16 1.18-.52l2.1-9.84c.21-.83-.3-1.18-1.04-.84Z"/></svg>
-            </a>
-            <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Youtube">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z" /></svg>
-            </a>
+                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.36981C18.7915 3.74873 17.189 3.28434 15.5298 3.00003C15.5298 3.00003 15.1518 3.42189 14.865 3.76878C13.0476 3.22018 11.1492 3.22018 9.423 3.76878C9.135 3.42189 8.7582 3 8.7582 3C7.09901 3.28434 5.49652 3.74873 3.97017 4.36981C0.324569 9.87328 -0.463321 15.1072 0.871542 20.2078C2.6516 21.6213 4.59436 22.548 6.65283 23C7.26284 22.3486 7.80165 21.631 8.256 20.8522C7.38573 20.4866 6.58162 20.021 5.84279 19.4515C6.11591 19.2633 6.3802 19.0664 6.6346 18.8608C10.0322 20.6453 14.2523 20.6453 17.6487 18.8608C17.9031 19.0664 18.1674 19.2633 18.4405 19.4515C17.7017 20.021 16.9064 20.4866 16.0273 20.8522C16.4817 21.631 17.0205 22.3486 17.6305 23C19.689 22.548 21.6317 21.6213 23.4118 20.2078C24.5828 14.2458 23.5938 8.81315 20.317 4.36981ZM8.02004 16.5392C6.88337 16.5392 6.00004 15.503 6.00004 14.1682C6.00004 12.8334 6.88337 11.7972 8.02004 11.7972C9.15671 11.7972 10.04 12.8334 10.0203 14.1682C10.0203 15.503 9.15671 16.5392 8.02004 16.5392ZM16.2687 16.5392C15.132 16.5392 14.2487 15.503 14.2487 14.1682C14.2487 12.8334 15.132 11.7972 16.2687 11.7972C17.4054 11.7972 18.2887 12.8334 18.2689 14.1682C18.2689 15.503 17.4054 16.5392 16.2687 16.5392Z" /></svg>
+             </a>
+             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Telegram">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24a12 12 0 1 1 12-12 12.013 12.013 0 0 1-12 12Zm5.74-15.652L6.44 12.27c-.88.39-1.01.76-.23 1.1l2.58 1.12 6.09-3.79c.33-.2.62-.09.35.13l-4.93 4.45-1.15 3.39c.83 0 .81-.38 1.12-.66l1.79-1.63 3.4 2.45c.6.35 1.01.16 1.18-.52l2.1-9.84c.21-.83-.3-1.18-1.04-.84Z"/></svg>
+             </a>
+             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Youtube">
+                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z" /></svg>
+             </a>
         </div>
     </footer>
 );
@@ -1355,15 +1355,39 @@ const App = () => {
                             <p className="text-lg md:text-xl text-theme-secondary mt-4 max-w-2xl mx-auto">The pinnacle of script performance and reliability for FF2.</p>
                             <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-6 text-theme-secondary">
                                 <div className="flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style={{stopColor: '#22c55e', stopOpacity:1}} />
+                                                <stop offset="100%" style={{stopColor: '#4ade80', stopOpacity:1}} />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M12 2L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 2ZM10 17L6 13L7.41 11.59L10 14.17L16.59 7.58L18 9L10 17Z" fill="url(#grad1)"/>
+                                    </svg>
                                     <span>100% Undetected</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M11.983 1.904a.75.75 0 00-1.217-.866l-7.5 10.5a.75.75 0 00.925 1.217L8 10.463V18a.75.75 0 001.5 0v-7.537l4.017-2.87a.75.75 0 00-.534-1.217L11.983 1.904z" /></svg>
+                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style={{stopColor: '#facc15', stopOpacity:1}} />
+                                                <stop offset="100%" style={{stopColor: '#f59e0b', stopOpacity:1}} />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M11 21H13V12.93L15.75 14.28L16.5 12.55L11 10V3H9V10.07L6.25 8.72L5.5 10.45L11 13V21Z" fill="url(#grad2)"/>
+                                    </svg>
                                     <span>Lightning Fast</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                     <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10.868 2.884c.321-.772 1.415-.772 1.736 0l.645 1.558a.75.75 0 00.729.516h1.634c.82 0 1.123.993.57 1.488l-1.328 1.004a.75.75 0 00-.286.905l.492 1.772c.245.882-.733 1.579-1.482 1.06l-1.423-.982a.75.75 0 00-.894 0l-1.423.982c-.749.52-1.726-.178-1.482-1.06l.492-1.772a.75.75 0 00-.286-.905l-1.328-1.004c-.553-.495-.25-1.488.57-1.488h1.634a.75.75 0 00.73-.516l.645-1.558z" /></svg>
+                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style={{stopColor: '#3b82f6', stopOpacity:1}} />
+                                                <stop offset="100%" style={{stopColor: '#60a5fa', stopOpacity:1}} />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" fill="url(#grad3)"/>
+                                    </svg>
                                     <span>Premium Quality</span>
                                 </div>
                             </div>
@@ -1382,7 +1406,7 @@ const App = () => {
                                  <button onClick={handlePreviewClick} className="mt-2 py-2 px-6 rounded-lg font-semibold text-center transition bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text flex items-center gap-2">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
                                     Preview Hub
-                                </button>
+                                 </button>
                             </div>
                         </div>
                     </section>
@@ -1486,7 +1510,7 @@ const App = () => {
                                                 </a>
                                             )}
                                         </div>
-                                    </div>
+                                     </div>
                                 ))}
                             </div>
                             <div className="text-center mt-8">
@@ -1543,9 +1567,9 @@ const App = () => {
                                                             Copy Script
                                                         </span>
                                                          <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-300 ${scriptCopied ? 'translate-y-0' : 'translate-y-full'}`}>
-                                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                                             Copied!
-                                                        </span>
+                                                         </span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -1628,4 +1652,3 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
