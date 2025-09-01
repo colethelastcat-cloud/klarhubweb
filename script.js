@@ -1,9 +1,5 @@
 const { useState, useEffect, useRef } = React;
 
-//=================================================
-// 1. HELPER HOOKS
-//=================================================
-
 const useInteractiveCard = () => {
   useEffect(() => {
     const cards = document.querySelectorAll('.interactive-card');
@@ -87,7 +83,6 @@ const useAnimatedCounter = (target, duration = 2000) => {
     return [ref, count];
 };
 
-
 const useActiveNav = (headerHeight) => {
     const [activeSection, setActiveSection] = useState('home');
     useEffect(() => {
@@ -105,11 +100,6 @@ const useActiveNav = (headerHeight) => {
     }, [headerHeight]);
     return activeSection;
 };
-
-
-//=================================================
-// 2. MODAL & OVERLAY COMPONENTS
-//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -160,29 +150,24 @@ const VideoModal = ({ videoUrls, onClose }) => {
             {(handleClose) => (
                 <div className="w-screen h-screen flex items-center justify-center relative group">
                     <button onClick={handleClose} className="absolute top-6 right-6 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl hover:bg-black/80 transition-colors">×</button>
-
                     <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
                     <button onClick={handleNext} className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                     </button>
-
                     <div className="w-full h-full flex items-center justify-center perspective-1000">
                         <div className="relative w-full h-[60vh] flex items-center justify-center transform-style-3d">
                              {videoUrls.map((url, index) => {
                                 const videoId = getYoutubeVideoId(url);
                                 const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/1280x720/121212/A0A0A0?text=Video';
-
                                 let offset = index - currentIndex;
                                 const numItems = videoUrls.length;
                                 if (Math.abs(offset) > numItems / 2) {
                                     offset = offset > 0 ? offset - numItems : offset + numItems;
                                 }
-
                                 const isActive = offset === 0;
                                 const isVisible = Math.abs(offset) <= 1;
-
                                 const style = {
                                     transform: `translateX(${offset * 80}%) scale(${isActive ? 1 : 0.7}) rotateY(${-offset * 40}deg)`,
                                     opacity: isVisible ? (isActive ? 1 : 0.3) : 0,
@@ -191,7 +176,6 @@ const VideoModal = ({ videoUrls, onClose }) => {
                                     filter: isActive ? 'blur(0px)' : 'blur(5px)',
                                     transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                                 };
-
                                 return (
                                     <div key={index} className="absolute w-[70%] md:w-[60%] aspect-video" style={style}>
                                         {isActive ? (
@@ -257,9 +241,7 @@ const AIHelperModal = ({ onClose }) => {
     const [chatHistory, setChatHistory] = useState([{ role: 'ai', text: 'Hello! I am the Klar Hub AI assistant. How can I help you today? Feel free to ask about features, pricing, or anything else.' }]);
     const [isLoading, setIsLoading] = useState(false);
     const chatEndRef = useRef(null);
-
     useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatHistory]);
-
     const callGeminiAPI = async (prompt) => {
         setIsLoading(true);
         if (window.location.protocol === 'file:') {
@@ -267,7 +249,6 @@ const AIHelperModal = ({ onClose }) => {
             setIsLoading(false);
             return;
         }
-
         const apiUrl = '/api/gemini';
         try {
             const response = await fetch(apiUrl, {
@@ -365,9 +346,7 @@ const KlarClickerGameModal = ({ onClose }) => {
     const [clickLevel, setClickLevel] = useState(1);
     const [autoLevel, setAutoLevel] = useState(0);
     const [loading, setLoading] = useState(true);
-
     const firebaseRef = useRef({});
-
     const klarsPerClick = 1 + (clickLevel - 1);
     const klarsPerSecond = autoLevel * 0.5;
     const clickUpgradeCost = Math.floor(10 * Math.pow(1.15, clickLevel));
@@ -385,14 +364,11 @@ const KlarClickerGameModal = ({ onClose }) => {
                 }
                 const firebaseConfig = JSON.parse(__firebase_config);
                 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
-                
                 const auth = firebase.auth();
                 const db = firebase.firestore();
-
                 if (!auth.currentUser) {
                     if (initialAuthToken) {
                         await auth.signInWithCustomToken(initialAuthToken);
@@ -400,15 +376,12 @@ const KlarClickerGameModal = ({ onClose }) => {
                         await auth.signInAnonymously();
                     }
                 }
-                
                 const userId = auth.currentUser.uid;
                 if (!userId) {
                     throw new Error("User not authenticated");
                 }
-                
                 const docRef = db.doc(`artifacts/${appId}/users/${userId}/klar_clicker_save`);
                 firebaseRef.current = { db, userId, docRef, disabled: false };
-
                 const docSnap = await docRef.get();
                 if (docSnap.exists) {
                     const data = docSnap.data();
@@ -423,28 +396,21 @@ const KlarClickerGameModal = ({ onClose }) => {
                 setLoading(false);
             }
         };
-
         initFirebase();
     }, []);
 
     useEffect(() => {
         if (loading || klarsPerSecond === 0) return;
-
         let lastUpdateTime = performance.now();
         let animationFrameId;
-
         const updateKlars = (currentTime) => {
             const deltaTime = currentTime - lastUpdateTime;
             lastUpdateTime = currentTime;
-
             const klarsToAdd = (klarsPerSecond * deltaTime) / 1000;
             setKlars(currentKlars => currentKlars + klarsToAdd);
-
             animationFrameId = requestAnimationFrame(updateKlars);
         };
-
         animationFrameId = requestAnimationFrame(updateKlars);
-
         return () => cancelAnimationFrame(animationFrameId);
     }, [loading, klarsPerSecond]);
 
@@ -456,7 +422,6 @@ const KlarClickerGameModal = ({ onClose }) => {
                 await firebaseRef.current.docRef.set(gameState, { merge: true });
             }
         };
-
         const interval = setInterval(saveGameState, 5000);
         return () => clearInterval(interval);
     }, [loading, klars, clickLevel, autoLevel]);
@@ -484,7 +449,6 @@ const KlarClickerGameModal = ({ onClose }) => {
                         <h3 className="text-xl font-bold">Klar Clicker</h3>
                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
                     </div>
-
                     {loading ? <div className="text-center p-8">Loading Game...</div> :
                     (<>
                         <div className="text-center p-4 bg-theme-dark rounded-lg mb-4">
@@ -492,14 +456,12 @@ const KlarClickerGameModal = ({ onClose }) => {
                             <p className="text-sm text-theme-secondary">Klars</p>
                             <p className="text-xs text-theme-secondary mt-1">{klarsPerSecond.toFixed(1)} per second</p>
                         </div>
-
                         <div 
                             className="w-48 h-48 mx-auto my-4 cursor-pointer active:scale-95 transition-transform select-none flex items-center justify-center"
                             onClick={handleLogoClick}
                         >
                             <Logo onScrollTo={() => {}}/>
                         </div>
-                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-theme-dark p-4 rounded-lg">
                                 <h4 className="font-bold">Click Power</h4>
@@ -512,7 +474,6 @@ const KlarClickerGameModal = ({ onClose }) => {
                                     Cost: {clickUpgradeCost.toLocaleString()}
                                 </button>
                             </div>
-
                             <div className="bg-theme-dark p-4 rounded-lg">
                                 <h4 className="font-bold">Auto Klars</h4>
                                 <p className="text-sm text-theme-secondary mb-2">+{klarsPerSecond.toFixed(1)} Klars per second (Lvl {autoLevel})</p>
@@ -555,7 +516,7 @@ const TosModal = ({ onClose }) => {
 
 const PreviewAnimation = ({ onAnimationEnd }) => {
     useEffect(() => {
-        const timer = setTimeout(onAnimationEnd, 1200); // Duration of the animation
+        const timer = setTimeout(onAnimationEnd, 1200);
         return () => clearTimeout(timer);
     }, [onAnimationEnd]);
 
@@ -569,15 +530,10 @@ const PreviewAnimation = ({ onAnimationEnd }) => {
     );
 };
 
-//=================================================
-// 3. UI PREVIEW COMPONENTS
-//=================================================
-
 const PreviewModal = ({ onClose }) => {
     const [activeTab, setActiveTab] = useState('Catching');
     const [isFading, setIsFading] = useState(false);
     const [previewState, setPreviewState] = useState({
-        // Default values for a realistic preview
         magnet_power: 25, magnet_chance: 100, arm_size: 3, football_size: 1,
         dime_lead: 11, mag_lead: 12.5, bullet_lead: 4, lead_distance: 0, height_distance: 0,
         walkspeed_value: 20, cframe_speed: 0, jump_power_value: 50, angle_power: 50, hip_height_value: 0, gravity_value: 196.1,
@@ -599,6 +555,11 @@ const PreviewModal = ({ onClose }) => {
         setPreviewState(prev => ({ ...prev, [key]: value }));
     };
     
+    const handleButtonInteraction = (e) => {
+        e.target.classList.add('active');
+        setTimeout(() => e.target.classList.remove('active'), 150);
+    };
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (listeningForBind) {
@@ -792,7 +753,7 @@ const PreviewModal = ({ onClose }) => {
         );
     };
     
-    const Button = ({ label }) => <button className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded active:scale-95 transition-all">{label}</button>
+    const Button = ({ label }) => <button onClick={handleButtonInteraction} className="w-full text-xs bg-black/30 text-gray-300 py-1.5 rounded active:bg-klar/30 active:scale-95 transition-all">{label}</button>
     const TextInput = ({ placeholder }) => <input type="text" placeholder={placeholder} className="w-full bg-black/30 text-xs p-2 rounded border border-gray-600 focus:outline-none focus:border-klar placeholder-gray-500" />
 
     const renderContent = () => {
@@ -908,7 +869,12 @@ const PreviewModal = ({ onClose }) => {
              case 'UI Settings':
                 return (
                     <div className="col-span-2">
-                       {/* Intentionally blank per user request */}
+                       <FeatureCard id="configs" title="Configurations" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0zM10 13a3 3 0 100-6 3 3 0 000 6z" /></svg>}>
+                        <TextInput placeholder="Type Config Name..." />
+                        <Button label="Save Config" />
+                        <Button label="Load Config" />
+                        <Button label="Reset Config" />
+                    </FeatureCard>
                     </div>
                 );
             default:
@@ -921,7 +887,6 @@ const PreviewModal = ({ onClose }) => {
         <Modal onClose={onClose}>
             {(handleClose) => (
                 <div className="w-[800px] h-[500px] bg-[#0D0D0F] text-white rounded-lg flex overflow-hidden border border-gray-800 shadow-2xl shadow-black/50">
-                    {/* Sidebar */}
                     <div className="w-48 bg-[#18181C] p-4 flex flex-col">
                         <h1 className="text-lg font-bold">Klar Hub | <span className="text-klar">FF2</span></h1>
                         <div className="mt-6 flex-grow space-y-1">
@@ -938,7 +903,6 @@ const PreviewModal = ({ onClose }) => {
                             ))}
                         </div>
                     </div>
-                    {/* Main Content */}
                     <div className={`flex-1 p-6 overflow-y-auto custom-scrollbar transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
                        <div className="hub-content-inner grid grid-cols-1 md:grid-cols-2 gap-4">
                           {renderContent()}
@@ -949,11 +913,6 @@ const PreviewModal = ({ onClose }) => {
         </Modal>
     );
 };
-
-
-//=================================================
-// 4. CORE PAGE COMPONENTS
-//=================================================
 
 const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeSection, isMobileMenuOpen, onGameClick, theme, setTheme }) => {
     const discordLink = "https://discord.gg/bGmGSnW3gQ";
@@ -1089,10 +1048,6 @@ const Footer = () => (
     </footer>
 );
 
-//=================================================
-// 5. MAIN APP COMPONENT
-//=================================================
-
 const App = () => {
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
@@ -1222,9 +1177,9 @@ const App = () => {
 
     const pricingTiers = [
         { name: '1 Week Klar Access', price: '$1.50', url: 'https://klarhub.sellhub.cx/product/1-Week/' },
-        { name: '1 Month Klar Access', price: '$2.50', url: 'https://klarhub.sellhub.cx/product/1-Month-Klar-Access/' },
-        { name: '3 Month Klar Access', price: '$3.75', url: 'https://klarhub.sellhub.cx/product/3-Month-Access/' },
-        { name: '6 Month Klar Access', price: '$5.50', url: 'https://klarhub.sellhub.cx/product/6-Month-Klar-Access/' },
+        { name: '1 Month Klar Access', price: '$2.50', url: 'https://klarhub.sellhub.cx/product/1-Month-Klar-Access/', robuxPrice: '450', robuxUrl: 'https://www.roblox.com/catalog/116340932269907/KLAR-1-month' },
+        { name: '3 Month Klar Access', price: '$3.75', url: 'https://klarhub.sellhub.cx/product/3-Month-Access/', robuxPrice: '800', robuxUrl: 'https://www.roblox.com/catalog/71184399134072/KLAR-3-Month' },
+        { name: '6 Month Klar Access', price: '$5.50', url: 'https://klarhub.sellhub.cx/product/6-Month-Klar-Access/', robuxPrice: '1225', robuxUrl: 'https://www.roblox.com/catalog/134764715699815/KLAR-6-Month' },
         { name: 'Lifetime Klar', price: '$15.00', url: 'https://klarhub.sellhub.cx/product/New-product/', isFeatured: true },
         { name: 'Extreme Alt Gen', price: '$1.00', url: 'https://klarhub.sellhub.cx/product/Extreme-Alt-Gen/' }
     ];
@@ -1313,7 +1268,6 @@ const App = () => {
                             </div>
                         </div>
                     </section>
-
                     <div className="w-full max-w-6xl mx-auto px-4 space-y-24">
                          <section id="stats" className="py-12 fade-in-section">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -1331,7 +1285,6 @@ const App = () => {
                                 </div>
                             </div>
                         </section>
-
                         <section id="features" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Core Features</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
@@ -1344,7 +1297,6 @@ const App = () => {
                                 ))}
                             </div>
                         </section>
-
                         <section id="games" className="py-12 text-center fade-in-section">
                              <h3 className="text-4xl font-bold">Supported Games</h3>
                              <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -1361,26 +1313,38 @@ const App = () => {
                                   ))}
                              </div>
                         </section>
-
                         <section id="pricing" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
-                            <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
                                 {pricingTiers.map(tier => (
-                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-theme'}`}>
+                                    <div key={tier.name} className={`relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 ${tier.isFeatured ? 'border-klar shadow-lg shadow-klar/30 transform md:scale-105' : 'border-theme'}`}>
                                         {tier.isFeatured && (
                                             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-klar px-4 py-1 text-sm font-semibold text-white rounded-full shadow-md">
                                                 Best Value
                                             </div>
                                         )}
-                                        <h4 className="text-xl font-bold mb-2">{tier.name}</h4>
-                                        <p className="text-theme-secondary text-sm mb-4">Starting at</p>
-                                        <p className="text-4xl font-extrabold text-klar mb-6">{tier.price}</p>
-                                        <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-3 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Purchase</a>
+                                        <h4 className="text-xl font-bold mb-2 h-12 flex items-center justify-center">{tier.name}</h4>
+                                        <div className="flex justify-center items-end gap-2 mb-4">
+                                            <p className="text-4xl font-extrabold text-klar">{tier.price}</p>
+                                            {tier.robuxPrice && (
+                                                <>
+                                                    <span className="text-xl text-theme-secondary pb-1">or</span>
+                                                    <p className="text-4xl font-extrabold text-klar">R${tier.robuxPrice}</p>
+                                                </>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-2 mt-auto">
+                                            <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Purchase (USD)</a>
+                                            {tier.robuxUrl && (
+                                                <a href={tier.robuxUrl} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-[#00A2FF]/20 hover:bg-[#00A2FF]/30 text-[#00A2FF] border border-[#00A2FF]">
+                                                    Purchase (Robux)
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </section>
-
                         <section id="free" className="py-12 fade-in-section">
                             <div className="text-center">
                                 <h3 className="text-4xl font-bold">Get Free Access</h3>
@@ -1389,7 +1353,6 @@ const App = () => {
                             <div className="mt-12 max-w-3xl mx-auto">
                                 <div className="relative pl-12">
                                     <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-theme"></div>
-
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
@@ -1403,7 +1366,6 @@ const App = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                              <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
@@ -1432,7 +1394,6 @@ const App = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="relative">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">3</div>
@@ -1445,7 +1406,6 @@ const App = () => {
                                 </div>
                             </div>
                         </section>
-
                          <section id="reviews" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Trusted by Players Worldwide</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
@@ -1465,7 +1425,6 @@ const App = () => {
                                  ))}
                             </div>
                         </section>
-
                         <section id="faq" className="py-12 max-w-3xl mx-auto fade-in-section">
                             <h3 className="text-4xl font-bold text-center">Frequently Asked Questions</h3>
                             <div className="mt-12 space-y-4">
@@ -1482,7 +1441,6 @@ const App = () => {
                                 ))}
                             </div>
                         </section>
-
                         <section id="community" className="py-12 text-center fade-in-section">
                             <div className="bg-theme-card border border-theme rounded-2xl p-8">
                                 <h3 className="text-4xl font-bold">Still Have Questions?</h3>
@@ -1510,9 +1468,6 @@ const App = () => {
     );
 };
 
-//=================================================
-// 6. RENDER APP
-//=================================================
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
