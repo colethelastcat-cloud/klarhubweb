@@ -1367,15 +1367,7 @@ const App = () => {
                                     <span>100% Undetected</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <defs>
-                                            <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style={{stopColor: '#facc15', stopOpacity:1}} />
-                                                <stop offset="100%" style={{stopColor: '#f59e0b', stopOpacity:1}} />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M11 21H13V12.93L15.75 14.28L16.5 12.55L11 10V3H9V10.07L6.25 8.72L5.5 10.45L11 13V21Z" fill="url(#grad2)"/>
-                                    </svg>
+                                    <span className="text-xl">⚡</span>
                                     <span>Lightning Fast</span>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -1652,3 +1644,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
