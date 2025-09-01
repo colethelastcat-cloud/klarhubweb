@@ -435,14 +435,14 @@ const AIHelperModal = ({ onClose }) => {
                         <div ref={chatEndRef} />
                     </div>
                      {chatHistory.length === 1 && (
-                        <div className="p-4 border-t border-theme flex-shrink-0">
-                            <p className="text-sm text-theme-secondary mb-2 text-center">Or try one of these:</p>
-                            <div className="flex flex-wrap justify-center gap-2">
-                                {quickQuestions.map(q => (
-                                    <button key={q} onClick={() => sendMessage(q)} className="bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text text-sm px-3 py-1 rounded-full transition">{q}</button>
-                                ))}
-                            </div>
-                        </div>
+                         <div className="p-4 border-t border-theme flex-shrink-0">
+                             <p className="text-sm text-theme-secondary mb-2 text-center">Or try one of these:</p>
+                             <div className="flex flex-wrap justify-center gap-2">
+                                 {quickQuestions.map(q => (
+                                     <button key={q} onClick={() => sendMessage(q)} className="bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text text-sm px-3 py-1 rounded-full transition">{q}</button>
+                                 ))}
+                             </div>
+                         </div>
                     )}
                     <form onSubmit={handleFormSubmit} className="p-4 border-t border-theme flex gap-2 flex-shrink-0">
                         <input
@@ -723,7 +723,7 @@ const PreviewModal = ({ onClose }) => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-        }, [previewState, handleValueChange]);
+    }, [previewState, handleValueChange]);
 
 
     const tabs = [
@@ -767,6 +767,33 @@ const PreviewModal = ({ onClose }) => {
             </div>
         );
     };
+
+    const CustomNumberInput = ({ value, onChange, step = 1, min = 0, max = 100 }) => {
+        const handleIncrement = () => {
+            let newValue = value + step;
+            if (step < 1) newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
+            onChange(Math.min(max, newValue));
+        };
+        const handleDecrement = () => {
+            let newValue = value - step;
+            if (step < 1) newValue = parseFloat(newValue.toFixed(String(step).split('.')[1]?.length || 2));
+            onChange(Math.max(min, newValue));
+        };
+
+        return (
+            <div className="flex items-center gap-1">
+                <span className="text-xs font-mono text-gray-300 w-12 text-center">{value}</span>
+                <div className="flex flex-col">
+                    <button onClick={handleIncrement} className="w-4 h-4 flex items-center justify-center bg-black/30 rounded-sm hover:bg-white/10 transition-colors">
+                        <svg className="w-2 h-2 text-gray-400" fill="none" viewBox="0 0 8 5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 4l3-3 3 3" /></svg>
+                    </button>
+                    <button onClick={handleDecrement} className="w-4 h-4 flex items-center justify-center bg-black/30 rounded-sm hover:bg-white/10 transition-colors">
+                         <svg className="w-2 h-2 text-gray-400" fill="none" viewBox="0 0 8 5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 1l3 3 3-3" /></svg>
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     const Slider = ({ id, label, min = 0, max = 100, step = 1 }) => {
         const sliderRef = useRef(null);
@@ -858,7 +885,7 @@ const PreviewModal = ({ onClose }) => {
              <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-400">{label}</span>
                  <select value={selectedValue} onChange={(e) => handleValueChange(id, e.target.value)} className="bg-black/30 text-xs text-gray-300 border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-klar">
-                    {options.map(o => <option key={o}>{o}</option>)}
+                     {options.map(o => <option key={o}>{o}</option>)}
                 </select>
             </div>
         );
@@ -903,17 +930,17 @@ const PreviewModal = ({ onClose }) => {
                  return (
                     <>
                          <FeatureCard id="qb_aimbot" title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                             <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
-                             <Checkbox id="auto_angle_enabled" label="Auto Angle" />
-                             <Checkbox id="smart_fit_enabled" label="Smart Fit" />
-                          </FeatureCard>
+                            <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
+                            <Checkbox id="auto_angle_enabled" label="Auto Angle" />
+                            <Checkbox id="smart_fit_enabled" label="Smart Fit" />
+                         </FeatureCard>
                          <FeatureCard id="qb_settings" title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                             <Slider id="dime_lead" label="Dime Lead" min={0} max={20} step={1} />
-                             <Slider id="mag_lead" label="Mag Lead" min={0} max={20} step={0.1}/>
-                             <Slider id="bullet_lead" label="Bullet Lead" min={0} max={20} step={1} />
-                             <Slider id="lead_distance" label="Lead Distance" min={0} max={20} step={1} />
-                             <Slider id="height_distance" label="Height Distance" min={0} max={20} step={1} />
-                          </FeatureCard>
+                            <Slider id="dime_lead" label="Dime Lead" min={0} max={20} step={1} />
+                            <Slider id="mag_lead" label="Mag Lead" min={0} max={20} step={0.1}/>
+                            <Slider id="bullet_lead" label="Bullet Lead" min={0} max={20} step={1} />
+                            <Slider id="lead_distance" label="Lead Distance" min={0} max={20} step={1} />
+                            <Slider id="height_distance" label="Height Distance" min={0} max={20} step={1} />
+                         </FeatureCard>
                     </>
                  );
             case 'Player':
@@ -985,7 +1012,7 @@ const PreviewModal = ({ onClose }) => {
                         <Button label="Save Config" />
                         <Button label="Load Config" />
                         <Button label="Reset Config" />
-                    </FeatureCard>
+                       </FeatureCard>
                     </div>
                 );
             default:
@@ -1018,6 +1045,88 @@ const PreviewModal = ({ onClose }) => {
                        <div className="hub-content-inner grid grid-cols-1 md:grid-cols-2 gap-4">
                           {renderContent()}
                        </div>
+                    </div>
+                </div>
+            )}
+        </Modal>
+    );
+};
+
+const ComparePlansModal = ({ onClose, allTiers }) => {
+    // Define the features to compare. This can be expanded easily.
+    const features = [
+        { name: 'Price', key: 'price' },
+        { name: 'Robux Price', key: 'robuxPrice' },
+        { 
+            name: 'Duration', 
+            // Custom logic to determine duration from the tier name
+            getValue: (tier) => {
+                if (tier.name.includes('Lifetime')) return 'Lifetime';
+                if (tier.name.includes('1 Week')) return '7 Days';
+                if (tier.name.includes('1 Month')) return '30 Days';
+                if (tier.name.includes('3 Month')) return '90 Days';
+                if (tier.name.includes('6 Month')) return '180 Days';
+                return 'N/A';
+            }
+        },
+        { 
+            name: 'Access To All Games',
+            // Render a checkmark for all Klar access plans
+            getValue: (tier) => tier.name.includes('Klar') ? '✔️' : 'N/A'
+        },
+        { 
+            name: 'Premium Support',
+            // Render a checkmark only for the Lifetime plan
+            getValue: (tier) => tier.name.includes('Lifetime') ? '✔️' : '❌'
+        },
+    ];
+
+    return (
+        <Modal onClose={onClose}>
+            {(handleClose) => (
+                <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-4xl border border-theme">
+                    <div className="p-4 border-b border-theme flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-theme-primary">Compare All Plans</h3>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
+                    </div>
+                    <div className="p-6 overflow-x-auto custom-scrollbar">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr>
+                                    <th className="p-3 text-sm font-semibold text-theme-primary bg-theme-dark rounded-tl-lg">Features</th>
+                                    {allTiers.map(tier => (
+                                        <th key={tier.name} className="p-3 text-sm font-semibold text-theme-primary bg-theme-dark text-center whitespace-nowrap">
+                                            {tier.name}
+                                            {tier.isFeatured && <span className="block text-xs text-klar font-normal">(Best Value)</span>}
+                                        </th>
+                                    ))}
+                                    <th className="p-3 bg-theme-dark rounded-tr-lg"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {features.map((feature, fIndex) => (
+                                    <tr key={feature.name} className="border-b border-theme">
+                                        <td className="p-3 font-medium text-theme-secondary">{feature.name}</td>
+                                        {allTiers.map(tier => (
+                                            <td key={tier.name} className="p-3 text-center text-theme-primary">
+                                                {feature.getValue ? feature.getValue(tier) : (tier[feature.key] || 'N/A')}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                                {/* Purchase buttons row */}
+                                <tr className="">
+                                    <td className="p-3"></td>
+                                    {allTiers.map(tier => (
+                                        <td key={tier.name} className="p-3 text-center">
+                                            <a href={tier.url} target="_blank" rel="noopener noreferrer" className="inline-block w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar text-sm">
+                                                Purchase
+                                            </a>
+                                        </td>
+                                    ))}
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}
@@ -1642,3 +1751,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
