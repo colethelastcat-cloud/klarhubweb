@@ -1002,21 +1002,37 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
     );
 };
 
-const App = () => {
-    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-    const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
-    const [isGameOpen, setIsGameOpen] = useState(false);
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeFaq, setActiveFaq] = useState(null);
-    const [scriptCopied, setScriptCopied] = useState(false);
-    const [selectedGame, setSelectedGame] = useState(null);
-    const [isTosModalOpen, setIsTosModalOpen] = useState(false);
-    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-    const [isPreviewAnimating, setIsPreviewAnimating] = useState(false);
-    const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-    const [freeKey, setFreeKey] = useState('');
-    const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
+const MobileMenu = ({ isOpen, onScrollTo, onTosClick, onClose }) => {
+    if (!isOpen) return null;
+    const discordLink = "https://discord.gg/bGmGSnW3gQ";
+    const navItems = [
+        { id: 'features', label: 'Features' },
+        { id: 'games', label: 'Supported Games' },
+        { id: 'pricing', label: 'Pricing' },
+        { id: 'free', label: 'Free Access' },
+        { id: 'reviews', label: 'Reviews' },
+        { id: 'faq', label: 'FAQ' },
+        { id: 'tos', label: 'Terms' }
+    ];
+    return (
+        <div className="fixed top-0 left-0 w-full h-full z-30 bg-theme-dark/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 text-2xl font-bold md:hidden">
+            {navItems.map(item => (
+                <button key={item.id} onClick={() => {
+                    if (item.id === 'tos') {
+                        onTosClick();
+                    } else {
+                        onScrollTo(item.id);
+                    }
+                    onClose();
+                }} className="text-theme-secondary hover:text-klar transition">{item.label}</button>
+            ))}
+            <div className="mt-4"><a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-3 px-8 text-xl rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Join Discord</a></div>
+        </div>
+    );
+};
 
+const BackToTopButton = () => {
+    const [isVisible, setIsVisible] = useState(false);
     useEffect(() => {
         const root = document.documentElement;
         localStorage.setItem('klar-theme', theme);
@@ -1196,31 +1212,15 @@ const App = () => {
                             <p className="text-lg md:text-xl text-theme-secondary mt-4 max-w-2xl mx-auto">The pinnacle of script performance and reliability for FF2.</p>
                             <div className="mt-6 flex flex-col md:flex-row items-center justify-center gap-6 text-theme-secondary">
                                 <div className="flex items-center gap-2">
-                                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <defs>
-                                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style={{stopColor: '#22c55e', stopOpacity:1}} />
-                                                <stop offset="100%" style={{stopColor: '#4ade80', stopOpacity:1}} />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M12 2L3 5V11C3 16.55 6.84 21.74 12 23C17.16 21.74 21 16.55 21 11V5L12 2ZM10 17L6 13L7.41 11.59L10 14.17L16.59 7.58L18 9L10 17Z" fill="url(#grad1)"/>
-                                    </svg>
+                                    <svg className="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd"></path></svg>
                                     <span>100% Undetected</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-xl">⚡</span>
+                                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M11.983 1.904a.75.75 0 00-1.217-.866l-7.5 10.5a.75.75 0 00.925 1.217L8 10.463V18a.75.75 0 001.5 0v-7.537l4.017-2.87a.75.75 0 00-.534-1.217L11.983 1.904z"></path></svg>
                                     <span>Lightning Fast</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <defs>
-                                            <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style={{stopColor: '#3b82f6', stopOpacity:1}} />
-                                                <stop offset="100%" style={{stopColor: '#60a5fa', stopOpacity:1}} />
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" fill="url(#grad3)"/>
-                                    </svg>
+                                    <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10.868 2.884c.321-.772 1.415-.772 1.736 0l.645 1.558a.75.75 0 00.729.516h1.634c.82 0 1.123.993.57 1.488l-1.328 1.004a.75.75 0 00-.286.905l.492 1.772c.245.882-.733 1.579-1.482 1.06l-1.423-.982a.75.75 0 00-.894 0l-1.423.982c-.749.52-1.726-.178-1.482-1.06l.492-1.772a.75.75 0 00-.286-.905l-1.328-1.004c-.553-.495-.25-1.488.57-1.488h1.634a.75.75 0 00.73-.516l.645-1.558z"></path></svg>
                                     <span>Premium Quality</span>
                                 </div>
                             </div>
@@ -1485,4 +1485,5 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
+
 
