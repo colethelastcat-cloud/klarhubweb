@@ -1,9 +1,5 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
-//=================================================
-// 1. HELPER HOOKS & CORE COMPONENTS
-//=================================================
-
 const useInteractiveCard = () => {
     useEffect(() => {
         const cards = document.querySelectorAll('.interactive-card');
@@ -17,7 +13,6 @@ const useInteractiveCard = () => {
             const rotateY = (x - rect.width / 2) / 6;
             const rotateX = (y - rect.height / 2) / -6;
 
-            // Check if the card is featured to apply a larger hover scale
             const isFeatured = card.classList.contains('featured-card-js');
             const hoverScale = isFeatured ? 1.15 : 1.05;
 
@@ -29,14 +24,12 @@ const useInteractiveCard = () => {
 
         const handleMouseLeave = (e) => {
             const card = e.currentTarget;
-            // Check if the card is featured to reset it to the correct base size
             const isFeatured = card.classList.contains('featured-card-js');
             const baseScale = isFeatured ? 1.1 : 1;
             card.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale(${baseScale})`;
         };
 
         cards.forEach(card => {
-            // A single, consistent transition fixes the flickering/glitching issue.
             card.style.transition = 'transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             card.addEventListener('mousemove', handleMouseMove);
             card.addEventListener('mouseleave', handleMouseLeave);
@@ -216,11 +209,6 @@ const AuroraBackground = () => {
         </div>
     );
 };
-
-
-//=================================================
-// 2. MODAL & OVERLAY COMPONENTS
-//=================================================
 
 const Modal = ({ children, onClose }) => {
     const [isAnimating, setIsAnimating] = useState(false);
@@ -874,13 +862,11 @@ const PreviewModal = ({ onClose }) => {
 };
 
 const ComparePlansModal = ({ onClose, allTiers }) => {
-    // Define the features to compare. This can be expanded easily.
     const features = [
         { name: 'Price', key: 'price' },
         { name: 'Robux Price', key: 'robuxPrice' },
         { 
             name: 'Duration', 
-            // Custom logic to determine duration from the tier name
             getValue: (tier) => {
                 if (tier.name.includes('Lifetime')) return 'Lifetime';
                 if (tier.name.includes('1 Week')) return '7 Days';
@@ -892,12 +878,10 @@ const ComparePlansModal = ({ onClose, allTiers }) => {
         },
         { 
             name: 'Access To All Games',
-            // Render a checkmark for all Klar access plans
             getValue: (tier) => tier.name.includes('Klar') ? '✔️' : 'N/A'
         },
         { 
             name: 'Premium Support',
-            // Render a checkmark for all paid plans
             getValue: (tier) => '✔️'
         },
     ];
@@ -935,7 +919,6 @@ const ComparePlansModal = ({ onClose, allTiers }) => {
                                         ))}
                                     </tr>
                                 ))}
-                                {/* Purchase buttons row */}
                                 <tr className="">
                                     <td className="p-3"></td>
                                     {allTiers.map(tier => (
@@ -1552,5 +1535,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
-
 
