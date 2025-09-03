@@ -186,29 +186,33 @@ const DiscordCounter = () => {
     const serverId = '1357439616877072545';
 
     useEffect(() => {
-        const fetchCount = () => {
+        const fetchCount = async () => {
             const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://discord.com/api/guilds/${serverId}/widget.json`)}`;
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                const data = await response.json();
 
-            fetch(apiUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok.');
-                    return response.json();
-                })
-                .then(data => {
-                    const discordData = JSON.parse(data.contents);
+                // It's possible for the proxy to return success but the content to be an error
+                if(!data.contents) {
+                     throw new Error('Proxy returned empty content.');
+                }
 
-                    if (discordData.code && discordData.message) {
-                        setOnlineCount('N/A');
-                    } else if (discordData.presence_count !== undefined) {
-                        setOnlineCount(discordData.presence_count);
-                    } else {
-                        setOnlineCount('N/A');
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching Discord data:", error);
-                    setOnlineCount('Error');
-                });
+                const discordData = JSON.parse(data.contents);
+
+                if (discordData.code && discordData.message) {
+                    setOnlineCount('N/A');
+                } else if (discordData.presence_count !== undefined) {
+                    setOnlineCount(discordData.presence_count);
+                } else {
+                    setOnlineCount('N/A');
+                }
+            } catch (error) {
+                console.error("Error fetching Discord data:", error);
+                setOnlineCount('...'); // Fallback for any error
+            }
         };
 
         fetchCount();
