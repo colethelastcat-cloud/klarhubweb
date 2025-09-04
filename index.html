@@ -45,10 +45,10 @@
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Removed 'defer' from React and ReactDOM to ensure they load before your script -->
+    <!-- React libraries are loaded without 'defer' to ensure they are ready before the main script runs -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
@@ -58,6 +58,7 @@
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
 
+    <!-- This script is now correctly processed by Babel after the libraries are loaded -->
     <script type="text/babel" src="script.js"></script>
 </body>
 </html>
