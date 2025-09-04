@@ -1,63 +1,251 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+html { 
+    scroll-behavior: smooth; 
+}
 
-    <title>Klar Hub | FF2 Script</title>
-    <meta name="description" content="The pinnacle of script performance and reliability for Football Fusion 2. Featuring Perfect Kicking, QB Aimbot, and Ball Magnets.">
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://klarhub.store/">
-    <meta property="og:title" content="Klar Hub | The Ultimate FF2 Script Hub">
-    <meta property="og:description" content="The pinnacle of script performance and reliability for Football Fusion 2.">
-    <meta property="og:image" content="https://klarhub.store/social-preview.png">
-
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://klarhub.store/">
-    <meta property="twitter:title" content="Klar Hub | The Ultimate FF2 Script Hub">
-    <meta property="twitter:description" content="The pinnacle of script performance and reliability for Football Fusion 2.">
-    <meta property="twitter:image" content="https://klarhub.store/social-preview.png">
-
-    <meta name="theme-color" content="#5586D6">
-
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://unpkg.com">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+:root {
+    --klar-primary: #5586D6;
+    --klar-darker: #2c4a8a;
+    --klar-light: #73a1e8;
     
-    <link rel="stylesheet" href="styles.css">
+    --background-dark: #121212;
+    --background-light: #1E1E1E;
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
+    --border-color: #4B5563;
+    --header-bg: rgba(18, 18, 18, 0.7);
+    --card-bg: rgba(30, 30, 30, 0.4);
+    --modal-card-bg: #1F2937;
+    --button-secondary-bg: #374151;
+    --button-secondary-hover-bg: #4B5563;
+    --button-secondary-text: #F9FAFB;
+    --aurora-opacity: 0.1;
+}
 
-    <style>
-        body::-webkit-scrollbar { width: 8px; }
-        body::-webkit-scrollbar-track { background: var(--background-dark, #121212); }
-        body::-webkit-scrollbar-thumb { background-color: var(--klar-primary, #5586D6); border-radius: 4px; }
-        body::-webkit-scrollbar-thumb:hover { background-color: var(--klar-light, #73a1e8); }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: var(--background-light, #1E1E1E); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--klar-primary, #5586D6); border-radius: 4px; border: 2px solid var(--background-light, #1E1E1E); }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--klar-light, #73a1e8); }
-    </style>
+.bg-theme-dark { background-color: var(--background-dark); }
+.bg-theme-light { background-color: var(--background-light); }
+.bg-theme-header { background-color: var(--header-bg); }
+.bg-theme-card { background-color: var(--card-bg); }
+.bg-theme-modal-card { background-color: var(--modal-card-bg); }
+.bg-theme-button-secondary { background-color: var(--button-secondary-bg); }
+.hover\:bg-theme-button-secondary-hover:hover { background-color: var(--button-secondary-hover-bg); }
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
-</head>
-<body class="antialiased">
-    <div id="preloader"><div class="spinner"></div></div>
-    <div id="root"></div>
+.text-theme-primary { color: var(--text-primary); }
+.text-theme-secondary { color: var(--text-secondary); }
+.text-theme-button-secondary-text { color: var(--text-secondary); }
 
-    <script type="text/babel" src="script.js"></script>
-</body>
-</html>
+input.text-theme-primary,
+textarea.text-theme-primary {
+    color: var(--text-primary) !important;
+}
 
+.placeholder-theme-secondary::placeholder { 
+    color: var(--text-secondary);
+    opacity: 1;
+}
+
+.border-theme { border-color: var(--border-color); }
+
+.fill-theme-primary { fill: var(--text-primary); }
+.stroke-theme-primary { stroke: var(--text-primary); }
+
+.bg-klar { background-color: var(--klar-primary); }
+.hover\:bg-klar-light:hover { background-color: var(--klar-light); }
+.text-klar { color: var(--klar-primary); }
+.border-klar { border-color: var(--klar-primary); }
+.shadow-klar { box-shadow: 0 4px 14px 0 rgba(85, 134, 214, 0.3); }
+.focus\:ring-klar:focus {
+  --tw-ring-color: var(--klar-primary);
+}
+
+.nav-active {
+    color: var(--klar-primary) !important;
+    font-weight: 700;
+}
+
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.fade-in-section.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.interactive-card {
+    position: relative;
+    transition: box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.interactive-card.featured-card-js {
+    transform: scale(1.1);
+}
+
+.interactive-card:hover { 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.2); 
+}
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(85, 134, 214, 0.15), transparent 40%) border-box;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+.interactive-card:hover::before { opacity: 1; }
+
+.faq-item { 
+    transition: transform 0.3s ease, border-color 0.3s ease; 
+}
+.faq-item:hover {
+    transform: scale(1.02);
+    border-color: var(--klar-primary);
+}
+
+.slider-thumb {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.slider-thumb.dragging, .slider-thumb:active {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px var(--klar-primary);
+    cursor: grabbing;
+}
+
+.no-arrows::-webkit-inner-spin-button,
+.no-arrows::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-arrows {
+  -moz-appearance: textfield;
+}
+
+#preloader {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--background-dark);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+}
+#preloader.loaded {
+    opacity: 0;
+    pointer-events: none;
+}
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: var(--klar-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.aurora-background {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+.aurora-spot {
+    position: absolute;
+    background-image: radial-gradient(circle, var(--klar-primary) 0%, transparent 60%);
+    border-radius: 50%;
+    filter: blur(100px);
+    will-change: transform;
+    pointer-events: none;
+    transition: transform 0.5s ease-out;
+    opacity: var(--aurora-opacity);
+}
+
+.action-button-wrapper {
+    animation: button-pop-in 1s 1s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: scale(0.5);
+}
+.initial-tooltip {
+    animation: tooltip-fade 7s 1.5s forwards ease-in-out;
+    opacity: 0;
+}
+
+.perspective-1000 { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+
+@keyframes spin { 
+    to { transform: rotate(360deg); } 
+}
+
+@keyframes button-pop-in { 
+    to { opacity: 1; transform: scale(1); } 
+}
+
+@keyframes tooltip-fade {
+    0% { opacity: 0; transform: translateY(0); }
+    10% { opacity: 1; transform: translateY(-0.5rem); }
+    80% { opacity: 1; transform: translateY(-0.5rem); }
+    100% { opacity: 0; transform: translateY(0); }
+}
+
+@keyframes hub-content-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.hub-content-inner {
+    animation: hub-content-fade-in 0.3s ease-out forwards;
+}
+
+.preview-animation-container {
+    position: relative;
+    width: 250px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.scanner-line {
+    position: absolute;
+    top: 0;
+    left: -10%;
+    width: 10px;
+    height: 100%;
+    background-color: var(--klar-primary);
+    box-shadow: 0 0 15px 5px var(--klar-primary);
+    filter: blur(2px);
+    animation: scan 1.2s ease-in-out forwards;
+}
+
+@keyframes scan {
+    0% {
+        left: -10%;
+    }
+    50% {
+        left: 110%;
+        width: 40px;
+    }
+    100% {
+        left: 110%;
+        width: 10px;
+    }
+}
