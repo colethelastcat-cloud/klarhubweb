@@ -45,9 +45,9 @@
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
@@ -57,36 +57,9 @@
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
 
-    <!-- The old script tag is removed -->
-    <!-- <script type="text/babel" src="script.js"></script> -->
+    <!-- The 'defer' attribute ensures this script runs after the document is parsed and other scripts are ready -->
+    <script type="text/babel" src="script.js" defer></script>
 
-    <!-- This new script manually fetches, transpiles, and runs your React code -->
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            fetch('script.js')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status} - Could not load script.js. Make sure it's in the same folder as index.html.`);
-                    }
-                    return response.text();
-                })
-                .then(jsxCode => {
-                    try {
-                        const transformedCode = Babel.transform(jsxCode, { presets: ['react'] }).code;
-                        const script = document.createElement('script');
-                        script.innerHTML = transformedCode;
-                        document.body.appendChild(script);
-                    } catch (babelError) {
-                        console.error("Babel transformation failed:", babelError);
-                        document.body.innerHTML = `<div style="padding: 2rem; font-family: sans-serif; color: red;"><h1>Script Error</h1><p>There was a problem compiling the React script. Please check the console for details.</p><pre>${babelError.message}</pre></div>`;
-                    }
-                })
-                .catch(fetchError => {
-                    console.error('Failed to fetch script.js:', fetchError);
-                    document.body.innerHTML = `<div style="padding: 2rem; font-family: sans-serif; color: red;"><h1>Loading Error</h1><p>${fetchError.message}</p></div>`;
-                });
-        });
-    </script>
 </body>
 </html>
 
