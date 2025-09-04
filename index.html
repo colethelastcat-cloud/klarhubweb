@@ -45,7 +45,6 @@
     </style>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- React libraries are loaded without 'defer' to ensure they are ready before the main script runs -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -58,8 +57,36 @@
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
 
-    <!-- This script is now correctly processed by Babel after the libraries are loaded -->
-    <script type="text/babel" src="script.js"></script>
+    <!-- The old script tag is removed -->
+    <!-- <script type="text/babel" src="script.js"></script> -->
+
+    <!-- This new script manually fetches, transpiles, and runs your React code -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('script.js')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} - Could not load script.js. Make sure it's in the same folder as index.html.`);
+                    }
+                    return response.text();
+                })
+                .then(jsxCode => {
+                    try {
+                        const transformedCode = Babel.transform(jsxCode, { presets: ['react'] }).code;
+                        const script = document.createElement('script');
+                        script.innerHTML = transformedCode;
+                        document.body.appendChild(script);
+                    } catch (babelError) {
+                        console.error("Babel transformation failed:", babelError);
+                        document.body.innerHTML = `<div style="padding: 2rem; font-family: sans-serif; color: red;"><h1>Script Error</h1><p>There was a problem compiling the React script. Please check the console for details.</p><pre>${babelError.message}</pre></div>`;
+                    }
+                })
+                .catch(fetchError => {
+                    console.error('Failed to fetch script.js:', fetchError);
+                    document.body.innerHTML = `<div style="padding: 2rem; font-family: sans-serif; color: red;"><h1>Loading Error</h1><p>${fetchError.message}</p></div>`;
+                });
+        });
+    </script>
 </body>
 </html>
 
