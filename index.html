@@ -23,25 +23,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="klar-hub-styles.css">
-    <style>
-        body::-webkit-scrollbar { width: 8px; }
-        body::-webkit-scrollbar-track { background: var(--background-dark, #121212); }
-        body::-webkit-scrollbar-thumb { background-color: var(--klar-primary, #5586D6); border-radius: 4px; }
-        body::-webkit-scrollbar-thumb:hover { background-color: var(--klar-light, #73a1e8); }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: var(--background-light, #1E1E1E); border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--klar-primary, #5586D6); border-radius: 4px; border: 2px solid var(--background-light, #1E1E1E); }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: var(--klar-light, #73a1e8); }
-    </style>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="antialiased">
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
-    <script type="text/babel" data-type="module" src="klar-hub-script.js"></script>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" data-type="module" src="script.js"></script>
 </body>
 </html>
