@@ -49,14 +49,13 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
 </head>
 <body class="antialiased">
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
 
-    <script type="text/babel" src="script.js"></script>
+    <!-- The script type has been changed to "module" to support ES module imports within script.js -->
+    <!-- The Babel processing is still handled by the unpkg @babel/standalone script above -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
