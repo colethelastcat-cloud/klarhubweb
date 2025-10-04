@@ -269,11 +269,11 @@ a, button, .interactive-card, .faq-item, [role="button"], [onclick], input, sele
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 10000;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), width 0.2s, height 0.2s, background-color 0.2s;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
 }
 
 .cursor-dot.hover {
     transform: translate(-50%, -50%) scale(2.5);
-    background-color: rgba(255, 255, 255, 0.5);
+    opacity: 0.5;
 }
 
