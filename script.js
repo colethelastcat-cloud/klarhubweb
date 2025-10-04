@@ -4,6 +4,56 @@ import { getFirestore, doc, setDoc, getDoc, setLogLevel } from 'https://www.gsta
 
 const { useState, useEffect, useRef, useCallback } = React;
 
+const useCustomCursor = (dependencies) => {
+    const cursorDotRef = useRef(null);
+    const cursorOutlineRef = useRef(null);
+
+    useEffect(() => {
+        const dot = cursorDotRef.current;
+        const outline = cursorOutlineRef.current;
+
+        if (!dot || !outline) return;
+
+        const moveCursor = e => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            dot.style.left = `${posX}px`;
+            dot.style.top = `${posY}px`;
+            outline.style.left = `${posX}px`;
+            outline.style.top = `${posY}px`;
+        };
+        window.addEventListener("mousemove", moveCursor);
+
+        const addHover = () => {
+            dot.classList.add('hover');
+            outline.classList.add('hover');
+        };
+
+        const removeHover = () => {
+            dot.classList.remove('hover');
+            outline.classList.remove('hover');
+        };
+        
+        const interactiveElements = document.querySelectorAll('a, button, .interactive-card, .faq-item, [role="button"], [onclick], input, select, textarea, svg');
+        
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseover', addHover);
+            el.addEventListener('mouseout', removeHover);
+        });
+
+        return () => {
+            window.removeEventListener("mousemove", moveCursor);
+            interactiveElements.forEach(el => {
+                el.removeEventListener('mouseover', addHover);
+                el.removeEventListener('mouseout', removeHover);
+            });
+        };
+    }, dependencies);
+
+    return { cursorDotRef, cursorOutlineRef };
+};
+
+
 const useInteractiveCard = () => {
     useEffect(() => {
         const cards = document.querySelectorAll('.interactive-card');
@@ -1095,6 +1145,9 @@ const App = () => {
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
+    const modalStates = [isVideoModalOpen, isAiHelperOpen, selectedGame, isTosModalOpen, isPreviewModalOpen, isCompareModalOpen];
+    const { cursorDotRef, cursorOutlineRef } = useCustomCursor(modalStates);
+
     useEffect(() => {
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
@@ -1316,6 +1369,8 @@ const App = () => {
 
     return (
         <div className="bg-theme-dark text-theme-primary">
+            <div ref={cursorDotRef} className="cursor-dot"></div>
+            <div ref={cursorOutlineRef} className="cursor-outline"></div>
             <AuroraBackground />
             <div className="relative z-10">
                 <Header
