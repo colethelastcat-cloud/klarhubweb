@@ -1,3 +1,7 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, setLogLevel } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
 const { useState, useEffect, useRef, useCallback } = React;
 
 const useInteractiveCard = () => {
@@ -46,7 +50,7 @@ const useInteractiveCard = () => {
 
 
 const useFadeInSection = () => {
-     useEffect(() => {
+    useEffect(() => {
         const sections = document.querySelectorAll('.fade-in-section');
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -259,59 +263,60 @@ const VideoModal = ({ videoUrls, onClose }) => {
             {(handleClose) => (
                 <div className="w-screen h-screen flex items-center justify-center relative group">
                     <button onClick={handleClose} className="absolute top-6 right-6 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-2xl hover:bg-black/80 transition-colors">×</button>
-                    <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
+                    <button onClick={handlePrev} className="absolute left-4 md:left-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110" aria-label="Previous Video">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
                     </button>
-                    <button onClick={handleNext} className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110">
+                    <button onClick={handleNext} className="absolute right-4 md:right-16 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full w-14 h-14 flex items-center justify-center transition-all z-40 hover:bg-black/70 hover:scale-110" aria-label="Next Video">
                         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                     </button>
                     <div className="w-full h-full flex items-center justify-center perspective-1000">
                         <div className="relative w-full h-[60vh] flex items-center justify-center transform-style-3d">
                              {videoUrls.map((url, index) => {
-                                const videoId = getYoutubeVideoId(url);
-                                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/1280x720/121212/A0A0A0?text=Video';
-                                let offset = index - currentIndex;
-                                const numItems = videoUrls.length;
-                                if (Math.abs(offset) > numItems / 2) {
-                                    offset = offset > 0 ? offset - numItems : offset + numItems;
-                                }
-                                const isActive = offset === 0;
-                                const isVisible = Math.abs(offset) <= 1;
-                                const style = {
-                                    transform: `translateX(${offset * 80}%) scale(${isActive ? 1 : 0.7}) rotateY(${-offset * 40}deg)`,
-                                    opacity: isVisible ? (isActive ? 1 : 0.3) : 0,
-                                    zIndex: numItems - Math.abs(offset),
-                                    pointerEvents: isActive ? 'auto' : 'none',
-                                    filter: isActive ? 'blur(0px)' : 'blur(5px)',
-                                    transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                                };
-                                return (
-                                    <div key={index} className="absolute w-[70%] md:w-[60%] aspect-video" style={style}>
-                                        {isActive ? (
-                                            <iframe
-                                                className="w-full h-full rounded-lg shadow-2xl border-2 border-klar"
-                                                src={url}
-                                                title={`Klar Hub Demo Video ${index + 1}`}
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                allowFullScreen
-                                            ></iframe>
-                                        ) : (
-                                            <div
-                                                className="w-full h-full cursor-pointer"
-                                                onClick={() => isVisible && setCurrentIndex(index)}
-                                                style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
-                                            >
-                                                <img
-                                                    src={thumbnailUrl}
-                                                    className="w-full h-full object-cover rounded-lg shadow-lg"
-                                                    alt={`Video thumbnail ${index + 1}`}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
+                                 const videoId = getYoutubeVideoId(url);
+                                 const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/1280x720/121212/A0A0A0?text=Video';
+                                 let offset = index - currentIndex;
+                                 const numItems = videoUrls.length;
+                                 if (Math.abs(offset) > numItems / 2) {
+                                     offset = offset > 0 ? offset - numItems : offset + numItems;
+                                 }
+                                 const isActive = offset === 0;
+                                 const isVisible = Math.abs(offset) <= 1;
+                                 const style = {
+                                     transform: `translateX(${offset * 80}%) scale(${isActive ? 1 : 0.7}) rotateY(${-offset * 40}deg)`,
+                                     opacity: isVisible ? (isActive ? 1 : 0.3) : 0,
+                                     zIndex: numItems - Math.abs(offset),
+                                     pointerEvents: isActive ? 'auto' : 'none',
+                                     filter: isActive ? 'blur(0px)' : 'blur(5px)',
+                                     transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                                 };
+                                 return (
+                                     <div key={index} className="absolute w-[70%] md:w-[60%] aspect-video" style={style}>
+                                         {isActive ? (
+                                             <iframe
+                                                 className="w-full h-full rounded-lg shadow-2xl border-2 border-klar"
+                                                 src={url}
+                                                 title={`Klar Hub Demo Video ${index + 1}`}
+                                                 frameBorder="0"
+                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                 allowFullScreen
+                                             ></iframe>
+                                         ) : (
+                                             <div
+                                                 className="w-full h-full cursor-pointer"
+                                                 onClick={() => isVisible && setCurrentIndex(index)}
+                                                 style={{ pointerEvents: isVisible ? 'auto' : 'none' }}
+                                             >
+                                                 <img
+                                                     src={thumbnailUrl}
+                                                     className="w-full h-full object-cover rounded-lg shadow-lg"
+                                                     alt={`Video thumbnail ${index + 1}`}
+                                                     onError={(e) => e.target.src = 'https://placehold.co/1280x720/121212/A0A0A0?text=Video+Not+Available'}
+                                                 />
+                                             </div>
+                                         )}
+                                     </div>
+                                 );
+                             })}
                         </div>
                     </div>
                 </div>
@@ -321,13 +326,13 @@ const VideoModal = ({ videoUrls, onClose }) => {
 };
 
 const GameFeaturesModal = ({ game, onClose }) => {
-     return (
+    return (
         <Modal onClose={onClose}>
             {(handleClose) => (
                  <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-lg border border-theme">
                      <div className="p-4 border-b border-theme flex justify-between items-center">
                          <h3 className="text-xl font-bold text-theme-primary">{game.name} Features</h3>
-                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
+                         <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close features modal">×</button>
                      </div>
                      <div className="p-6">
                          <ul className="space-y-3 text-theme-secondary">
@@ -342,7 +347,7 @@ const GameFeaturesModal = ({ game, onClose }) => {
                  </div>
             )}
         </Modal>
-     );
+    );
 };
 
 const AIHelperModal = ({ onClose }) => {
@@ -401,7 +406,7 @@ const AIHelperModal = ({ onClose }) => {
                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center flex-shrink-0">
                         <h3 className="text-lg font-bold text-theme-primary">AI Script Helper</h3>
-                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">×</button>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close AI helper">×</button>
                     </div>
                     <div className="flex-1 p-4 space-y-4 overflow-y-auto custom-scrollbar">
                         {chatHistory.map((msg, index) => (
@@ -439,8 +444,9 @@ const AIHelperModal = ({ onClose }) => {
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Ask a question..."
                             className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-3"
+                            aria-label="Ask a question to AI helper"
                         />
-                        <button type="submit" className="bg-klar hover:bg-klar-light text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center" disabled={isLoading}>
+                        <button type="submit" className="bg-klar hover:bg-klar-light text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center" disabled={isLoading} aria-label="Send message">
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086L2.279 16.76a.75.75 0 00.95.826l1.425-3.562a.75.75 0 000-1.406L3.105 2.289z" /></svg>
                         </button>
                     </form>
@@ -457,7 +463,7 @@ const TosModal = ({ onClose }) => {
                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-2xl border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center">
                         <h3 className="text-xl font-bold text-theme-primary">Terms & Conditions</h3>
-                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close terms and conditions">&times;</button>
                     </div>
                     <div className="p-6 space-y-4 text-theme-secondary max-h-[70vh] overflow-y-auto custom-scrollbar">
                         <p><strong className="text-theme-primary">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
@@ -523,9 +529,9 @@ const PreviewModal = ({ onClose }) => {
                 if (e.key.length === 1 && e.key.match(/[a-zA-Z0-9]/i)) {
                     handleValueChange(`${listeningForBind}_bind`, e.key.toUpperCase());
                 } else if (e.key === " ") {
-                     handleValueChange(`${listeningForBind}_bind`, 'Space');
+                    handleValueChange(`${listeningForBind}_bind`, 'Space');
                 } else {
-                     handleValueChange(`${listeningForBind}_bind`, e.key);
+                    handleValueChange(`${listeningForBind}_bind`, e.key);
                 }
                 setListeningForBind(null);
                 e.preventDefault();
@@ -541,7 +547,7 @@ const PreviewModal = ({ onClose }) => {
         };
     }, [listeningForBind, handleValueChange]);
 
-     useEffect(() => {
+    useEffect(() => {
         const handleKeyDown = (e) => {
             const key = e.key.toUpperCase() === ' ' ? 'SPACE' : e.key.toUpperCase();
             
@@ -563,7 +569,7 @@ const PreviewModal = ({ onClose }) => {
 
 
     const tabs = [
-        { name: 'Catching', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /><path d="M5 3a1 1 0 000 2h10a1 1 0 100-2H5z" /></svg> },
+        { name: 'Catching', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg> },
         { name: 'Throwing', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg> },
         { name: 'Player', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg> },
         { name: 'Automatic', icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" /></svg> },
@@ -692,11 +698,11 @@ const PreviewModal = ({ onClose }) => {
         const selectedValue = previewState[id] || options[0];
         return (
              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-400">{label}</span>
+                 <span className="text-xs text-gray-400">{label}</span>
                  <select value={selectedValue} onChange={(e) => handleValueChange(id, e.target.value)} className="bg-black/30 text-xs text-gray-300 border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-klar">
-                    {options.map(o => <option key={o}>{o}</option>)}
-                </select>
-            </div>
+                     {options.map(o => <option key={o}>{o}</option>)}
+                 </select>
+             </div>
         );
     };
     
@@ -709,41 +715,41 @@ const PreviewModal = ({ onClose }) => {
                 return (
                     <>
                         <FeatureCard id="magnets" title="Magnets" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" /></svg>}>
-                           <Checkbox id="magnets_enabled" label="Magnets" />
-                           <Slider id="magnet_power" label="Magnet Power" min={0} max={100} step={1} />
-                           <Slider id="magnet_chance" label="Magnet Chance" min={0} max={100} step={1} />
-                           <Checkbox id="show_hitbox" label="Show Hitbox" />
-                           <Dropdown id="magnet_type" label="Magnet Type" options={["Regular", "Advanced"]} />
-                           <Checkbox id="freefall_shape" label="Freefall Shape" />
-                           <Dropdown id="hitbox_shape" label="Hitbox Shape" options={["Forcefield", "Box"]} />
+                            <Checkbox id="magnets_enabled" label="Magnets" />
+                            <Slider id="magnet_power" label="Magnet Power" min={0} max={100} step={1} />
+                            <Slider id="magnet_chance" label="Magnet Chance" min={0} max={100} step={1} />
+                            <Checkbox id="show_hitbox" label="Show Hitbox" />
+                            <Dropdown id="magnet_type" label="Magnet Type" options={["Regular", "Advanced"]} />
+                            <Checkbox id="freefall_shape" label="Freefall Shape" />
+                            <Dropdown id="hitbox_shape" label="Hitbox Shape" options={["Forcefield", "Box"]} />
                         </FeatureCard>
-                         <FeatureCard id="pull_vector" title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
-                           <Checkbox id="pull_vector_enabled" label="Pull Vector" />
-                           <Dropdown id="vector_type" label="Vector Type" options={["Tween", "Linear"]} />
-                           <Slider id="vector_distance" label="Distance" min={0} max={50} step={1} />
-                           <Slider id="vector_power" label="Power" min={0} max={50} step={1} />
+                        <FeatureCard id="pull_vector" title="Pull Vector" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                            <Checkbox id="pull_vector_enabled" label="Pull Vector" />
+                            <Dropdown id="vector_type" label="Vector Type" options={["Tween", "Linear"]} />
+                            <Slider id="vector_distance" label="Distance" min={0} max={50} step={1} />
+                            <Slider id="vector_power" label="Power" min={0} max={50} step={1} />
                         </FeatureCard>
-                         <FeatureCard id="resizements" title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
-                           <Checkbox id="arm_resizement_enabled" label="Arm Resizement" />
-                           <Slider id="arm_size" label="Arm Size" min={1} max={10} step={1} />
-                           <Checkbox id="football_resize_enabled" label="Football Resize" />
-                           <Slider id="football_size" label="Football Size" min={1} max={5} step={1} />
+                        <FeatureCard id="resizements" title="Resizements" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                            <Checkbox id="arm_resizement_enabled" label="Arm Resizement" />
+                            <Slider id="arm_size" label="Arm Size" min={1} max={10} step={1} />
+                            <Checkbox id="football_resize_enabled" label="Football Resize" />
+                            <Slider id="football_size" label="Football Size" min={1} max={5} step={1} />
                         </FeatureCard>
-                         <FeatureCard id="freeze_tech" title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
-                           <Checkbox id="freeze_tech_enabled" label="Freeze Tech" />
-                           <Slider id="freeze_duration" label="Duration" min={0} max={10} step={1} />
+                        <FeatureCard id="freeze_tech" title="Freeze Tech" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>}>
+                            <Checkbox id="freeze_tech_enabled" label="Freeze Tech" />
+                            <Slider id="freeze_duration" label="Duration" min={0} max={10} step={1} />
                         </FeatureCard>
                     </>
                 );
             case 'Throwing':
-                 return (
+                return (
                     <>
-                         <FeatureCard id="qb_aimbot" title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
+                        <FeatureCard id="qb_aimbot" title="QB Aimbot" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.82m5.84-2.56v4.82a6 6 0 01-1.292 3.536l-1.992-1.992a4.5 4.5 0 00-6.364-6.364l-1.992-1.992A6 6 0 0115.59 14.37z" /></svg>}>
                             <Checkbox id="qb_aimbot_enabled" label="QB Aimbot" />
                             <Checkbox id="auto_angle_enabled" label="Auto Angle" />
                             <Checkbox id="smart_fit_enabled" label="Smart Fit" />
                        </FeatureCard>
-                         <FeatureCard id="qb_settings" title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
+                        <FeatureCard id="qb_settings" title="QB Settings" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}>
                             <Slider id="dime_lead" label="Dime Lead" min={0} max={20} step={1} />
                             <Slider id="mag_lead" label="Mag Lead" min={0} max={20} step={0.1}/>
                             <Slider id="bullet_lead" label="Bullet Lead" min={0} max={20} step={1} />
@@ -751,9 +757,9 @@ const PreviewModal = ({ onClose }) => {
                             <Slider id="height_distance" label="Height Distance" min={0} max={20} step={1} />
                        </FeatureCard>
                     </>
-                 );
+                );
             case 'Player':
-                 return (
+                return (
                     <>
                         <FeatureCard id="walkspeed" title="Walkspeed" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="walkspeed_enabled" label="Speed" /><Dropdown id="speed_type" label="Speed Type" options={['Walkspeed', 'Jump']} /><Slider id="walkspeed_value" label="Walkspeed" min={16} max={100} step={1} /><Slider id="cframe_speed" label="CFrame Speed" min={0} max={50} step={1} /></FeatureCard>
                         <FeatureCard id="jump_power" title="Jump Power" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="jump_power_enabled" label="Jump Power" /><Dropdown id="jump_type" label="Type" options={['Normal', 'High']} /><Slider id="jump_power_value" label="Power" min={50} max={200} step={1} /></FeatureCard>
@@ -762,7 +768,7 @@ const PreviewModal = ({ onClose }) => {
                         <FeatureCard id="no_jump" title="No Jump Cooldown" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="no_jump_cooldown_enabled" label="No Jump Cooldown" /></FeatureCard>
                         <FeatureCard id="gravity" title="Gravity" icon={<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>}><Checkbox id="gravity_enabled" label="Gravity" /><Slider id="gravity_value" label="Gravity" min={0} max={500} step={0.1}/></FeatureCard>
                     </>
-                 );
+                );
             case 'Automatic':
                 return (
                     <>
@@ -821,7 +827,7 @@ const PreviewModal = ({ onClose }) => {
                         <Button label="Save Config" />
                         <Button label="Load Config" />
                         <Button label="Reset Config" />
-                    </FeatureCard>
+                       </FeatureCard>
                     </div>
                 );
             default:
@@ -852,7 +858,7 @@ const PreviewModal = ({ onClose }) => {
                     </div>
                     <div className={`flex-1 p-6 overflow-y-auto custom-scrollbar transition-opacity duration-150 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
                        <div className="hub-content-inner grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {renderContent()}
+                            {renderContent()}
                        </div>
                     </div>
                 </div>
@@ -892,7 +898,7 @@ const ComparePlansModal = ({ onClose, allTiers }) => {
                 <div className="bg-theme-modal-card rounded-lg shadow-2xl w-full max-w-4xl border border-theme">
                     <div className="p-4 border-b border-theme flex justify-between items-center">
                         <h3 className="text-xl font-bold text-theme-primary">Compare All Plans</h3>
-                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl">&times;</button>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close compare plans modal">&times;</button>
                     </div>
                     <div className="p-6 overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse">
@@ -953,7 +959,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
     return (
        <header ref={headerRef} className="bg-theme-header sticky top-0 z-40 p-4 flex justify-between items-center backdrop-blur-sm transition-colors duration-300">
             <div className="flex-1 flex justify-start items-center gap-4">
-                 <Logo onScrollTo={onScrollTo}/>
+                <Logo onScrollTo={onScrollTo}/>
             </div>
             <nav className="hidden md:flex flex-shrink-0 justify-center items-center gap-6 text-sm font-semibold">
                 {navItems.map(item => (
@@ -973,7 +979,7 @@ const Header = ({ headerRef, onScrollTo, onToggleMobileMenu, onTosClick, activeS
                 <a href={discordLink} target="_blank" rel="noopener noreferrer" className="inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">Join Discord</a>
             </div>
             <div className="md:hidden flex-1 flex justify-end">
-                <button onClick={onToggleMobileMenu} className="text-theme-primary z-50">
+                <button onClick={onToggleMobileMenu} className="text-theme-primary z-50" aria-label="Toggle mobile menu">
                     {isMobileMenuOpen ?
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> :
                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
@@ -1025,7 +1031,7 @@ const BackToTopButton = () => {
     }, []);
 
     return (
-        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+        <button id="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={`fixed bottom-8 left-8 bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto transition-all ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`} aria-label="Back to top">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"/></svg>
         </button>
     );
@@ -1046,7 +1052,7 @@ const AIHelperButton = ({ onClick }) => {
                      <div className="absolute right-4 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
                  </div>
             )}
-            <button id="ai-helper-button" onClick={onClick} className="bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto shadow-lg shadow-klar">
+            <button id="ai-helper-button" onClick={onClick} className="bg-klar/80 hover:bg-klar text-white w-12 h-12 rounded-full flex items-center justify-center pointer-events-auto shadow-lg shadow-klar" aria-label="Open AI Helper">
                 <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 21v-1.5M15.75 3v1.5m0 16.5v-1.5m3.75-12H21M12 21v-1.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 3.75v16.5M16.5 4.5l-9 15M16.5 19.5l-9-15" /></svg>
             </button>
         </div>
@@ -1058,7 +1064,7 @@ const Footer = () => (
         <p>© 2025 Klar Hub. All rights reserved.</p>
         <p className="mt-2">made by auaqa</p>
          <div className="flex justify-center gap-6 mt-4">
-             <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Discord">
+             <a href="https://discord.gg/bGmGSnW3gQ" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-klar transition-colors" aria-label="Discord">
                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.36981C18.7915 3.74873 17.189 3.28434 15.5298 3.00003C15.5298 3.00003 15.1518 3.42189 14.865 3.76878C13.0476 3.22018 11.1492 3.22018 9.423 3.76878C9.135 3.42189 8.7582 3 8.7582 3C7.09901 3.28434 5.49652 3.74873 3.97017 4.36981C0.324569 9.87328 -0.463321 15.1072 0.871542 20.2078C2.6516 21.6213 4.59436 22.548 6.65283 23C7.26284 22.3486 7.80165 21.631 8.256 20.8522C7.38573 20.4866 6.58162 20.021 5.84279 19.4515C6.11591 19.2633 6.3802 19.0664 6.6346 18.8608C10.0322 20.6453 14.2523 20.6453 17.6487 18.8608C17.9031 19.0664 18.1674 19.2633 18.4405 19.4515C17.7017 20.021 16.9064 20.4866 16.0273 20.8522C16.4817 21.631 17.0205 22.3486 17.6305 23C19.689 22.548 21.6317 21.6213 23.4118 20.2078C24.5828 14.2458 23.5938 8.81315 20.317 4.36981ZM8.02004 16.5392C6.88337 16.5392 6.00004 15.503 6.00004 14.1682C6.00004 12.8334 6.88337 11.7972 8.02004 11.7972C9.15671 11.7972 10.04 12.8334 10.0203 14.1682C10.0203 15.503 9.15671 16.5392 8.02004 16.5392ZM16.2687 16.5392C15.132 16.5392 14.2487 15.503 14.2487 14.1682C14.2487 12.8334 15.132 11.7972 16.2687 11.7972C17.4054 11.7972 18.2887 12.8334 18.2689 14.1682C18.2689 15.503 17.4054 16.5392 16.2687 16.5392Z" /></svg>
              </a>
              <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Telegram">
@@ -1067,11 +1073,18 @@ const Footer = () => (
              <a href="#" className="text-gray-400 hover:text-klar transition-colors" aria-label="Youtube">
                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.545 15.568V8.432L15.818 12l-6.273 3.568Z" /></svg>
              </a>
-         </div>
+          </div>
      </footer>
 );
 
 const App = () => {
+    // Firebase related states
+    const [db, setDb] = useState(null);
+    const [auth, setAuth] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
+
+    // Other states
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1085,9 +1098,79 @@ const App = () => {
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
+    // Firebase Initialization and Auth Listener
+    useEffect(() => {
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        if (Object.keys(firebaseConfig).length === 0) {
+            console.warn("Firebase config is missing or empty. Firestore and Auth will not function.");
+            setIsAuthReady(true);
+            return;
+        }
+
+        try {
+            const appInstance = initializeApp(firebaseConfig);
+            const authInstance = getAuth(appInstance);
+            const dbInstance = getFirestore(appInstance);
+            setAuth(authInstance);
+            setDb(dbInstance);
+            setLogLevel('Debug'); // Enable Firestore debug logging
+
+            const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
+                if (user) {
+                    setUserId(user.uid);
+                    // Load theme from Firestore
+                    const userSettingsRef = doc(dbInstance, `artifacts/${appId}/users/${user.uid}/settings`, 'theme');
+                    const docSnap = await getDoc(userSettingsRef);
+                    if (docSnap.exists()) {
+                        setTheme(docSnap.data().theme);
+                    } else {
+                        // If no theme saved, use local storage and then save it
+                        const localTheme = localStorage.getItem('klar-theme') || 'dark';
+                        setTheme(localTheme);
+                        await setDoc(userSettingsRef, { theme: localTheme }, { merge: true })
+                            .catch(error => console.error("Error setting initial theme in Firestore:", error));
+                    }
+                } else {
+                    // Attempt anonymous sign-in or use custom token if available
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(authInstance, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(authInstance);
+                        }
+                    } catch (error) {
+                        console.error("Error during Firebase sign-in (anonymous or custom token):", error);
+                    }
+                    // If still no user, or anon fails, default to local storage theme
+                    setTheme(localStorage.getItem('klar-theme') || 'dark');
+                }
+                setIsAuthReady(true); // Auth state is known
+            });
+
+            return () => unsubscribe();
+        } catch (e) {
+            console.error("Failed to initialize Firebase or set up auth listener:", e);
+            setIsAuthReady(true); // Allow app to proceed even if Firebase fails
+        }
+    }, []); // Run once on component mount
+
+    // Effect to save theme to Firestore when it changes
+    useEffect(() => {
+        if (db && userId && theme && isAuthReady) { // Only save if Firebase is ready and user is known
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const userSettingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'theme');
+            setDoc(userSettingsRef, { theme }, { merge: true })
+                .catch(error => console.error("Error saving theme to Firestore:", error));
+        }
+    }, [db, userId, theme, isAuthReady]);
+
+
+    // Theme application effect
     useEffect(() => {
         const root = document.documentElement;
-        localStorage.setItem('klar-theme', theme);
+        localStorage.setItem('klar-theme', theme); // Keep localStorage for initial load fallback
         
         const themes = {
             dark: {
@@ -1095,7 +1178,7 @@ const App = () => {
                 '--background-light': '#1E1E1E',
                 '--text-primary': '#F9FAFB', 
                 '--text-secondary': '#D1D5DB',
-                '--border-color': '#4B5563',   
+                '--border-color': '#4B5563',    
                 '--header-bg': 'rgba(18, 18, 18, 0.7)',
                 '--card-bg': 'rgba(30, 30, 30, 0.4)',
                 '--modal-card-bg': '#1F2937',
@@ -1109,7 +1192,7 @@ const App = () => {
                 '--background-light': '#FFFFFF',
                 '--text-primary': '#111827',
                 '--text-secondary': '#374151',
-                '--border-color': '#9CA3AF', 
+                '--border-color': '#9CA3AF',    
                 '--header-bg': 'rgba(249, 250, 251, 0.8)',
                 '--card-bg': '#FFFFFF',
                 '--modal-card-bg': '#FFFFFF',
@@ -1180,12 +1263,23 @@ const App = () => {
     const handleCopyScript = () => {
         const keyToUse = freeKey || "insert key";
         const scriptText = `script_key="${keyToUse}";\nloadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/50da22b3657a22c353b0dde631cb1dcf.lua"))()`;
-        navigator.clipboard.writeText(scriptText).then(() => {
+        
+        // Use document.execCommand('copy') for iframe compatibility
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = scriptText;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        try {
+            document.execCommand('copy');
             setScriptCopied(true);
             setTimeout(() => setScriptCopied(false), 2000);
-        }).catch(err => {
+        } catch (err) {
             console.error('Failed to copy script: ', err);
-        });
+            // Fallback for cases where execCommand fails or is not supported
+            alert('Failed to copy script. Please copy it manually: ' + scriptText); // Using alert as a last resort fallback, as per instruction, to be replaced by custom modal
+        } finally {
+            document.body.removeChild(tempTextArea);
+        }
     };
     
     const handlePreviewClick = () => {
@@ -1247,7 +1341,7 @@ const App = () => {
                     theme={theme}
                     setTheme={setTheme}
                 />
-                 <MobileMenu
+                <MobileMenu
                     isOpen={isMobileMenuOpen}
                     onScrollTo={handleScrollTo}
                     onTosClick={() => {
@@ -1287,15 +1381,15 @@ const App = () => {
                                     </button>
                                 </div>
                                 <DiscordCounter />
-                                 <button onClick={handlePreviewClick} className="mt-2 py-2 px-6 rounded-lg font-semibold text-center transition bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text flex items-center gap-2">
+                                <button onClick={handlePreviewClick} className="mt-2 py-2 px-6 rounded-lg font-semibold text-center transition bg-theme-button-secondary hover:bg-theme-button-secondary-hover text-theme-button-secondary-text flex items-center gap-2">
                                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C3.732 4.943 9.522 3 10 3s6.268 1.943 9.542 7c-3.274 5.057-9.064 7-9.542 7S3.732 15.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
                                     Preview Hub
-                                 </button>
+                                </button>
                             </div>
                         </div>
                     </section>
                     <div className="w-full max-w-6xl mx-auto px-4 space-y-24">
-                         <section id="stats" className="py-12 fade-in-section">
+                        <section id="stats" className="py-12 fade-in-section">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                                 <div ref={usersRef}>
                                     <p className="text-5xl font-extrabold text-klar">{usersCount.toLocaleString()}+</p>
@@ -1324,20 +1418,20 @@ const App = () => {
                             </div>
                         </section>
                         <section id="games" className="py-12 text-center fade-in-section">
-                             <h3 className="text-4xl font-bold">Supported Games</h3>
-                             <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                                  {supportedGames.map(game => (
-                                       <div key={game.name} className="bg-theme-card p-8 rounded-lg border border-theme text-center interactive-card flex flex-col justify-between">
-                                           <div>
-                                               <h4 className="text-2xl font-bold">{game.name}</h4>
-                                               <p className="text-klar font-semibold text-lg">{game.abbr}</p>
-                                           </div>
-                                           <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
-                                               View Features
-                                           </button>
-                                       </div>
-                                  ))}
-                             </div>
+                            <h3 className="text-4xl font-bold">Supported Games</h3>
+                            <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                                 {supportedGames.map(game => (
+                                         <div key={game.name} className="bg-theme-card p-8 rounded-lg border border-theme text-center interactive-card flex flex-col justify-between">
+                                             <div>
+                                                 <h4 className="text-2xl font-bold">{game.name}</h4>
+                                                 <p className="text-klar font-semibold text-lg">{game.abbr}</p>
+                                             </div>
+                                             <button onClick={() => setSelectedGame(game)} className="mt-6 w-full py-2 px-4 rounded-lg font-semibold text-center transition bg-klar/20 hover:bg-klar/30 text-klar border border-klar">
+                                                 View Features
+                                             </button>
+                                         </div>
+                                 ))}
+                            </div>
                         </section>
                         <section id="pricing" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Choose Your Access</h3>
@@ -1375,7 +1469,7 @@ const App = () => {
                             </div>
                             <div className="mt-8 grid md:grid-cols-3 gap-8">
                                 {bottomTiers.map(tier => (
-                                     <div key={tier.name} className="relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 border-theme">
+                                    <div key={tier.name} className="relative bg-theme-card p-8 rounded-lg border text-center interactive-card flex flex-col transition-[box-shadow,border-color] duration-300 border-theme">
                                         <h4 className="text-xl font-bold mb-2 h-12 flex items-center justify-center">{tier.name}</h4>
                                         <div className="flex justify-center items-end gap-2 mb-4">
                                             <p className="text-4xl font-extrabold text-klar">{tier.price}</p>
@@ -1394,7 +1488,7 @@ const App = () => {
                                                 </a>
                                             )}
                                         </div>
-                                     </div>
+                                    </div>
                                 ))}
                             </div>
                             <div className="text-center mt-8">
@@ -1413,7 +1507,7 @@ const App = () => {
                                     <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-theme"></div>
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
-                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
+                                            <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">1</div>
                                         </div>
                                         <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
                                             <h4 className="text-2xl font-semibold">Get Your Key</h4>
@@ -1421,12 +1515,13 @@ const App = () => {
                                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Linkvertise-vdVzClkaaLyp" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Linkvertise)</a>
                                                 <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access-jfTfOGvFxqSh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Lootlabs)</a>
+                                                <a href="https://ads.luarmor.net/get_key?for=Free_Klar_Access_Workink-dULHAjlXrxDx" target="_blank" rel="noopener noreferrer" className="flex-1 inline-block py-2 px-6 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white">Get Key (Workink)</a>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="relative mb-12">
                                         <div className="absolute left-0 top-0 w-12 h-12 flex items-center justify-center">
-                                             <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
+                                            <div className="z-10 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl bg-klar/10 border-2 border-klar text-klar shadow-[0_0_15px_rgba(85,134,214,0.4)] backdrop-blur-sm">2</div>
                                         </div>
                                         <div className="ml-4 p-6 bg-theme-card border border-theme rounded-lg">
                                             <h4 className="text-2xl font-semibold">Prepare Your Script</h4>
@@ -1444,16 +1539,17 @@ const App = () => {
                                                         onChange={(e) => setFreeKey(e.target.value)}
                                                         placeholder="Paste your key here"
                                                         className="w-full bg-theme-button-secondary border border-theme rounded-lg text-theme-primary placeholder-theme-secondary focus:outline-none focus:ring-2 focus:ring-klar p-2"
+                                                        aria-label="Paste your script key"
                                                     />
                                                     <button onClick={handleCopyScript} className="flex-shrink-0 bg-klar hover:bg-klar-light text-white px-4 py-2 text-sm font-semibold rounded-lg transition relative overflow-hidden">
                                                         <span className={`flex items-center gap-2 transition-transform duration-300 ${scriptCopied ? '-translate-y-full' : 'translate-y-0'}`}>
                                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM5 11a1 1 0 100 2h4a1 1 0 100-2H5z" /></svg>
                                                             Copy Script
                                                         </span>
-                                                         <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-300 ${scriptCopied ? 'translate-y-0' : 'translate-y-full'}`}>
+                                                        <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-transform duration-300 ${scriptCopied ? 'translate-y-0' : 'translate-y-full'}`}>
                                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                                             Copied!
-                                                         </span>
+                                                        </span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -1471,23 +1567,23 @@ const App = () => {
                                 </div>
                             </div>
                         </section>
-                         <section id="reviews" className="py-12 text-center fade-in-section">
+                        <section id="reviews" className="py-12 text-center fade-in-section">
                             <h3 className="text-4xl font-bold">Trusted by Players Worldwide</h3>
                             <div className="mt-12 grid md:grid-cols-3 gap-8">
-                                 {testimonials.map((t, i) => (
-                                    <div key={i} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card flex flex-col h-full">
-                                        <div className="flex-grow"><p className="text-theme-secondary italic text-lg">"{t.text}"</p></div>
-                                        <div className="mt-4 pt-4 border-t border-theme">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-klar font-semibold">{t.name}</span>
-                                                <div className="flex">
-                                                    {Array(t.stars).fill(0).map((_, i) => <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>)}
-                                                </div>
-                                            </div>
-                                            <p className="text-gray-500 text-sm mt-1">{t.date}</p>
-                                        </div>
-                                    </div>
-                                 ))}
+                                {testimonials.map((t, i) => (
+                                     <div key={i} className="bg-theme-card p-6 rounded-lg border border-theme text-left interactive-card flex flex-col h-full">
+                                         <div className="flex-grow"><p className="text-theme-secondary italic text-lg">"{t.text}"</p></div>
+                                         <div className="mt-4 pt-4 border-t border-theme">
+                                             <div className="flex justify-between items-center">
+                                                 <span className="text-klar font-semibold">{t.name}</span>
+                                                 <div className="flex">
+                                                     {Array(t.stars).fill(0).map((_, i) => <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>)}
+                                                 </div>
+                                             </div>
+                                             <p className="text-gray-500 text-sm mt-1">{t.date}</p>
+                                         </div>
+                                     </div>
+                                ))}
                             </div>
                         </section>
                         <section id="faq" className="py-12 max-w-3xl mx-auto fade-in-section">
