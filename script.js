@@ -6,33 +6,21 @@ const { useState, useEffect, useRef, useCallback } = React;
 
 const useCustomCursor = (dependencies) => {
     const cursorDotRef = useRef(null);
-    const cursorOutlineRef = useRef(null);
 
     useEffect(() => {
         const dot = cursorDotRef.current;
-        const outline = cursorOutlineRef.current;
-
-        if (!dot || !outline) return;
+        if (!dot) return;
 
         const moveCursor = e => {
             const posX = e.clientX;
             const posY = e.clientY;
             dot.style.left = `${posX}px`;
             dot.style.top = `${posY}px`;
-            outline.style.left = `${posX}px`;
-            outline.style.top = `${posY}px`;
         };
         window.addEventListener("mousemove", moveCursor);
 
-        const addHover = () => {
-            dot.classList.add('hover');
-            outline.classList.add('hover');
-        };
-
-        const removeHover = () => {
-            dot.classList.remove('hover');
-            outline.classList.remove('hover');
-        };
+        const addHover = () => dot.classList.add('hover');
+        const removeHover = () => dot.classList.remove('hover');
         
         const interactiveElements = document.querySelectorAll('a, button, .interactive-card, .faq-item, [role="button"], [onclick], input, select, textarea, svg');
         
@@ -50,7 +38,7 @@ const useCustomCursor = (dependencies) => {
         };
     }, dependencies);
 
-    return { cursorDotRef, cursorOutlineRef };
+    return { cursorDotRef };
 };
 
 
@@ -1146,7 +1134,7 @@ const App = () => {
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
 
     const modalStates = [isVideoModalOpen, isAiHelperOpen, selectedGame, isTosModalOpen, isPreviewModalOpen, isCompareModalOpen];
-    const { cursorDotRef, cursorOutlineRef } = useCustomCursor(modalStates);
+    const { cursorDotRef } = useCustomCursor(modalStates);
 
     useEffect(() => {
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -1370,7 +1358,6 @@ const App = () => {
     return (
         <div className="bg-theme-dark text-theme-primary">
             <div ref={cursorDotRef} className="cursor-dot"></div>
-            <div ref={cursorOutlineRef} className="cursor-outline"></div>
             <AuroraBackground />
             <div className="relative z-10">
                 <Header
