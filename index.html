@@ -47,15 +47,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
 </head>
 <body class="antialiased">
     <div id="preloader"><div class="spinner"></div></div>
     <div id="root"></div>
 
-    <!-- The script type has been changed to "module" to support ES module imports within script.js -->
-    <!-- The Babel processing is still handled by the unpkg @babel/standalone script above -->
-    <script type="module" src="script.js"></script>
+    <script type="text/babel" data-type="module" src="script.js"></script>
 </body>
 </html>
+
