@@ -165,11 +165,14 @@ const useActiveNav = (headerHeight) => {
 
 const Logo = () => (
     <a href="#home" className="cursor-pointer">
-        <svg className="h-8 w-auto" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 10 L12 90 L28 90 L28 60 L60 90 L75 90 L40 50 L75 10 L60 10 L28 40 L28 10 L12 10 Z" className="fill-theme-primary stroke-theme-primary" strokeWidth="4"/>
-        </svg>
+        <img 
+            src="https://media.discordapp.net/attachments/1357439617313542319/1424119018213871656/download_1.png?ex=68e6be30&is=68e56cb0&hm=49c1a79f780f46f3fd7edf4a060719c7e66f4e1f182ba705893ce44b42f0c316&=&format=webp&quality=lossless" 
+            alt="Klar Hub Logo" 
+            className="h-8 w-auto" 
+        />
     </a>
 );
+
 
 const AuroraBackground = () => {
     const [spots] = useState(() =>
@@ -410,8 +413,6 @@ const AIHelperModal = ({ onClose }) => {
     );
 };
 
-// ... (Other components like TosModal, ChangelogModal, Toast, Header, MobileMenu, BackToTopButton, AIHelperButton, Footer remain the same)
-// ... existing code ...
 const TosModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose}>
@@ -623,6 +624,7 @@ const Footer = () => (
 );
 
 const App = () => {
+    // ... component state declarations ...
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -634,6 +636,8 @@ const App = () => {
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
     const [isScrolled, setIsScrolled] = useState(false);
+    
+    // ... hooks and helper functions ...
     
     useEffect(() => {
         const preloader = document.getElementById('preloader');
@@ -875,3 +879,4 @@ const App = () => {
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
