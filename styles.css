@@ -1,5 +1,7 @@
-html { 
-    scroll-behavior: smooth; 
+/* Custom CSS from styles.css */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height, 80px);
 }
 
 body {
@@ -13,12 +15,12 @@ body {
     --klar-primary: #5586D6;
     --klar-darker: #2c4a8a;
     --klar-light: #73a1e8;
-    
+
     --background-dark: #121212;
     --background-light: #1E1E1E;
     --text-primary: #F9FAFB;
     --text-secondary: #D1D5DB;
-    --border-color: #4B5563;
+    --border-color: #374151; /* Darker border */
     --header-bg: rgba(18, 18, 18, 0.7);
     --card-bg: rgba(30, 30, 30, 0.4);
     --modal-card-bg: #1F2937;
@@ -28,6 +30,23 @@ body {
     --aurora-opacity: 0.1;
 }
 
+body.light {
+    --background-dark: #F9FAFB;
+    --background-light: #FFFFFF;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --border-color: #E5E7EB; /* Lighter border */
+    --header-bg: rgba(249, 250, 251, 0.8);
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --modal-card-bg: #FFFFFF;
+    --button-secondary-bg: #E5E7EB;
+    --button-secondary-hover-bg: #D1D5DB;
+    --button-secondary-text: #111827;
+    --aurora-opacity: 0.05;
+}
+
+
+/* Theme-related CSS variables controlled by JS */
 .bg-theme-dark { background-color: var(--background-dark); }
 .bg-theme-light { background-color: var(--background-light); }
 .bg-theme-header { background-color: var(--header-bg); }
@@ -45,7 +64,7 @@ textarea.text-theme-primary {
     color: var(--text-primary) !important;
 }
 
-.placeholder-theme-secondary::placeholder { 
+.placeholder-theme-secondary::placeholder {
     color: var(--text-secondary);
     opacity: 1;
 }
@@ -61,7 +80,7 @@ textarea.text-theme-primary {
 .border-klar { border-color: var(--klar-primary); }
 .shadow-klar { box-shadow: 0 4px 14px 0 rgba(85, 134, 214, 0.3); }
 .focus\:ring-klar:focus {
-  --tw-ring-color: var(--klar-primary);
+    --tw-ring-color: var(--klar-primary);
 }
 
 .nav-active {
@@ -81,7 +100,7 @@ textarea.text-theme-primary {
 
 .interactive-card {
     position: relative;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Moved transform transition here */
     transform-style: preserve-3d;
     will-change: transform;
 }
@@ -90,8 +109,8 @@ textarea.text-theme-primary {
     transform: scale(1.1);
 }
 
-.interactive-card:hover { 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.2); 
+.interactive-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 20px rgba(85, 134, 214, 0.2);
 }
 .interactive-card::before {
     content: '';
@@ -106,12 +125,23 @@ textarea.text-theme-primary {
 }
 .interactive-card:hover::before { opacity: 1; }
 
-.faq-item { 
-    transition: transform 0.3s ease, border-color 0.3s ease; 
+.faq-item {
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 .faq-item:hover {
     transform: scale(1.02);
     border-color: var(--klar-primary);
+}
+
+.reviews-expandable {
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+    overflow: hidden;
+    max-height: 0; /* Initial state for animation */
+    opacity: 0;
+}
+.reviews-expandable.is-expanded {
+    max-height: 2000px; /* Large enough value to cover content */
+    opacity: 1;
 }
 
 .slider-thumb {
@@ -125,11 +155,11 @@ textarea.text-theme-primary {
 
 .no-arrows::-webkit-inner-spin-button,
 .no-arrows::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 .no-arrows {
-  -moz-appearance: textfield;
+    -moz-appearance: textfield;
 }
 
 #preloader {
@@ -158,7 +188,7 @@ textarea.text-theme-primary {
 .aurora-background {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1;
+    z-index: -2; /* Moved behind snowflakes */
     overflow: hidden;
 }
 .aurora-spot {
@@ -185,12 +215,105 @@ textarea.text-theme-primary {
 .perspective-1000 { perspective: 1000px; }
 .transform-style-3d { transform-style: preserve-3d; }
 
-@keyframes spin { 
-    to { transform: rotate(360deg); } 
+.header-scrolled {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-@keyframes button-pop-in { 
-    to { opacity: 1; transform: scale(1); } 
+.toast-notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    background-color: var(--klar-primary);
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    animation: toast-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards, toast-out 0.5s 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.hero-button, .get-key-button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hero-button:hover, .get-key-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(85, 134, 214, 0.4);
+}
+.hero-button:active, .get-key-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 14px 0 rgba(85, 134, 214, 0.3);
+}
+
+.glowing-letter {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
+}
+.glowing-letter:hover {
+    transform: scale(1.15) translateY(-2px);
+    text-shadow: 0 0 10px var(--text-primary);
+}
+.glowing-letter.text-klar:hover {
+    text-shadow: 0 0 10px var(--klar-primary), 0 0 20px var(--klar-primary);
+}
+
+/* Marquee styles for supported games */
+.marquee {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    padding: 2rem 0; /* Added padding to prevent clipping on hover */
+    -webkit-mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+    mask-image: linear-gradient(to right, transparent, white 20%, white 80%, transparent);
+}
+.marquee-content {
+    display: flex;
+    width: max-content;
+    animation: scroll 40s linear infinite; /* Increased speed */
+}
+/* Removed the general hover rule, JS will handle this now for cards only */
+@keyframes scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@media (max-width: 1024px) {
+    .marquee-content { animation-duration: 30s; } /* Increased speed */
+}
+@media (max-width: 768px) {
+    .marquee-content { animation-duration: 20s; } /* Increased speed */
+}
+
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toast-out {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+}
+
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes button-pop-in {
+    to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes tooltip-fade {
@@ -214,75 +337,40 @@ textarea.text-theme-primary {
     animation: hub-content-fade-in 0.3s ease-out forwards;
 }
 
-.preview-animation-container {
-    position: relative;
-    width: 250px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.scanner-line {
-    position: absolute;
-    top: 0;
-    left: -10%;
-    width: 10px;
-    height: 100%;
-    background-color: var(--klar-primary);
-    box-shadow: 0 0 15px 5px var(--klar-primary);
-    filter: blur(2px);
-    animation: scan 1.2s ease-in-out forwards;
-}
-
-@keyframes scan {
-    0% {
-        left: -10%;
-    }
-    50% {
-        left: 110%;
-        width: 40px;
-    }
-    100% {
-        left: 110%;
-        width: 10px;
-    }
-}
-
-html, body {
-    cursor: none;
-}
-
-a, button, .interactive-card, .faq-item, [role="button"], [onclick], input, select, textarea, svg {
-    cursor: none;
-}
-
-.cursor-dot {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 12px;
-    height: 12px;
-    background-color: white;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10000;
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-}
-
-.cursor-dot.hover {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 0.5;
-}
- 
+/* Scrollbar styles */
 body::-webkit-scrollbar { width: 8px; }
 body::-webkit-scrollbar-track { background: var(--background-dark, #121212); }
 body::-webkit-scrollbar-thumb { background-color: var(--klar-primary, #5586D6); border-radius: 4px; }
 body::-webkit-scrollbar-thumb:hover { background-color: var(--klar-light, #73a1e8); }
- 
+
 .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px;}
 .custom-scrollbar::-webkit-scrollbar-track { background: #111111; border-radius: 3px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4f4f4f; border-radius: 3px; }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #6f6f6f; }
+
+/* Snowflakes CSS */
+#snow-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.snowflake {
+    position: absolute;
+    top: -10px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(105vh);
+    }
+}
