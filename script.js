@@ -1,15 +1,12 @@
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-// --- ALL COMPONENTS DEFINED BEFORE App ---
 const SnowfallEffect = () => {
     useEffect(() => {
         const container = document.getElementById('snow-container');
         if (!container) return;
-
         const createSnowflake = () => {
             const snowflake = document.createElement('div');
             snowflake.className = 'snowflake';
-
             const size = Math.random() * 3 + 1;
             snowflake.style.width = `${size}px`;
             snowflake.style.height = `${size}px`;
@@ -18,22 +15,18 @@ const SnowfallEffect = () => {
             snowflake.style.animationDuration = `${duration}s`;
             const delay = Math.random() * -15;
             snowflake.style.animationDelay = `${delay}s`;
-
             container.appendChild(snowflake);
         };
-
         const snowflakeCount = 50;
         for (let i = 0; i < snowflakeCount; i++) {
             createSnowflake();
         }
-
         const setContainerHeight = () => {
             container.style.height = `${document.documentElement.scrollHeight}px`;
         };
         setContainerHeight();
         window.addEventListener('resize', setContainerHeight);
         window.addEventListener('load', setContainerHeight);
-
         return () => {
             window.removeEventListener('resize', setContainerHeight);
             window.removeEventListener('load', setContainerHeight);
@@ -164,15 +157,10 @@ const useActiveNav = (headerHeight) => {
 };
 
 const Logo = () => (
-    <a href="#home" className="cursor-pointer">
-        <img 
-            src="https://media.discordapp.net/attachments/1357439617313542319/1424119018213871656/download_1.png?ex=68e6be30&is=68e56cb0&hm=49c1a79f780f46f3fd7edf4a060719c7e66f4e1f182ba705893ce44b42f0c316&=&format=webp&quality=lossless" 
-            alt="Klar Hub Logo" 
-            className="h-8 w-auto" 
-        />
+    <a href="#home" className="cursor-pointer flex items-center gap-3 text-2xl font-bold text-theme-primary group">
+        <span className="text-white font-black text-4xl">K</span>
     </a>
 );
-
 
 const AuroraBackground = () => {
     const [spots] = useState(() =>
@@ -417,18 +405,18 @@ const TosModal = ({ onClose }) => {
     return (
         <Modal onClose={onClose}>
             {(handleClose) => (
-                   <div className="bg-gray-900/70 backdrop-blur-xl rounded-xl shadow-2xl shadow-black/50 w-full max-w-2xl border border-white/10">
-                       <div className="p-4 border-b border-white/10 flex justify-between items-center">
-                           <h3 className="text-xl font-bold text-theme-primary">Terms & Conditions</h3>
-                           <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close terms and conditions">&times;</button>
-                       </div>
-                       <div className="p-6 space-y-4 text-theme-secondary max-h-[70vh] overflow-y-auto custom-scrollbar">
-                           <p><strong className="text-theme-primary">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
-                           <p><strong className="text-theme-primary">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
-                           <p><strong className="text-theme-primary">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
-                           <p><strong className="text-theme-primary">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
-                       </div>
-                   </div>
+                <div className="bg-gray-900/70 backdrop-blur-xl rounded-xl shadow-2xl shadow-black/50 w-full max-w-2xl border border-white/10">
+                    <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                        <h3 className="text-xl font-bold text-theme-primary">Terms & Conditions</h3>
+                        <button onClick={handleClose} className="text-theme-secondary hover:text-theme-primary text-2xl" aria-label="Close terms and conditions">&times;</button>
+                    </div>
+                    <div className="p-6 space-y-4 text-theme-secondary max-h-[70vh] overflow-y-auto custom-scrollbar">
+                        <p><strong className="text-theme-primary">Refund Policy:</strong> All sales are final. Due to the digital nature of our products, we do not offer refunds once a purchase is completed. Please review all features and compatibility information before buying.</p>
+                        <p><strong className="text-theme-primary">License Agreement:</strong> Your license is for personal use only. Account or script sharing is strictly prohibited. Violation of this rule may result in a permanent suspension of your access without a refund.</p>
+                        <p><strong className="text-theme-primary">Software Use:</strong> Any attempt to reverse-engineer, decompile, or crack our software is a violation of these terms and applicable laws. We reserve the right to pursue appropriate action and terminate access for such activities.</p>
+                        <p><strong className="text-theme-primary">Disclaimer:</strong> Our software is provided 'as-is'. While we strive for 100% uptime and safety, we are not liable for any account actions or issues that may arise from its use. Use at your own discretion.</p>
+                    </div>
+                </div>
             )}
         </Modal>
     );
@@ -436,6 +424,19 @@ const TosModal = ({ onClose }) => {
 
 const ChangelogModal = ({ onClose }) => {
     const updates = [
+        {
+            version: "v0.03",
+            date: "Oct 13, 2025",
+            changes: [
+                {type: "NEW", text: "Added Auto Boot to Flag Football (Paid)."},
+                {type: "NEW", text: "Added TP To Endzone for Flag Football (Paid)."},
+                {type: "IMPROVEMENT", text: "Updated FF2 Anti-Cheat bypass for Zenith and Potassium (Paid & Free)."},
+                {type: "NEW", text: "Added Hump To Flag Football (Paid)."},
+                {type: "NEW", text: "Added Trash Talk to Flag Football (Paid)."},
+                {type: "NEW", text: "Added support for Free Flag Football."},
+                {type: "FIX", text: "Addressed and fixed several sources of lag."},
+            ]
+        },
         {
             version: "v0.02",
             date: "Oct 08, 2025",
@@ -624,7 +625,6 @@ const Footer = () => (
 );
 
 const App = () => {
-    // ... component state declarations ...
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [isAiHelperOpen, setIsAiHelperOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -636,8 +636,6 @@ const App = () => {
     const [freeKey, setFreeKey] = useState('');
     const [theme, setTheme] = useState(() => localStorage.getItem('klar-theme') || 'dark');
     const [isScrolled, setIsScrolled] = useState(false);
-    
-    // ... hooks and helper functions ...
     
     useEffect(() => {
         const preloader = document.getElementById('preloader');
@@ -786,11 +784,14 @@ const App = () => {
                                 <div className="flex items-center gap-2"><svg className="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg><span>Premium Quality</span></div>
                             </div>
                             <div className="mt-8 flex flex-col items-center justify-center gap-4">
-                               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                   <a href="#pricing" className="py-3 px-8 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white shadow-lg shadow-klar flex items-center gap-2 hero-button"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>Purchase Now</a>
-                                   <button onClick={() => setIsVideoModalOpen(true)} className="py-3 px-8 rounded-lg font-semibold text-center transition bg-transparent border border-theme text-theme-secondary hover:text-theme-primary hover:border-klar flex items-center gap-2 hero-button"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z" clipRule="evenodd" /></svg>Watch Demo</button>
-                               </div>
-                                <p className="text-lg text-theme-secondary mt-4">Join our active community on Discord!</p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                <a href="#pricing" className="py-3 px-8 rounded-lg font-semibold text-center transition bg-klar hover:bg-klar-light text-white shadow-lg shadow-klar flex items-center gap-2 hero-button"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>Purchase Now</a>
+                                <button onClick={() => setIsVideoModalOpen(true)} className="py-3 px-8 rounded-lg font-semibold text-center transition bg-transparent border border-theme text-theme-secondary hover:text-theme-primary hover:border-klar flex items-center gap-2 hero-button"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z" clipRule="evenodd" /></svg>Watch Demo</button>
+                            </div>
+                                <div className="relative group mt-4">
+                                    <p className="text-lg text-theme-secondary">Join our active community on Discord!</p>
+                                    <p className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-max text-theme-secondary font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300">crxsh is tuff</p>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -879,4 +880,3 @@ const App = () => {
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-
