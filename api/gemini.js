@@ -1,5 +1,6 @@
 export default async function handler(request, response) {
     if (request.method !== 'POST') {
+        response.setHeader('Allow', ['POST']);
         return response.status(405).json({ error: 'Method not allowed' });
     }
 
@@ -10,11 +11,18 @@ export default async function handler(request, response) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    if (!apiKey) {
+        console.error("GEMINI_API_KEY is not set in environment variables.");
+        return response.status(500).json({ error: 'Server configuration error.' });
+    }
+
+    // Updated model version to the correct preview date
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
     let onlineMembers = 'several'; // Default value
 
     try {
+        // Fetch Discord member count
         const discordRes = await fetch('https://discord.com/api/guilds/1357439616877072545/widget.json');
         if (discordRes.ok) {
             const discordData = await discordRes.json();
@@ -24,6 +32,7 @@ export default async function handler(request, response) {
         }
     } catch (e) {
         console.error("Could not fetch Discord member count:", e);
+        // Continue without failing the request
     }
 
     const systemPrompt = `You are Klaro, the friendly and helpful AI assistant for Klar Hub. Your purpose is to answer user questions about the scripts. There are currently ${onlineMembers} members online in the Discord.
@@ -53,10 +62,14 @@ export default async function handler(request, response) {
       
       When asked about prices, provide the relevant price clearly. Do not make up features. If you don't know an answer, politely say you don't have that information.`;
 
-    const contents = history.map(msg => ({
-        role: msg.role === 'ai' ? 'model' : 'user',
-        parts: [{ text: msg.text }]
-    }));
+    // Ensure history is an array and map it correctly
+    const contents = Array.isArray(history) 
+        ? history.map(msg => ({
+            role: msg.role === 'ai' ? 'model' : 'user',
+            parts: [{ text: msg.text }]
+        })) 
+        : [];
+        
     contents.push({ role: 'user', parts: [{ text: prompt }] });
 
     try {
@@ -70,8 +83,9 @@ export default async function handler(request, response) {
         });
 
         if (!geminiResponse.ok) {
-            console.error('Gemini API Error:', await geminiResponse.text());
-            return response.status(500).json({ error: 'Failed to fetch response from AI.' });
+            const errorText = await geminiResponse.text();
+            console.error('Gemini API Error:', errorText);
+            return response.status(geminiResponse.status).json({ error: 'Failed to fetch response from AI.', details: errorText });
         }
 
         const result = await geminiResponse.json();
@@ -80,7 +94,7 @@ export default async function handler(request, response) {
         if (text) {
             return response.status(200).json({ text });
         } else {
-            return response.status(500).json({ error: 'No response from AI.' });
+            return response.status(500).json({ error: 'No response text received from AI.' });
         }
     } catch (error) {
         console.error('Proxy Error:', error);
