@@ -425,6 +425,16 @@ const TosModal = ({ onClose }) => {
 const ChangelogModal = ({ onClose }) => {
     const updates = [
         {
+            version: "v0.04",
+            date: "Nov 18, 2025",
+            changes: [
+                {type: "NEW", text: "New UI implementation."},
+                {type: "FIX", text: "Fixed every issue related to bypasses for FF2 (Paid & Free)."},
+                {type: "FIX", text: "Resolved general stability bugs."},
+                {type: "NEW", text: "Added more free features."},
+            ]
+        },
+        {
             version: "v0.03",
             date: "Oct 13, 2025",
             changes: [
